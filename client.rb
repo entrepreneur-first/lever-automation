@@ -123,7 +123,7 @@ class Client
       summary[:assigned_to_job] += 1 if result['assigned_to_job']
       summary[:added_source_tag] += 1 if result['added_source_tag']
 
-      puts JSON.pretty_generate(summary) if summary[:opportunities] % 10 == 0
+      # puts JSON.pretty_generate(summary) if summary[:opportunities] % 100 == 0
       log(JSON.pretty_generate(summary)) if summary[:opportunities] % 500 == 0
       # break if summary[:opportunities] % 100 == 0
     }
@@ -136,8 +136,8 @@ class Client
   # apply changes & trigger webhook as necessary
   def process_opportunity(opp)
     result = {}
-    log('Processing Opportunity: ' + opp['id'])
-    log_prefix('| ')
+    # log('Processing Opportunity: ' + opp['id'])
+    log_prefix(opp['id'] + ': ')
 
     # checks lastInteractionAt and tag checksum, creating checksum tag if necessary
     last_update = latest_change(opp)
@@ -211,7 +211,7 @@ class Client
   end
   
   def send_webhook(opp, update_time)
-    log("Sending webhook - change detected for: " + opp["id"])
+    log("Sending webhook - change detected") #: " + opp["id"])
     OPPORTUNITY_CHANGED_WEBHOOK_URLS.each {|url|
       result = HTTParty.post(
         url,
@@ -449,7 +449,7 @@ class Client
   def add_tag(opp, tags, commit=false)
     tags = [tags] if tags.class != Array
     return queue_add_tag(opp, tags) if @batch_tag_updates && !commit
-    api_action_log("Adding tags: " + opp["id"] + ": " + tags.join(',')) do
+    api_action_log("Adding tags: " + tags.join(',')) do
       result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + '/addTags?' + to_query({ perform_as: LEVER_BOT_USER }),
         body: {
           tags: tags
@@ -467,7 +467,7 @@ class Client
   def remove_tag(opp, tags, commit=false)
     tags = [tags] if tags.class != Array
     return queue_remove_tag(opp, tags) if @batch_tag_updates && !commit
-    api_action_log("Removing tags: " + opp["id"] + ": " + tags.join(',')) do
+    api_action_log("Removing tags: " + tags.join(',')) do
       result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + '/removeTags?' + to_query({ perform_as: LEVER_BOT_USER }),
         body: {
           tags: tags
@@ -483,7 +483,7 @@ class Client
   end
   
   def add_note(opp, msg, timestamp=nil)
-    api_action_log("Adding note: " + opp["id"] + ": " + msg) do
+    api_action_log("Adding note: " + msg) do
       result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + '/notes?' + to_query({ perform_as: LEVER_BOT_USER }),
         body: {
           value: msg,
@@ -603,7 +603,7 @@ class Client
   end
 
   def add_candidate_to_posting(candidate_id, posting_id)
-    api_action_log("Adding candidate " + candidate_id + " to posting " + posting_id) do
+    api_action_log("Adding to posting " + posting_id) do
       result = HTTParty.post(API_URL + 'candidates/' + candidate_id + '/addPostings?' + to_query({
           perform_as: LEVER_BOT_USER
         }),
