@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-require "bundler/inline"
-gemfile true do
-  source "http://rubygems.org"
-  gem "httparty"
-end
 require "date"
 require "digest/md5"
 require_relative "client"
