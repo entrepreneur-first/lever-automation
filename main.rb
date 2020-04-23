@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
-require "date"
-require "digest/md5"
 require_relative "client"
-
 client = Client.new(ENV['LKEY'])
 
 loop do
