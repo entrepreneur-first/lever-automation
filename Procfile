@@ -1,1 +1,1 @@
-daemon: bundle exec ruby daemon.rb start --syslog
+daemon: bundle exec ruby daemon.rb start -t
