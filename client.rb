@@ -677,19 +677,19 @@ class Client
 
   def log(msg)
     msg = log_prefix_lines(msg)
-    puts msg
+    puts msg UNLESS ENV['LOG_FILE'].nil?
     @log.info(msg)
   end
 
   def warn(msg)
     msg = msg
-    puts log_prefix_lines("WARN: " + msg)
+    puts log_prefix_lines("WARN: " + msg) unless ENV['LOG_FILE'].nil?
     @log.warn(log_prefix_lines(msg))
   end
 
   def error(msg)
     msg = msg
-    puts log_prefix_lines("ERROR: " + msg)
+    puts log_prefix_lines("ERROR: " + msg) unless ENV['LOG_FILE'].nil?
     @log.error(log_prefix_lines(msg))
     @error_log.error(log_prefix_lines(msg))
   end
