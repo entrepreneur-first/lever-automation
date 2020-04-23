@@ -1,41 +1,47 @@
 # frozen_string_literal: true
 
 require "bundler/inline"
-
 gemfile true do
   source "http://rubygems.org"
   gem "httparty"
 end
-
+require "date"
+require "digest/md5"
 require_relative "client"
-require_relative "filter"
-require_relative "writer"
-require_relative "input"
 
-input = Input.new
-input.prompt
+client = Client.new(ENV['LKEY'])
 
-client = Client.new(input.api_key)
+loop do
+  puts "\nEnter 'summarise', 'process', or email to process one candidate:"
+  command = gets.chomp
 
- puts "\nEnter email:"
- email = gets.chomp
-# posting_id = "23bf8c07-b32e-483f-9007-1b9c2a004eb6"
-# client.assign_to_job(email, posting_id)
+  case command
+  when ''
+      break
+      
+  when 'summarise'
+      client.summarise_opportunities
+      
+  when 'process'
+      client.process_opportunities
+      
+  when 'fix tags'
+      client.fix_auto_assigned_tags
+  
+  when 'check links'
+      client.check_links
 
-puts JSON.pretty_generate(client.opportunities_for_contact(email))
+  else
+    email = command.gsub('mailto:', '')
+    command, email = command.split(' ') if command.include?(' ')
+    os = client.opportunities_for_contact(email)
+    case command
+    when 'view'
+      puts JSON.pretty_generate(os)
+    else
+      os.each { |opp| client.process_opportunity(opp) }
+    end
+  end
+end
 
-# client.opportunities_without_posting
-
-# Opportunities
-
-# raw_opportunities = Client.new(input.api_key).all_opportunities(input.posting_ids)
-# puts raw_opportunities.count
-# filtered_opportunities = Filter.new(raw_opportunities).opportunities
-# Writer.new("opportunities.csv", filtered_opportunities).run
-
-# Feedback
-
-# opportunities_ids = raw_opportunities.map { |opp| opp.fetch("id") }
-# raw_feedback = Client.new(input.api_key).feedback(opportunities_ids)
-# filtered_feedback = Filter.new(raw_feedback).feedback
-# Writer.new("feedback.csv", filtered_feedback).run
+puts 'OK, bye'

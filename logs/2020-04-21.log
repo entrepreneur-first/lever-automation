@@ -1,0 +1,486 @@
+# Logfile created on 2020-04-21 21:34:10 +0000 by logger.rb/61378
+INFO, 2020-04-21 21:34:13 +0000, Processing Opportunity: 6c9e7127-d23d-4c35-b129-df42e453a4c8
+INFO, 2020-04-21 21:34:13 +0000, Processing Opportunity: 75c149ae-d682-43e0-8c1b-0e9b7acebc86
+INFO, 2020-04-21 21:35:15 +0000, Processing Opportunity: 6c9e7127-d23d-4c35-b129-df42e453a4c8
+INFO, 2020-04-21 21:35:15 +0000, | Adding tag: 6c9e7127-d23d-4c35-b129-df42e453a4c8: 🤖 [bot] tag checksum: a8c6aeed01083184af3aaa3cd3926f7a
+INFO, 2020-04-21 21:35:15 +0000, Processing Opportunity: 75c149ae-d682-43e0-8c1b-0e9b7acebc86
+INFO, 2020-04-21 21:35:15 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] tag checksum: 9a5d0567ace4d4ea66ba049ca7043ad5
+INFO, 2020-04-21 21:35:15 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [auto] Source from application: Sourced
+INFO, 2020-04-21 21:35:16 +0000, | Adding note: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: Added tag 🤖 [auto] Source from application: Sourced
+|   because field "How did you hear about EF?"
+|   is "I was directly contacted by EF"
+INFO, 2020-04-21 21:35:16 +0000, | Removing tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] tag checksum: 9a5d0567ace4d4ea66ba049ca7043ad5
+INFO, 2020-04-21 21:35:16 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] tag checksum: a12e8dee4add25d2edd065962b7bfbc0
+INFO, 2020-04-21 21:35:17 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] last change detected: 2020-04-21 21:35:17 UTC
+INFO, 2020-04-21 21:35:17 +0000, | Sending webhook - change detected for: 75c149ae-d682-43e0-8c1b-0e9b7acebc86
+INFO, 2020-04-21 21:35:17 +0000, | Adding note: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 21:37:26 +0000, Processing Opportunity: 6c9e7127-d23d-4c35-b129-df42e453a4c8
+INFO, 2020-04-21 21:37:26 +0000, Processing Opportunity: 75c149ae-d682-43e0-8c1b-0e9b7acebc86
+INFO, 2020-04-21 21:40:24 +0000, Processing Opportunity: 6c9e7127-d23d-4c35-b129-df42e453a4c8
+INFO, 2020-04-21 21:40:24 +0000, Processing Opportunity: 75c149ae-d682-43e0-8c1b-0e9b7acebc86
+INFO, 2020-04-21 21:40:24 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [auto] self-reported source: Sourced
+INFO, 2020-04-21 21:40:25 +0000, | Adding note: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: Added tag 🤖 [auto] self-reported source: Sourced
+|   because field "How did you hear about EF?"
+|   is "I was directly contacted by EF"
+INFO, 2020-04-21 21:40:25 +0000, | Removing tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] tag checksum: a12e8dee4add25d2edd065962b7bfbc0
+INFO, 2020-04-21 21:40:25 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] tag checksum: 028c4a0fd0dd9c6affbc9502b11097f1
+INFO, 2020-04-21 21:40:25 +0000, | Removing tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] last change detected: 2020-04-21 21:35:17 UTC
+INFO, 2020-04-21 21:40:26 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] last change detected: 2020-04-21 21:40:25 UTC
+INFO, 2020-04-21 21:40:26 +0000, | Sending webhook - change detected for: 75c149ae-d682-43e0-8c1b-0e9b7acebc86
+INFO, 2020-04-21 21:40:26 +0000, | Adding note: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 21:42:27 +0000, Processing Opportunity: 6c9e7127-d23d-4c35-b129-df42e453a4c8
+INFO, 2020-04-21 21:42:27 +0000, Processing Opportunity: 75c149ae-d682-43e0-8c1b-0e9b7acebc86
+INFO, 2020-04-21 21:42:27 +0000, | Removing tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] tag checksum: 028c4a0fd0dd9c6affbc9502b11097f1
+INFO, 2020-04-21 21:42:27 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] tag checksum: 9a5d0567ace4d4ea66ba049ca7043ad5
+INFO, 2020-04-21 21:42:27 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [auto] self-reported source: Sourced
+INFO, 2020-04-21 21:42:28 +0000, | Adding note: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: Added tag 🤖 [auto] self-reported source: Sourced
+|   because field "How did you hear about EF?"
+|   is "I was directly contacted by EF"
+INFO, 2020-04-21 21:42:28 +0000, | Removing tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] tag checksum: 9a5d0567ace4d4ea66ba049ca7043ad5
+INFO, 2020-04-21 21:42:28 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] tag checksum: 99e79d9750af60ea602186b6f9ce48f1
+INFO, 2020-04-21 21:42:29 +0000, | Removing tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] last change detected: 2020-04-21 21:40:25 UTC
+INFO, 2020-04-21 21:42:29 +0000, | Adding tag: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: 🤖 [bot] last change detected: 2020-04-21 21:42:29 UTC
+INFO, 2020-04-21 21:42:29 +0000, | Sending webhook - change detected for: 75c149ae-d682-43e0-8c1b-0e9b7acebc86
+INFO, 2020-04-21 21:42:30 +0000, | Adding note: 75c149ae-d682-43e0-8c1b-0e9b7acebc86: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 21:42:50 +0000, Processing Opportunity: 6c9e7127-d23d-4c35-b129-df42e453a4c8
+INFO, 2020-04-21 21:42:50 +0000, Processing Opportunity: 75c149ae-d682-43e0-8c1b-0e9b7acebc86
+INFO, 2020-04-21 21:44:40 +0000, Processing Opportunity: 729c8cb1-b3dc-487e-987e-d89be7f09c89
+INFO, 2020-04-21 21:44:40 +0000, | Adding tag: 729c8cb1-b3dc-487e-987e-d89be7f09c89: 🤖 [bot] tag checksum: 8a8fb32d799810e5fc56f00160d180cd
+INFO, 2020-04-21 21:44:41 +0000, | Adding tag: 729c8cb1-b3dc-487e-987e-d89be7f09c89: 🤖 [bot] last change detected: 2020-04-20 02:04:03 UTC
+INFO, 2020-04-21 21:44:41 +0000, | Sending webhook - change detected for: 729c8cb1-b3dc-487e-987e-d89be7f09c89
+INFO, 2020-04-21 21:44:41 +0000, | Adding note: 729c8cb1-b3dc-487e-987e-d89be7f09c89: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 21:48:50 +0000, Processing Opportunity: 0049e829-8b4c-48df-9b43-946b75ba87f8
+INFO, 2020-04-21 21:48:50 +0000, | Adding tag: 0049e829-8b4c-48df-9b43-946b75ba87f8: 🤖 [bot] tag checksum: cf9e6660624fa329064221da7be3a1f3
+INFO, 2020-04-21 21:48:50 +0000, | Adding tag: 0049e829-8b4c-48df-9b43-946b75ba87f8: 🤖 [bot] last change detected: 2020-04-20 02:21:37 UTC
+INFO, 2020-04-21 21:48:51 +0000, | Sending webhook - change detected for: 0049e829-8b4c-48df-9b43-946b75ba87f8
+INFO, 2020-04-21 21:48:51 +0000, | Adding note: 0049e829-8b4c-48df-9b43-946b75ba87f8: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 21:49:56 +0000, Processing Opportunity: 0049e829-8b4c-48df-9b43-946b75ba87f8
+INFO, 2020-04-21 21:50:16 +0000, Processing Opportunity: 0049e829-8b4c-48df-9b43-946b75ba87f8
+INFO, 2020-04-21 21:50:33 +0000, Processing Opportunity: 0049e829-8b4c-48df-9b43-946b75ba87f8
+INFO, 2020-04-21 21:51:29 +0000, Processing Opportunity: 0049e829-8b4c-48df-9b43-946b75ba87f8
+INFO, 2020-04-21 22:00:26 +0000, Processing Opportunity: 0449e063-0982-4154-ae75-8950f2283272
+INFO, 2020-04-21 22:00:26 +0000, | Adding tag: 0449e063-0982-4154-ae75-8950f2283272: 🤖 [bot] tag checksum: 4f0a9ed70701f44315aa4cadd42f3af7
+INFO, 2020-04-21 22:00:26 +0000, | Adding tag: 0449e063-0982-4154-ae75-8950f2283272: 🤖 [bot] last change detected: 2020-04-20 02:25:55 UTC
+INFO, 2020-04-21 22:00:26 +0000, | Sending webhook - change detected for: 0449e063-0982-4154-ae75-8950f2283272
+INFO, 2020-04-21 22:00:26 +0000, | Adding note: 0449e063-0982-4154-ae75-8950f2283272: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:00:27 +0000, Processing Opportunity: 38a4f134-709a-4378-b34c-2b98732fde2a
+INFO, 2020-04-21 22:00:27 +0000, | Adding tag: 38a4f134-709a-4378-b34c-2b98732fde2a: 🤖 [bot] tag checksum: 101151c726e8db9d40c2db7a75fa6dc5
+INFO, 2020-04-21 22:00:27 +0000, | Adding tag: 38a4f134-709a-4378-b34c-2b98732fde2a: 🤖 [bot] last change detected: 2020-04-17 13:55:47 UTC
+INFO, 2020-04-21 22:00:27 +0000, | Sending webhook - change detected for: 38a4f134-709a-4378-b34c-2b98732fde2a
+INFO, 2020-04-21 22:00:28 +0000, | Adding note: 38a4f134-709a-4378-b34c-2b98732fde2a: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:01:44 +0000, Processing Opportunity: 0449e063-0982-4154-ae75-8950f2283272
+INFO, 2020-04-21 22:01:44 +0000, Processing Opportunity: 38a4f134-709a-4378-b34c-2b98732fde2a
+INFO, 2020-04-21 22:02:31 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:02:31 +0000, | Adding tag: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3: 🤖 [bot] tag checksum: 71b4899aedde25cae0ecf98a71d8d54e
+INFO, 2020-04-21 22:02:31 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:02:31 +0000, | Adding tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] tag checksum: 672a47805fa2667b3962ed21b1033c6c
+INFO, 2020-04-21 22:02:31 +0000, | Adding tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [auto] self-reported source: Offline-or-Organic
+INFO, 2020-04-21 22:02:31 +0000, | Adding note: fe90ec26-b0f2-4497-859d-1c1ba74e4065: Added tag 🤖 [auto] self-reported source: Offline-or-Organic
+|   because field "How did you hear about EF?"
+|   is "I came across EF on my own"
+INFO, 2020-04-21 22:02:32 +0000, | Removing tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] tag checksum: 672a47805fa2667b3962ed21b1033c6c
+INFO, 2020-04-21 22:02:32 +0000, | Adding tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] tag checksum: 07fb5c55208e5d2aa524a3b60c24845b
+INFO, 2020-04-21 22:02:32 +0000, | Adding tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] last change detected: 2020-04-21 22:02:32 UTC
+INFO, 2020-04-21 22:02:32 +0000, | Sending webhook - change detected for: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:02:33 +0000, | Adding note: fe90ec26-b0f2-4497-859d-1c1ba74e4065: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 22:02:33 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:02:33 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: 57c2596a82692816f9dc5ceed7e9ec5a
+INFO, 2020-04-21 22:02:33 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [auto] self-reported source: Offline-or-Organic
+INFO, 2020-04-21 22:02:34 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Added tag 🤖 [auto] self-reported source: Offline-or-Organic
+|   because field "How did you hear about EF?"
+|   is "I came across EF on my own"
+INFO, 2020-04-21 22:02:34 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: 57c2596a82692816f9dc5ceed7e9ec5a
+INFO, 2020-04-21 22:02:34 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: a2a789b52f14b983ea54272f6380360a
+INFO, 2020-04-21 22:02:34 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:02:34 UTC
+INFO, 2020-04-21 22:02:35 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:02:35 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 22:03:36 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:03:36 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:03:36 +0000, | Removing tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] last change detected: 2020-04-21 22:02:32 UTC
+INFO, 2020-04-21 22:03:36 +0000, | Adding tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] last change detected: 2020-04-21 22:02:33 UTC
+INFO, 2020-04-21 22:03:36 +0000, | Sending webhook - change detected for: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:03:36 +0000, | Adding note: fe90ec26-b0f2-4497-859d-1c1ba74e4065: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:03:37 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:03:37 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:02:34 UTC
+INFO, 2020-04-21 22:03:37 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:02:35 UTC
+INFO, 2020-04-21 22:03:37 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:03:38 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:03:48 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:03:48 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:03:48 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:03:56 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:03:56 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:03:56 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:08:03 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:08:03 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:08:03 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:08:36 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:08:36 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:08:36 +0000, | Removing tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] tag checksum: 07fb5c55208e5d2aa524a3b60c24845b
+INFO, 2020-04-21 22:08:37 +0000, | Adding tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] tag checksum: 672a47805fa2667b3962ed21b1033c6c
+INFO, 2020-04-21 22:08:37 +0000, | Adding tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [auto] self-reported source: Offline-or-Organic
+INFO, 2020-04-21 22:08:37 +0000, | Adding note: fe90ec26-b0f2-4497-859d-1c1ba74e4065: Added tag 🤖 [auto] self-reported source: Offline-or-Organic
+|   because field "How did you hear about EF?"
+|   is "I came across EF on my own"
+INFO, 2020-04-21 22:08:37 +0000, | Removing tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] tag checksum: 672a47805fa2667b3962ed21b1033c6c
+INFO, 2020-04-21 22:08:38 +0000, | Adding tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] tag checksum: 07fb5c55208e5d2aa524a3b60c24845b
+INFO, 2020-04-21 22:08:38 +0000, | Sending webhook - change detected for: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:08:38 +0000, | Adding note: fe90ec26-b0f2-4497-859d-1c1ba74e4065: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 22:08:39 +0000, | Removing tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] last change detected: 2020-04-21 22:02:33 UTC
+INFO, 2020-04-21 22:08:39 +0000, | Adding tag: fe90ec26-b0f2-4497-859d-1c1ba74e4065: 🤖 [bot] last change detected: 2020-04-21 22:08:39 UTC
+INFO, 2020-04-21 22:08:39 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:08:39 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: a2a789b52f14b983ea54272f6380360a
+INFO, 2020-04-21 22:08:40 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: 57c2596a82692816f9dc5ceed7e9ec5a
+INFO, 2020-04-21 22:08:40 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [auto] self-reported source: Offline-or-Organic
+INFO, 2020-04-21 22:08:40 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Added tag 🤖 [auto] self-reported source: Offline-or-Organic
+|   because field "How did you hear about EF?"
+|   is "I came across EF on my own"
+INFO, 2020-04-21 22:08:41 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: 57c2596a82692816f9dc5ceed7e9ec5a
+INFO, 2020-04-21 22:08:41 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: a2a789b52f14b983ea54272f6380360a
+INFO, 2020-04-21 22:08:41 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:08:42 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 22:08:42 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:02:35 UTC
+INFO, 2020-04-21 22:08:43 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:08:42 UTC
+INFO, 2020-04-21 22:09:09 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:09:09 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:09:09 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:09:09 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:09:09 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:09:10 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:08:42 UTC
+INFO, 2020-04-21 22:09:10 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:09:10 UTC
+INFO, 2020-04-21 22:11:15 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:11:15 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:11:15 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:16:13 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:16:13 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:16:13 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:16:13 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: a2a789b52f14b983ea54272f6380360a
+INFO, 2020-04-21 22:16:13 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: 57c2596a82692816f9dc5ceed7e9ec5a
+INFO, 2020-04-21 22:16:13 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [auto] self-reported source: Offline-or-Organic
+INFO, 2020-04-21 22:16:13 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Added tag 🤖 [auto] self-reported source: Offline-or-Organic
+|   because field "How did you hear about EF?"
+|   is "I came across EF on my own"
+INFO, 2020-04-21 22:16:14 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: 57c2596a82692816f9dc5ceed7e9ec5a
+INFO, 2020-04-21 22:16:14 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: a2a789b52f14b983ea54272f6380360a
+INFO, 2020-04-21 22:16:14 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:16:15 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 22:16:15 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:09:10 UTC
+INFO, 2020-04-21 22:16:16 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:16:15 UTC
+INFO, 2020-04-21 22:16:49 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:16:49 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:16:49 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:16:49 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:16:50 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:16:50 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:16:15 UTC
+INFO, 2020-04-21 22:16:51 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:16:50 UTC
+INFO, 2020-04-21 22:19:05 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:19:45 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:19:45 +0000, | {:time=>1586761687686, :source=>"a new interaction"}
+INFO, 2020-04-21 22:19:45 +0000, | 1586761687686
+INFO, 2020-04-21 22:19:45 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:19:45 +0000, | {:time=>1587506918995, :source=>"a new interaction"}
+INFO, 2020-04-21 22:19:45 +0000, | 1587506919000
+INFO, 2020-04-21 22:19:45 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:19:45 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: a2a789b52f14b983ea54272f6380360a
+INFO, 2020-04-21 22:19:46 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: 57c2596a82692816f9dc5ceed7e9ec5a
+INFO, 2020-04-21 22:19:46 +0000, | {:time=>1587507586000, :source=>"tags updated"}
+INFO, 2020-04-21 22:19:46 +0000, | 1587507410000
+INFO, 2020-04-21 22:19:46 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [auto] self-reported source: Offline-or-Organic
+INFO, 2020-04-21 22:19:46 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Added tag 🤖 [auto] self-reported source: Offline-or-Organic
+|   because field "How did you hear about EF?"
+|   is "I came across EF on my own"
+INFO, 2020-04-21 22:19:47 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: 57c2596a82692816f9dc5ceed7e9ec5a
+INFO, 2020-04-21 22:19:47 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] tag checksum: a2a789b52f14b983ea54272f6380360a
+INFO, 2020-04-21 22:19:48 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:19:48 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 22:19:48 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:16:50 UTC
+INFO, 2020-04-21 22:19:49 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:19:48 UTC
+INFO, 2020-04-21 22:20:01 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:20:01 +0000, | {:time=>1586761687686, :source=>"a new interaction"}
+INFO, 2020-04-21 22:20:01 +0000, | 1586761687686
+INFO, 2020-04-21 22:20:01 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:20:01 +0000, | {:time=>1587506918995, :source=>"a new interaction"}
+INFO, 2020-04-21 22:20:01 +0000, | 1587506919000
+INFO, 2020-04-21 22:20:01 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:20:01 +0000, | {:time=>1587507588614, :source=>"a new interaction"}
+INFO, 2020-04-21 22:20:01 +0000, | 1587507588000
+INFO, 2020-04-21 22:20:01 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:20:02 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:20:02 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:19:48 UTC
+INFO, 2020-04-21 22:20:03 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:20:02 UTC
+INFO, 2020-04-21 22:23:24 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:23:24 +0000, | {:time=>1586761687686, :source=>"a new interaction"}
+INFO, 2020-04-21 22:23:24 +0000, | 1586761687686
+INFO, 2020-04-21 22:23:24 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:23:24 +0000, | {:time=>1587506918995, :source=>"a new interaction"}
+INFO, 2020-04-21 22:23:24 +0000, | 1587506919000
+INFO, 2020-04-21 22:23:24 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:23:24 +0000, | {:time=>1587507602510, :source=>"a new interaction"}
+INFO, 2020-04-21 22:23:24 +0000, | 1587507602000
+INFO, 2020-04-21 22:23:24 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:23:25 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:23:25 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:20:02 UTC
+INFO, 2020-04-21 22:23:26 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:23:25 UTC
+INFO, 2020-04-21 22:23:38 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:23:38 +0000, | {:time=>1586761687686, :source=>"a new interaction"}
+INFO, 2020-04-21 22:23:38 +0000, | 1586761687686
+INFO, 2020-04-21 22:23:38 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:23:38 +0000, | {:time=>1587506918995, :source=>"a new interaction"}
+INFO, 2020-04-21 22:23:38 +0000, | 1587506919000
+INFO, 2020-04-21 22:23:38 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:23:38 +0000, | {:time=>1587507805525, :source=>"a new interaction"}
+INFO, 2020-04-21 22:23:38 +0000, | 1587507805000
+INFO, 2020-04-21 22:23:38 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:23:38 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:23:38 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:23:25 UTC
+INFO, 2020-04-21 22:23:39 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:23:38 UTC
+INFO, 2020-04-21 22:23:55 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:23:55 +0000, | {:time=>1586761687686, :source=>"a new interaction"}
+INFO, 2020-04-21 22:23:55 +0000, | 1586761687686
+INFO, 2020-04-21 22:23:55 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:23:55 +0000, | {:time=>1587506918995, :source=>"a new interaction"}
+INFO, 2020-04-21 22:23:55 +0000, | 1587506919000
+INFO, 2020-04-21 22:23:55 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:23:55 +0000, | {:time=>1587507818677, :source=>"a new interaction"}
+INFO, 2020-04-21 22:23:55 +0000, | 1587507818000
+INFO, 2020-04-21 22:23:55 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:23:55 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:23:55 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:23:38 UTC
+INFO, 2020-04-21 22:23:56 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:23:55 UTC
+INFO, 2020-04-21 22:24:02 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:24:02 +0000, | {:time=>1586761687686, :source=>"a new interaction"}
+INFO, 2020-04-21 22:24:02 +0000, | 1586761687686
+INFO, 2020-04-21 22:24:02 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:24:02 +0000, | {:time=>1587506918995, :source=>"a new interaction"}
+INFO, 2020-04-21 22:24:02 +0000, | 1587506919000
+INFO, 2020-04-21 22:24:02 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:24:02 +0000, | {:time=>1587507835666, :source=>"a new interaction"}
+INFO, 2020-04-21 22:24:02 +0000, | 1587507835000
+INFO, 2020-04-21 22:24:02 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:24:03 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:24:03 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:23:55 UTC
+INFO, 2020-04-21 22:24:03 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:24:03 UTC
+INFO, 2020-04-21 22:35:35 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:35:35 +0000, | {:time=>1586761687686, :source=>"a new interaction"}
+INFO, 2020-04-21 22:35:35 +0000, | 1586761687686
+INFO, 2020-04-21 22:35:35 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:35:35 +0000, | {:time=>1587506918995, :source=>"a new interaction"}
+INFO, 2020-04-21 22:35:35 +0000, | 1587506919000
+INFO, 2020-04-21 22:35:35 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:35:35 +0000, | {:time=>1587507843333, :source=>"a new interaction"}
+INFO, 2020-04-21 22:35:35 +0000, | 1587507843000
+INFO, 2020-04-21 22:35:35 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:35:36 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:35:36 +0000, | {"data"=>{"id"=>"711752c2-37bd-4f25-a88d-4eb1952f0a29", "name"=>"Saikumar Panchala", "contact"=>"90ceacb4-6e18-4f32-b600-94cfc7656877", "headline"=>"Robotics Club, Sathyabama University", "stage"=>"0db63e4b-7448-49fb-864d-ed2a2bae9648", "location"=>"Noida, UTTAR PRADESH", "phones"=>[{"type"=>"other", "value"=>"9705914393"}, {"type"=>"mobile", "value"=>"+91-9705914393"}], "emails"=>["saikumar.panchala.pgdm21@iilmgsm.ac.in"], "links"=>["http://www.linkedin.com/in/sai-kumar-panchala-77b80018b"], "archived"=>nil, "tags"=>["EF Bangalore Cohort (July 2020)", "BA4", "Bangalore", "EF Cohort", "Full-time Permanent", "Ashwin", "\u{1F916} [auto] self-reported source: Offline-or-Organic", "\u{1F916} [bot] tag checksum: a2a789b52f14b983ea54272f6380360a", "\u{1F916} [bot] last change detected: 2020-04-21 22:24:03 UTC"], "sources"=>["Organic"], "stageChanges"=>[{"toStageId"=>"applicant-new", "toStageIndex"=>9, "updatedAt"=>1586673385409}, {"toStageId"=>"76b1d300-3e5c-467c-a6cf-7d55b8073a34", "toStageIndex"=>10, "updatedAt"=>1586788197844, "userId"=>"d202fb11-a9cc-49b3-91b1-c25e71a4698b"}, {"toStageId"=>"0db63e4b-7448-49fb-864d-ed2a2bae9648", "toStageIndex"=>26, "updatedAt"=>1587315562590, "userId"=>"d202fb11-a9cc-49b3-91b1-c25e71a4698b"}], "origin"=>"applied", "sourcedBy"=>nil, "owner"=>"d202fb11-a9cc-49b3-91b1-c25e71a4698b", "followers"=>["d202fb11-a9cc-49b3-91b1-c25e71a4698b", "89fa1bd8-ac8f-4db5-8bad-8a2d32576671", "011386a9-a295-4d9f-b9c6-2e74b9b9879f", "066d13f6-502a-4e58-b489-33f4d3842d2e", "c9bbc933-6a5c-4777-8d24-8ba7b8f4e27d", "937a5cf8-799f-4230-826e-68cb2a6e74ca", "e6414a92-e785-46eb-ad30-181c18db19b5"], "applications"=>["da7ad7d9-7dac-4290-9e06-c7e44c2ed4f1"], "createdAt"=>1586673385409, "lastInteractionAt"=>1587508536519, "lastAdvancedAt"=>1587315562590, "snoozedUntil"=>nil, "urls"=>{"list"=>"https://hire.lever.co/candidates", "show"=>"https://hire.lever.co/candidates/711752c2-37bd-4f25-a88d-4eb1952f0a29"}, "isAnonymized"=>false, "dataProtection"=>{"store"=>{"allowed"=>true, "expiresAt"=>nil}, "contact"=>{"allowed"=>true, "expiresAt"=>nil}}}}
+INFO, 2020-04-21 22:35:36 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:24:03 UTC
+INFO, 2020-04-21 22:35:37 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:35:36 UTC
+INFO, 2020-04-21 22:37:53 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:37:53 +0000, | {:time=>1586761687686, :source=>"a new interaction"}
+INFO, 2020-04-21 22:37:53 +0000, | 1586761687686
+INFO, 2020-04-21 22:37:53 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:37:53 +0000, | {:time=>1587506918995, :source=>"a new interaction"}
+INFO, 2020-04-21 22:37:53 +0000, | 1587506919000
+INFO, 2020-04-21 22:37:53 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:37:53 +0000, | {:time=>1587508536519, :source=>"a new interaction"}
+INFO, 2020-04-21 22:37:53 +0000, | 1587508536000
+INFO, 2020-04-21 22:37:53 +0000, | Sending webhook - change detected for: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:37:53 +0000, | Adding note: 711752c2-37bd-4f25-a88d-4eb1952f0a29: Updated reporting data after detecting a new interaction
+INFO, 2020-04-21 22:37:54 +0000, | {"id"=>"711752c2-37bd-4f25-a88d-4eb1952f0a29", "name"=>"Saikumar Panchala", "contact"=>"90ceacb4-6e18-4f32-b600-94cfc7656877", "headline"=>"Robotics Club, Sathyabama University", "stage"=>"0db63e4b-7448-49fb-864d-ed2a2bae9648", "location"=>"Noida, UTTAR PRADESH", "phones"=>[{"type"=>"other", "value"=>"9705914393"}, {"type"=>"mobile", "value"=>"+91-9705914393"}], "emails"=>["saikumar.panchala.pgdm21@iilmgsm.ac.in"], "links"=>["http://www.linkedin.com/in/sai-kumar-panchala-77b80018b"], "archived"=>nil, "tags"=>["EF Bangalore Cohort (July 2020)", "BA4", "Bangalore", "EF Cohort", "Full-time Permanent", "Ashwin", "\u{1F916} [auto] self-reported source: Offline-or-Organic", "\u{1F916} [bot] tag checksum: a2a789b52f14b983ea54272f6380360a", "\u{1F916} [bot] last change detected: 2020-04-21 22:35:36 UTC"], "sources"=>["Organic"], "stageChanges"=>[{"toStageId"=>"applicant-new", "toStageIndex"=>9, "updatedAt"=>1586673385409}, {"toStageId"=>"76b1d300-3e5c-467c-a6cf-7d55b8073a34", "toStageIndex"=>10, "updatedAt"=>1586788197844, "userId"=>"d202fb11-a9cc-49b3-91b1-c25e71a4698b"}, {"toStageId"=>"0db63e4b-7448-49fb-864d-ed2a2bae9648", "toStageIndex"=>26, "updatedAt"=>1587315562590, "userId"=>"d202fb11-a9cc-49b3-91b1-c25e71a4698b"}], "origin"=>"applied", "sourcedBy"=>nil, "owner"=>"d202fb11-a9cc-49b3-91b1-c25e71a4698b", "followers"=>["d202fb11-a9cc-49b3-91b1-c25e71a4698b", "89fa1bd8-ac8f-4db5-8bad-8a2d32576671", "011386a9-a295-4d9f-b9c6-2e74b9b9879f", "066d13f6-502a-4e58-b489-33f4d3842d2e", "c9bbc933-6a5c-4777-8d24-8ba7b8f4e27d", "937a5cf8-799f-4230-826e-68cb2a6e74ca", "e6414a92-e785-46eb-ad30-181c18db19b5"], "applications"=>["da7ad7d9-7dac-4290-9e06-c7e44c2ed4f1"], "createdAt"=>1586673385409, "lastInteractionAt"=>1587508674224, "lastAdvancedAt"=>1587315562590, "snoozedUntil"=>nil, "urls"=>{"list"=>"https://hire.lever.co/candidates", "show"=>"https://hire.lever.co/candidates/711752c2-37bd-4f25-a88d-4eb1952f0a29"}, "isAnonymized"=>false, "dataProtection"=>{"store"=>{"allowed"=>true, "expiresAt"=>nil}, "contact"=>{"allowed"=>true, "expiresAt"=>nil}}}
+INFO, 2020-04-21 22:37:54 +0000, | Removing tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:35:36 UTC
+INFO, 2020-04-21 22:37:55 +0000, | Adding tag: 711752c2-37bd-4f25-a88d-4eb1952f0a29: 🤖 [bot] last change detected: 2020-04-21 22:37:55 UTC
+INFO, 2020-04-21 22:38:06 +0000, Processing Opportunity: dc88a8f5-b2e9-4a1b-864d-2645a663c7b3
+INFO, 2020-04-21 22:38:06 +0000, | {:time=>1586761687686, :source=>"a new interaction"}
+INFO, 2020-04-21 22:38:06 +0000, | 1586761687686
+INFO, 2020-04-21 22:38:06 +0000, Processing Opportunity: fe90ec26-b0f2-4497-859d-1c1ba74e4065
+INFO, 2020-04-21 22:38:06 +0000, | {:time=>1587506918995, :source=>"a new interaction"}
+INFO, 2020-04-21 22:38:06 +0000, | 1587506919000
+INFO, 2020-04-21 22:38:06 +0000, Processing Opportunity: 711752c2-37bd-4f25-a88d-4eb1952f0a29
+INFO, 2020-04-21 22:38:06 +0000, | {:time=>1587508674224, :source=>"a new interaction"}
+INFO, 2020-04-21 22:38:06 +0000, | 1587508675000
+INFO, 2020-04-21 22:40:47 +0000, Processing Opportunity: 9badd95c-e856-4da1-b326-5f0ca3beda04
+INFO, 2020-04-21 22:40:47 +0000, | Adding tag: 9badd95c-e856-4da1-b326-5f0ca3beda04: 🤖 [bot] tag checksum: 71b4899aedde25cae0ecf98a71d8d54e
+INFO, 2020-04-21 22:40:47 +0000, Processing Opportunity: f653f49f-eb16-4953-bc22-db5bb05734a8
+INFO, 2020-04-21 22:40:47 +0000, | Adding tag: f653f49f-eb16-4953-bc22-db5bb05734a8: 🤖 [bot] tag checksum: 672a47805fa2667b3962ed21b1033c6c
+INFO, 2020-04-21 22:40:48 +0000, | Adding tag: f653f49f-eb16-4953-bc22-db5bb05734a8: 🤖 [auto] self-reported source: Offline-or-Organic
+INFO, 2020-04-21 22:40:48 +0000, | Adding note: f653f49f-eb16-4953-bc22-db5bb05734a8: Added tag 🤖 [auto] self-reported source: Offline-or-Organic
+|   because field "How did you hear about EF?"
+|   is "I came across EF on my own"
+INFO, 2020-04-21 22:40:48 +0000, | Removing tag: f653f49f-eb16-4953-bc22-db5bb05734a8: 🤖 [bot] tag checksum: 672a47805fa2667b3962ed21b1033c6c
+INFO, 2020-04-21 22:40:48 +0000, | Adding tag: f653f49f-eb16-4953-bc22-db5bb05734a8: 🤖 [bot] tag checksum: 07fb5c55208e5d2aa524a3b60c24845b
+INFO, 2020-04-21 22:40:49 +0000, | Sending webhook - change detected for: f653f49f-eb16-4953-bc22-db5bb05734a8
+INFO, 2020-04-21 22:40:49 +0000, | Adding note: f653f49f-eb16-4953-bc22-db5bb05734a8: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 22:40:50 +0000, | Adding tag: f653f49f-eb16-4953-bc22-db5bb05734a8: 🤖 [bot] last change detected: 2020-04-21 22:40:50 UTC
+INFO, 2020-04-21 22:40:56 +0000, Processing Opportunity: 9badd95c-e856-4da1-b326-5f0ca3beda04
+INFO, 2020-04-21 22:40:56 +0000, Processing Opportunity: f653f49f-eb16-4953-bc22-db5bb05734a8
+INFO, 2020-04-21 22:42:17 +0000, Processing Opportunity: 6c9e7127-d23d-4c35-b129-df42e453a4c8
+INFO, 2020-04-21 22:42:17 +0000, Processing Opportunity: 75c149ae-d682-43e0-8c1b-0e9b7acebc86
+INFO, 2020-04-21 22:42:49 +0000, Processing Opportunity: 712e7331-3374-4b0f-b806-1f98b4711195
+INFO, 2020-04-21 22:42:49 +0000, | Adding tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [bot] tag checksum: c087d62f3b6f639ec9318b3c3253e52a
+INFO, 2020-04-21 22:42:49 +0000, | Removing tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [auto] no location tag detected
+INFO, 2020-04-21 22:42:50 +0000, | Adding tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [auto] auto-assigned to cohort: bangalore
+INFO, 2020-04-21 22:42:50 +0000, | Adding tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [auto] auto-assigned to cohort
+INFO, 2020-04-21 22:42:50 +0000, | Adding note: 712e7331-3374-4b0f-b806-1f98b4711195: Assigned to cohort job: bangalore based on tags
+INFO, 2020-04-21 22:42:51 +0000, | Adding candidate 712e7331-3374-4b0f-b806-1f98b4711195 to posting 23bf8c07-b32e-483f-9007-1b9c2a004eb6
+INFO, 2020-04-21 22:42:51 +0000, | Removing tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [bot] tag checksum: c087d62f3b6f639ec9318b3c3253e52a
+INFO, 2020-04-21 22:42:52 +0000, | Adding tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [bot] tag checksum: c943f7de3320c7d1fe941caa3043f16a
+INFO, 2020-04-21 22:42:52 +0000, | Sending webhook - change detected for: 712e7331-3374-4b0f-b806-1f98b4711195
+INFO, 2020-04-21 22:42:52 +0000, | Adding note: 712e7331-3374-4b0f-b806-1f98b4711195: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 22:42:53 +0000, | Adding tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [bot] last change detected: 2020-04-21 22:42:53 UTC
+INFO, 2020-04-21 22:43:27 +0000, Processing Opportunity: 712e7331-3374-4b0f-b806-1f98b4711195
+INFO, 2020-04-21 22:43:27 +0000, | Removing tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [bot] tag checksum: c943f7de3320c7d1fe941caa3043f16a
+INFO, 2020-04-21 22:43:27 +0000, | Adding tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [bot] tag checksum: 9eba98a5383532c89686b56185d756c5
+INFO, 2020-04-21 22:43:28 +0000, | Sending webhook - change detected for: 712e7331-3374-4b0f-b806-1f98b4711195
+INFO, 2020-04-21 22:43:28 +0000, | Adding note: 712e7331-3374-4b0f-b806-1f98b4711195: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 22:43:29 +0000, | Removing tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [bot] last change detected: 2020-04-21 22:42:53 UTC
+INFO, 2020-04-21 22:43:29 +0000, | Adding tag: 712e7331-3374-4b0f-b806-1f98b4711195: 🤖 [bot] last change detected: 2020-04-21 22:43:29 UTC
+INFO, 2020-04-21 22:43:37 +0000, Processing Opportunity: 712e7331-3374-4b0f-b806-1f98b4711195
+INFO, 2020-04-21 23:02:26 +0000, Processing Opportunity: 23615666-a856-460f-a935-2338bb345311
+INFO, 2020-04-21 23:02:26 +0000, | Adding tag: 23615666-a856-460f-a935-2338bb345311: 🤖 [bot] tag checksum: c087d62f3b6f639ec9318b3c3253e52a
+INFO, 2020-04-21 23:02:26 +0000, | Adding tag: 23615666-a856-460f-a935-2338bb345311: 🤖 [auto] auto-assigned to cohort: bangalore
+INFO, 2020-04-21 23:02:26 +0000, | Adding tag: 23615666-a856-460f-a935-2338bb345311: 🤖 [auto] auto-assigned to cohort
+INFO, 2020-04-21 23:02:26 +0000, | Adding note: 23615666-a856-460f-a935-2338bb345311: Assigned to cohort job: bangalore based on tags
+INFO, 2020-04-21 23:02:27 +0000, | Adding candidate 23615666-a856-460f-a935-2338bb345311 to posting 23bf8c07-b32e-483f-9007-1b9c2a004eb6
+INFO, 2020-04-21 23:02:27 +0000, | Removing tag: 23615666-a856-460f-a935-2338bb345311: 🤖 [bot] tag checksum: c087d62f3b6f639ec9318b3c3253e52a
+INFO, 2020-04-21 23:02:28 +0000, | Adding tag: 23615666-a856-460f-a935-2338bb345311: 🤖 [bot] tag checksum: 9eba98a5383532c89686b56185d756c5
+INFO, 2020-04-21 23:02:28 +0000, | Sending webhook - change detected for: 23615666-a856-460f-a935-2338bb345311
+INFO, 2020-04-21 23:02:28 +0000, | Adding note: 23615666-a856-460f-a935-2338bb345311: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 23:02:29 +0000, | Adding tag: 23615666-a856-460f-a935-2338bb345311: 🤖 [bot] last change detected: 2020-04-21 23:02:29 UTC
+INFO, 2020-04-21 23:28:41 +0000, Processing Opportunity: 19034040-4f2e-487f-92c9-145ab0d0a77d
+INFO, 2020-04-21 23:28:41 +0000, | Adding tag: 19034040-4f2e-487f-92c9-145ab0d0a77d: 🤖 [bot] tag checksum: 377d009a7bd0a72c16985d4559c3cbb7
+INFO, 2020-04-21 23:28:42 +0000, | Adding tag: 19034040-4f2e-487f-92c9-145ab0d0a77d: 🤖 [auto] auto-assigned to cohort: bangalore
+INFO, 2020-04-21 23:28:42 +0000, | Adding tag: 19034040-4f2e-487f-92c9-145ab0d0a77d: 🤖 [auto] auto-assigned to cohort
+INFO, 2020-04-21 23:28:42 +0000, | Adding candidate 19034040-4f2e-487f-92c9-145ab0d0a77d to posting 23bf8c07-b32e-483f-9007-1b9c2a004eb6
+INFO, 2020-04-21 23:28:43 +0000, | Removing tag: 19034040-4f2e-487f-92c9-145ab0d0a77d: 🤖 [bot] tag checksum: 377d009a7bd0a72c16985d4559c3cbb7
+INFO, 2020-04-21 23:28:43 +0000, | Adding tag: 19034040-4f2e-487f-92c9-145ab0d0a77d: 🤖 [bot] tag checksum: 2dd66eb04d78d180518f5ebb7daf2de4
+INFO, 2020-04-21 23:28:44 +0000, | Sending webhook - change detected for: 19034040-4f2e-487f-92c9-145ab0d0a77d
+INFO, 2020-04-21 23:28:44 +0000, | Adding note: 19034040-4f2e-487f-92c9-145ab0d0a77d: Updated reporting data after detecting tags updated
+INFO, 2020-04-21 23:28:45 +0000, | Adding tag: 19034040-4f2e-487f-92c9-145ab0d0a77d: 🤖 [bot] last change detected: 2020-04-21 23:28:45 UTC
+INFO, 2020-04-21 23:28:52 +0000, Processing Opportunity: 19034040-4f2e-487f-92c9-145ab0d0a77d
+INFO, 2020-04-21 23:33:50 +0000, Processing Opportunity: c9d42519-d649-4804-b9ce-cb99e8c9e732
+INFO, 2020-04-21 23:33:50 +0000, | Adding tag: c9d42519-d649-4804-b9ce-cb99e8c9e732: 🤖 [bot] tag checksum: 8bf6b77e5efbc10a557d6072ce26c325
+INFO, 2020-04-21 23:33:50 +0000, | Adding tag: c9d42519-d649-4804-b9ce-cb99e8c9e732: 🤖 [auto] auto-assigned to cohort: bangalore
+INFO, 2020-04-21 23:33:51 +0000, | Adding tag: c9d42519-d649-4804-b9ce-cb99e8c9e732: 🤖 [auto] auto-assigned to cohort
+INFO, 2020-04-21 23:33:51 +0000, | Adding candidate c9d42519-d649-4804-b9ce-cb99e8c9e732 to posting 23bf8c07-b32e-483f-9007-1b9c2a004eb6
+INFO, 2020-04-21 23:33:51 +0000, | Removing tag: c9d42519-d649-4804-b9ce-cb99e8c9e732: 🤖 [bot] tag checksum: 8bf6b77e5efbc10a557d6072ce26c325
+INFO, 2020-04-21 23:33:52 +0000, | Adding tag: c9d42519-d649-4804-b9ce-cb99e8c9e732: 🤖 [bot] tag checksum: c2423ab10b7fdb3c72f445085b60a3e8
+INFO, 2020-04-21 23:33:52 +0000, | Sending webhook - change detected for: c9d42519-d649-4804-b9ce-cb99e8c9e732
+INFO, 2020-04-21 23:33:52 +0000, | Adding note: c9d42519-d649-4804-b9ce-cb99e8c9e732: Updated reporting data after detecting tags updated
+|   #leadpages #Bangalore #li tech1 #🤖 [auto] auto-assigned to cohort: bangalore #🤖 [auto] auto-assigned to cohort #EF Bangalore Cohort (July 2020) #BA4 #EF Cohort #Full-time Permanent #🤖 [bot] tag checksum: c2423ab10b7fdb3c72f445085b60a3e8
+INFO, 2020-04-21 23:33:56 +0000, | Adding tag: c9d42519-d649-4804-b9ce-cb99e8c9e732: 🤖 [bot] last change detected: 2020-04-21 23:33:54 UTC
+INFO, 2020-04-21 23:38:58 +0000, Processing Opportunity: 3eed6ebc-82b3-4e07-b769-27e47c083730
+INFO, 2020-04-21 23:38:58 +0000, | Adding tag: 3eed6ebc-82b3-4e07-b769-27e47c083730: 🤖 [bot] tag checksum: ce1b37a5a296bdfebb0e4b386489936b
+INFO, 2020-04-21 23:38:59 +0000, | Adding tag: 3eed6ebc-82b3-4e07-b769-27e47c083730: 🤖 [auto] auto-assigned to cohort: bangalore
+INFO, 2020-04-21 23:38:59 +0000, | Adding tag: 3eed6ebc-82b3-4e07-b769-27e47c083730: 🤖 [auto] auto-assigned to cohort
+INFO, 2020-04-21 23:38:59 +0000, | Adding candidate 3eed6ebc-82b3-4e07-b769-27e47c083730 to posting 23bf8c07-b32e-483f-9007-1b9c2a004eb6
+INFO, 2020-04-21 23:39:00 +0000, | Removing tag: 3eed6ebc-82b3-4e07-b769-27e47c083730: 🤖 [bot] tag checksum: ce1b37a5a296bdfebb0e4b386489936b
+INFO, 2020-04-21 23:39:00 +0000, | Adding tag: 3eed6ebc-82b3-4e07-b769-27e47c083730: 🤖 [bot] tag checksum: b52e6ae5f8ad999a26605bc269870e4b
+INFO, 2020-04-21 23:39:00 +0000, | Sending webhook - change detected for: 3eed6ebc-82b3-4e07-b769-27e47c083730
+INFO, 2020-04-21 23:39:01 +0000, | Adding note: 3eed6ebc-82b3-4e07-b769-27e47c083730: Updated reporting data after detecting tags updated
+|   #leadpages #Bangalore #li-dom3 #-[auto]-auto-assigned-to-cohort:-bangalore #-[auto]-auto-assigned-to-cohort #EF-Bangalore-Cohort-(July-2020) #BA4 #EF-Cohort #Full-time-Permanent
+INFO, 2020-04-21 23:39:01 +0000, | Adding tag: 3eed6ebc-82b3-4e07-b769-27e47c083730: 🤖 [bot] last change detected: 2020-04-21 23:39:02 UTC
+INFO, 2020-04-21 23:40:37 +0000, Processing Opportunity: c453003f-8100-4573-8e38-4c509da1158e
+INFO, 2020-04-21 23:40:37 +0000, | Adding tag: c453003f-8100-4573-8e38-4c509da1158e: 🤖 [bot] tag checksum: c087d62f3b6f639ec9318b3c3253e52a
+INFO, 2020-04-21 23:40:38 +0000, | Adding tag: c453003f-8100-4573-8e38-4c509da1158e: 🤖 [auto] auto-assigned to cohort: bangalore
+INFO, 2020-04-21 23:40:38 +0000, | Adding tag: c453003f-8100-4573-8e38-4c509da1158e: 🤖 [auto] auto-assigned to cohort
+INFO, 2020-04-21 23:40:38 +0000, | Adding candidate c453003f-8100-4573-8e38-4c509da1158e to posting 23bf8c07-b32e-483f-9007-1b9c2a004eb6
+INFO, 2020-04-21 23:40:39 +0000, | Removing tag: c453003f-8100-4573-8e38-4c509da1158e: 🤖 [bot] tag checksum: c087d62f3b6f639ec9318b3c3253e52a
+INFO, 2020-04-21 23:40:39 +0000, | Adding tag: c453003f-8100-4573-8e38-4c509da1158e: 🤖 [bot] tag checksum: 9eba98a5383532c89686b56185d756c5
+INFO, 2020-04-21 23:40:39 +0000, | Sending webhook - change detected for: c453003f-8100-4573-8e38-4c509da1158e
+INFO, 2020-04-21 23:40:40 +0000, | Adding note: c453003f-8100-4573-8e38-4c509da1158e: Updated reporting data after detecting tags updated
+|   #BA4 #Bangalore #EF-Bangalore-Cohort-(July-2020) #EF-Cohort #Full-time-Permanent #leadpages #li-tech3 #🤖-[auto]-auto-assigned-to-cohort #🤖-[auto]-auto-assigned-to-cohort:-bangalore
+INFO, 2020-04-21 23:40:40 +0000, | Adding tag: c453003f-8100-4573-8e38-4c509da1158e: 🤖 [bot] last change detected: 2020-04-21 23:40:41 UTC
+INFO, 2020-04-21 23:43:22 +0000, Processing Opportunity: 01b19836-d22f-404d-8769-1126cc39a12b
+INFO, 2020-04-21 23:43:22 +0000, | Adding tag: 01b19836-d22f-404d-8769-1126cc39a12b: 🤖 [bot] tag checksum: a34dbab99eb0f443e2d5a4b65ba31e5b
+INFO, 2020-04-21 23:43:22 +0000, | Adding tag: 01b19836-d22f-404d-8769-1126cc39a12b: 🤖 [auto] auto-assigned to cohort: singapore
+INFO, 2020-04-21 23:43:23 +0000, | Adding tag: 01b19836-d22f-404d-8769-1126cc39a12b: 🤖 [auto] auto-assigned to cohort
+INFO, 2020-04-21 23:43:23 +0000, | Adding candidate 01b19836-d22f-404d-8769-1126cc39a12b to posting 3b2c714a-edee-4fd0-974d-413bae32c818
+INFO, 2020-04-21 23:43:24 +0000, | Removing tag: 01b19836-d22f-404d-8769-1126cc39a12b: 🤖 [bot] tag checksum: a34dbab99eb0f443e2d5a4b65ba31e5b
+INFO, 2020-04-21 23:43:24 +0000, | Adding tag: 01b19836-d22f-404d-8769-1126cc39a12b: 🤖 [bot] tag checksum: 0bfac78c2148d88a14265999bec326e1
+INFO, 2020-04-21 23:43:24 +0000, | Sending webhook - change detected for: 01b19836-d22f-404d-8769-1126cc39a12b
+INFO, 2020-04-21 23:43:24 +0000, | Adding note: 01b19836-d22f-404d-8769-1126cc39a12b: Updated reporting data after detecting tags updated
+|   #EF-Cohort #EF-Singapore-Cohort--Aug-2020- #EF-Singapore-Cohort--August-2020- #EFSG #Full-time-Permanent #Learn #SG8 #Singapore #linkedin #[auto]-auto-assigned-to-cohort #[auto]-auto-assigned-to-cohort:-singapore
+INFO, 2020-04-21 23:43:25 +0000, | Adding tag: 01b19836-d22f-404d-8769-1126cc39a12b: 🤖 [bot] last change detected: 2020-04-21 23:43:26 UTC
+INFO, 2020-04-21 23:44:52 +0000, Processing Opportunity: 9c379668-fd35-4ccc-bc52-87a9fa27ffa5
+INFO, 2020-04-21 23:44:52 +0000, | Adding tag: 9c379668-fd35-4ccc-bc52-87a9fa27ffa5: 🤖 [bot] tag checksum: ffe05a203cd00eba62607dd0cf171882
+INFO, 2020-04-21 23:44:52 +0000, | Adding tag: 9c379668-fd35-4ccc-bc52-87a9fa27ffa5: 🤖 [auto] auto-assigned to cohort: bangalore
+INFO, 2020-04-21 23:44:52 +0000, | Adding tag: 9c379668-fd35-4ccc-bc52-87a9fa27ffa5: 🤖 [auto] auto-assigned to cohort
+INFO, 2020-04-21 23:44:53 +0000, | Adding candidate 9c379668-fd35-4ccc-bc52-87a9fa27ffa5 to posting 23bf8c07-b32e-483f-9007-1b9c2a004eb6
+INFO, 2020-04-21 23:44:53 +0000, | Removing tag: 9c379668-fd35-4ccc-bc52-87a9fa27ffa5: 🤖 [bot] tag checksum: ffe05a203cd00eba62607dd0cf171882
+INFO, 2020-04-21 23:44:53 +0000, | Adding tag: 9c379668-fd35-4ccc-bc52-87a9fa27ffa5: 🤖 [bot] tag checksum: 297ec5bd65e0814c80682983f99f866a
+INFO, 2020-04-21 23:44:54 +0000, | Sending webhook - change detected for: 9c379668-fd35-4ccc-bc52-87a9fa27ffa5
+INFO, 2020-04-21 23:44:54 +0000, | Adding note: 9c379668-fd35-4ccc-bc52-87a9fa27ffa5: Updated reporting data after detecting tags updated
+|   #2PreC #BA4 #Bangalore #EF-Bangalore-Cohort--July-2020- #EF-Cohort #Full-time-Permanent #Rishabh-to-QC #leadpages #li-dom3 #auto-assigned-to-cohort #auto-assigned-to-cohort:-bangalore
+INFO, 2020-04-21 23:44:55 +0000, | Adding tag: 9c379668-fd35-4ccc-bc52-87a9fa27ffa5: 🤖 [bot] last change detected: 2020-04-21 23:44:55 UTC
+INFO, 2020-04-21 23:45:19 +0000, Processing Opportunity: 9c379668-fd35-4ccc-bc52-87a9fa27ffa5
+INFO, 2020-04-21 23:46:05 +0000, Processing Opportunity: 08c44903-c2c3-4093-90b2-85e7a612bdb7
+INFO, 2020-04-21 23:46:05 +0000, | Adding tag: 08c44903-c2c3-4093-90b2-85e7a612bdb7: 🤖 [bot] tag checksum: 95511fe78e329db036eaf2c732c8d01a
+INFO, 2020-04-21 23:46:05 +0000, | Adding tag: 08c44903-c2c3-4093-90b2-85e7a612bdb7: 🤖 [auto] auto-assigned to cohort: bangalore
+INFO, 2020-04-21 23:46:06 +0000, | Adding tag: 08c44903-c2c3-4093-90b2-85e7a612bdb7: 🤖 [auto] auto-assigned to cohort
+INFO, 2020-04-21 23:46:06 +0000, | Adding candidate 08c44903-c2c3-4093-90b2-85e7a612bdb7 to posting 23bf8c07-b32e-483f-9007-1b9c2a004eb6
+INFO, 2020-04-21 23:46:07 +0000, | Removing tag: 08c44903-c2c3-4093-90b2-85e7a612bdb7: 🤖 [bot] tag checksum: 95511fe78e329db036eaf2c732c8d01a
+INFO, 2020-04-21 23:46:07 +0000, | Adding tag: 08c44903-c2c3-4093-90b2-85e7a612bdb7: 🤖 [bot] tag checksum: 4351d2af61a6263550013d275d223963
+INFO, 2020-04-21 23:46:07 +0000, | Sending webhook - change detected for: 08c44903-c2c3-4093-90b2-85e7a612bdb7
+INFO, 2020-04-21 23:46:08 +0000, | Adding note: 08c44903-c2c3-4093-90b2-85e7a612bdb7: Updated reporting data after detecting tags updated
+|   #0PreC #BA4 #Bangalore #EF-Bangalore-Cohort--July-2020- #EF-Cohort #Full-time-Permanent #Rishabh-to-QC #leadpages #li-tech1 #auto-assigned-to-cohort #auto-assigned-to-cohort--bangalore
+INFO, 2020-04-21 23:46:08 +0000, | Adding tag: 08c44903-c2c3-4093-90b2-85e7a612bdb7: 🤖 [bot] last change detected: 2020-04-21 23:46:09 UTC
+INFO, 2020-04-21 23:57:02 +0000, {
+    "opportunities": 50,
+    "unique_contacts": 50,
+    "leads_assigned_to_cohort_posting": 23,
+    "unassigned_leads_aka_opportunities_without_posting": 27,
+    "unassigned_leads_without_detected_location": 18,
+    "unassigned_leads_with_detected_location": 9
+  }
+INFO, 2020-04-21 23:57:02 +0000, {
+    "unassigned_tagable_to_bangalore": 9,
+    "unassigned_tagable_owned_by_Wei Ting Chin": 9,
+    "unassigned_tagable_sourced_by_Wei Ting Chin": 9
+  }
+INFO, 2020-04-21 23:57:02 +0000, {
+    "opportunities": 100,
+    "unique_contacts": 94,
+    "leads_assigned_to_cohort_posting": 28,
+    "unassigned_leads_aka_opportunities_without_posting": 72,
+    "unassigned_leads_without_detected_location": 45,
+    "unassigned_leads_with_detected_location": 27,
+    "contacts_with_duplicates": 1,
+    "contacts_with_3_plus": 1
+  }
+INFO, 2020-04-21 23:57:02 +0000, {
+    "unassigned_tagable_to_bangalore": 26,
+    "unassigned_tagable_owned_by_Wei Ting Chin": 27,
+    "unassigned_tagable_sourced_by_Wei Ting Chin": 27,
+    "unassigned_tagable_to_singapore": 1
+  }
+INFO, 2020-04-21 23:57:02 +0000, Lever API active opportunities page=0 start
+INFO, 2020-04-21 23:57:03 +0000, Lever API active opportunities page=0 end
+INFO, 2020-04-21 23:59:56 +0000, {
+    "opportunities": 50,
+    "unique_contacts": 50,
+    "leads_assigned_to_cohort_posting": 23,
+    "unassigned_leads_aka_opportunities_without_posting": 27,
+    "unassigned_leads_without_detected_location": 18,
+    "unassigned_leads_with_detected_location": 9
+  }
+INFO, 2020-04-21 23:59:56 +0000, {
+    "unassigned_tagable_to_bangalore": 9,
+    "unassigned_tagable_owned_by_Wei Ting Chin": 9,
+    "unassigned_tagable_sourced_by_Wei Ting Chin": 9
+  }
+INFO, 2020-04-21 23:59:56 +0000, {
+    "opportunities": 100,
+    "unique_contacts": 94,
+    "leads_assigned_to_cohort_posting": 28,
+    "unassigned_leads_aka_opportunities_without_posting": 72,
+    "unassigned_leads_without_detected_location": 45,
+    "unassigned_leads_with_detected_location": 27,
+    "contacts_with_duplicates": 1,
+    "contacts_with_3_plus": 1
+  }
+INFO, 2020-04-21 23:59:56 +0000, {
+    "unassigned_tagable_to_bangalore": 26,
+    "unassigned_tagable_owned_by_Wei Ting Chin": 27,
+    "unassigned_tagable_sourced_by_Wei Ting Chin": 27,
+    "unassigned_tagable_to_singapore": 1
+  }
+INFO, 2020-04-21 23:59:56 +0000, Lever API active opportunities page=0 start
