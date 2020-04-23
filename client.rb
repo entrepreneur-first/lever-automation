@@ -53,10 +53,10 @@ class Client
     @password = ''
     
     @log = Logger.new(ENV['LOG_FILE'].nil? ? STDOUT : LOG_FILE)
-    @log.formatter = proc { |severity, datetime, progname, msg| "#{severity}, #{datetime}, #{msg}\n" }
+    @log.formatter = proc { |severity, datetime, progname, msg| ENV['LOG_FILE'].nil? ? "#{msg}\n" : "#{severity}, #{datetime}, #{msg}\n" }
     @log_prefix = []
     @error_log = Logger.new(ENV['LOG_FILE'].nil? ? STDOUT : ERROR_LOG_FILE)
-    @error_log.formatter = proc { |severity, datetime, progname, msg| "#{severity}, #{datetime}, #{msg}\n" }
+    @error_log.formatter = proc { |severity, datetime, progname, msg| ENV['LOG_FILE'].nil? ? "#{msg}\n" : "#{severity}, #{datetime}, #{msg}\n" }
   end
 
   def summarise_opportunities
