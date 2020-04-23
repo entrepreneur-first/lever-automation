@@ -677,7 +677,7 @@ class Client
 
   def log(msg)
     msg = log_prefix_lines(msg)
-    puts msg UNLESS ENV['LOG_FILE'].nil?
+    puts msg unless ENV['LOG_FILE'].nil?
     @log.info(msg)
   end
 
