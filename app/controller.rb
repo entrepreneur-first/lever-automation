@@ -175,22 +175,23 @@ class Controller
   def send_webhook(opp, update_time)
     log.log("Sending webhook - change detected") #: " + opp["id"])
     OPPORTUNITY_CHANGED_WEBHOOK_URLS.each {|url|
-      result = HTTParty.post(
-        url,
-        body: {
-          # id: '',
-          triggeredAt: update_time,
-          event: 'candidateOtherChange_EFCustomBot',
-          # signature: '',
-          # token: '',
-          data: {
-            candidateId: opp['id'],
-            contactId: opp['contact'],
-            opportunityId: opp['id']
-          }
-        }.to_json,
-        headers: { 'Content-Type' => 'application/json' }
-      )
+      p = fork {HTTParty.post(
+          url,
+          body: {
+            # id: '',
+            triggeredAt: update_time,
+            event: 'candidateOtherChange_EFCustomBot',
+            # signature: '',
+            # token: '',
+            data: {
+              candidateId: opp['id'],
+              contactId: opp['contact'],
+              opportunityId: opp['id']
+            }
+          }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )}
+      Process.detach(p)
     }
   end
 
