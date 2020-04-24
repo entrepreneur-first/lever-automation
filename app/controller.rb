@@ -306,8 +306,8 @@ class Controller
     client.feedback_for_opp(opp).each {|f|
       link = feedback_summary_link(f)
       next if opp['links'].include?(link)
-      remove_links_with_prefix(opp, feedback_summary_link_prefix(f))
-      add_links(opp, link)
+      client.remove_links_with_prefix(opp, feedback_summary_link_prefix(f))
+      client.add_links(opp, link)
     }
   end
   
