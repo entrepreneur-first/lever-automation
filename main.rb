@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "client"
-client = Client.new(ENV['LKEY'])
+require_relative 'app/controller'
+controller = Controller.new
 
 loop do
-  puts "\nEnter 'summarise', 'process', or email to process one candidate:"
+  puts "\nEnter 'summarise', 'process', 'fix tags', 'check links', or '[view] <email>' to view/process one candidate:"
   command = gets.chomp
 
   case command
@@ -12,26 +12,26 @@ loop do
       break
       
   when 'summarise'
-      client.summarise_opportunities
+      controller.summarise_opportunities
       
   when 'process'
-      client.process_opportunities
+      controller.process_opportunities
       
   when 'fix tags'
-      client.fix_auto_assigned_tags
+      controller.fix_auto_assigned_tags
   
   when 'check links'
-      client.check_links
+      controller.check_links
 
   else
     email = command.gsub('mailto:', '')
     command, email = command.split(' ') if command.include?(' ')
-    os = client.opportunities_for_contact(email)
+    os = controller.client.opportunities_for_contact(email)
     case command
     when 'view'
       puts JSON.pretty_generate(os)
     else
-      os.each { |opp| client.process_opportunity(opp) }
+      os.each { |opp| controller.process_opportunity(opp) }
     end
   end
 end
