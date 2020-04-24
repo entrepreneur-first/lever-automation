@@ -53,7 +53,7 @@ class Client
   end
   
   def feedback_for_opp(opp)
-    get_paged_result(feedback_url(opp['id'], {}, 'feedback')
+    get_paged_result(feedback_url(opp['id']), {}, 'feedback')
   end
   
   def feedback(opportunities_ids = [])
