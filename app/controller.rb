@@ -321,7 +321,7 @@ class Controller
         'user': f['user'],
         'createdAt': f['createdAt'],
         'completedAt': f['completedAt']
-      }.reject{|k,v| v.nil?}.merge(Rules.summarise_feedback(f)
+      }.reject{|k,v| v.nil?}.merge(Rules.summarise_feedback(f))
     )
   end
   
