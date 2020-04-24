@@ -86,9 +86,8 @@ class Controller
       summary[:assigned_to_job] += 1 if result['assigned_to_job']
       summary[:added_source_tag] += 1 if result['added_source_tag']
 
-      # puts JSON.pretty_generate(summary) if summary[:opportunities] % 100 == 0
-      log.log(JSON.pretty_generate(summary)) if summary[:opportunities] % 500 == 0
-      # break if summary[:opportunities] % 100 == 0
+      # log.log(JSON.pretty_generate(summary)) if summary[:opportunities] % 500 == 0
+      log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job") if summary[:opportunities] % 5000 == 0
     }
     client.batch_updates(false)
 
@@ -106,9 +105,6 @@ class Controller
     last_update = latest_change(opp)
     # should notify of change based on state before we executed?
     notify = last_update[:time] > last_webhook_change(opp) + 100
-    # log(last_update.to_s)
-    # log(last_webhook_change(opp).to_s)
-    # has_tag_change = tags_have_changed?(opp)
 
     if check_no_posting(opp)
       # if we added to a job then reload as tags etc will have changed
