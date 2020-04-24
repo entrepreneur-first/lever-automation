@@ -1,11 +1,13 @@
-require 'daemons'
+# frozen_string_literal: true
 
-require_relative 'client'
-client = Client.new(ENV['LKEY'])
+require 'daemons'
+require_relative 'app/controller'
+
+controller = Controller.new
 
 Daemons.run_proc('lever_daemon.rb') do
   loop do
-    client.process_opportunities
+    controller.process_opportunities
     sleep(10)
   end
 end
