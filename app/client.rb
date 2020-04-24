@@ -68,74 +68,104 @@ class Client
   # Updating data
   #
 
-  def batch_tag_updates(batch=true)
-    @batch_tag_updates = batch
+  def batch_updates(batch=true)
+    @batch_updates = batch
   end
 
   def commit_opp(opp)
-    add_tag(opp, opp['_addTags'], true) unless opp['_addTags'].nil? || opp['_addTags'].length == 0
-    remove_tag(opp, opp['_removeTags'], true) unless opp['_removeTags'].nil? || opp['_removeTags'].length == 0
+    ['Tags','Links'].each{|type|
+      add_annotations(opp, type, opp['_add'+type], true) if (opp['_add'+type] || []).any?
+      remove_annotations(opp, type, opp['_remove'+type], true) if (opp['_remove'+type] || []).any?
+    }
   end
   
   def add_tag(opp, tags, commit=false)
-    tags = [tags] if tags.class != Array
-    return queue_add_tag(opp, tags) if @batch_tag_updates && !commit
-    api_action_log("Adding tags: " + tags.join(',')) do
-      result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + '/addTags?' + Util.to_query({ perform_as: LEVER_BOT_USER }),
-        body: {
-          tags: tags
-        }.to_json,
-        headers: { 'Content-Type' => 'application/json' },
-        basic_auth: auth
-      )
-      tags.each {|tag|
-        opp['tags'] += [tag] if !opp['tags'].include?(tag)
-      }
-      result
-    end
+    add_annotations(opp, 'Tags', tags, commit)
   end
   
   def remove_tag(opp, tags, commit=false)
-    tags = [tags] if tags.class != Array
-    return queue_remove_tag(opp, tags) if @batch_tag_updates && !commit
-    api_action_log("Removing tags: " + tags.join(',')) do
-      result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + '/removeTags?' + Util.to_query({ perform_as: LEVER_BOT_USER }),
-        body: {
-          tags: tags
-        }.to_json,
-        headers: { 'Content-Type' => 'application/json' },
-        basic_auth: auth
-      )
-      tags.each {|tag|
-        opp['tags'].delete(tag)
-      }
-      result
-    end
+    remove_annotations(opp, 'Tags', tags, commit)
   end
-    
+  
   def remove_tags_with_prefix(opp, prefix)
     opp["tags"].each { |tag|
       remove_tag(opp, tag) if tag.start_with? prefix
     }
   end
 
-  def queue_add_tag(opp, tags)
-    tags = [tags] if tags.class != Array
-    tags.each { |tag|
-      opp['_addTags'] = [] if opp['_addTags'].nil?
-      opp['_addTags'] << tag unless opp['_addTags'].include?(tag)
-      opp['tags'] << tag unless opp['tags'].include?(tag)
-      opp['_removeTags'].delete(tag) unless opp['_removeTags'].nil?
+  def add_links(opp, links, commit=false)
+    add_annotations(opp, 'Links', links, commit)
+  end
+  
+  def remove_links(opp, links, commit=false)
+    remove_annotations(opp, 'Links', links, commit)
+  end
+
+  def remove_links_with_prefix(opp, prefix)
+    opp["links"].each { |link|
+      remove_links(opp, link) if link.start_with? prefix
+    }
+  end
+
+  def add_annotations(opp, type, values, commit)  
+    values = [values] if values.class != Array
+    return queue_add_annotations(opp, type, values) if @batch_updates && !commit    
+    ltype = type.downcase
+
+    api_action_log("Adding #{ltype}: " + values.join(',')) do
+      result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + "/add#{type}?" + Util.to_query({ perform_as: LEVER_BOT_USER }),
+        body: {
+          "#{ltype}": values
+        }.to_json,
+        headers: { 'Content-Type' => 'application/json' },
+        basic_auth: auth
+      )
+      values.each {|value|
+        opp[ltype] += [value] if !opp[ltype].include?(value)
+      }
+      result
+    end
+  end
+  
+  def remove_annotations(opp, type, values, commit=false)
+    values = [values] if values.class != Array
+    return queue_remove_annotations(opp, type, values) if @batch_updates && !commit
+    ltype = type.downcase
+    
+    api_action_log("Removing #{ltype}: " + values.join(',')) do
+      result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + "/remove#{type}?" + Util.to_query({ perform_as: LEVER_BOT_USER }),
+        body: {
+          "#{ltype}": values
+        }.to_json,
+        headers: { 'Content-Type' => 'application/json' },
+        basic_auth: auth
+      )
+      values.each {|value|
+        opp[ltype].delete(value)
+      }
+      result
+    end
+  end
+    
+  def queue_add_annotations(opp, type, values)
+    values = [values] if values.class != Array
+    ltype = type.downcase
+    values.each { |value|
+      opp['_add'+type] = [] if opp['_add'+type].nil?
+      opp['_add'+type] << value unless opp['_add'+type].include?(value)
+      opp[ltype] << value unless opp[ltype].include?(value)
+      opp['_remove'+type].delete(value) unless opp['_remove'+type].nil?
     }
   end
   
-  def queue_remove_tag(opp, tags)
-    tags = [tags] if tags.class != Array
-    tags.each { |tag|
-      opp['_removeTags'] = [] if opp['_removeTags'].nil?
-      opp['_removeTags'] << tag unless opp['_removeTags'].include?(tag) || (!opp['_addTags'].nil? && opp['_addTags'].include?(tag))
-      opp['_addTags'].delete(tag) unless opp['_addTags'].nil?
-      opp['tags'].delete(tag)
+  def queue_remove_annotations(opp, type, values)
+    values = [values] if values.class != Array
+    ltype = type.downcase
+    values.each { |value|
+      opp['_remove'+type] = [] if opp['_remove'+type].nil?
+      opp['_remove'+type] << value unless opp['_remove'+type].include?(value) || (!opp['_add'+type].nil? && opp['_add'+type].include?(value))
+      opp['_add'+type].delete(value) unless opp['_add'+type].nil?
+      opp[ltype].delete(value)
     }
   end
   
