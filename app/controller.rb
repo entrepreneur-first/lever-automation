@@ -399,7 +399,7 @@ class Controller
 
   def fix_checksum_links
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false}, 'fixing checksum links for active opportunities') { |opp|
-      client.remove_links_with_prefix(AUTO_LINK_PREFIX + 'checksum/')
+      client.remove_links_with_prefix(opp, AUTO_LINK_PREFIX + 'checksum/')
     }
   end
 
