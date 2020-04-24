@@ -23,8 +23,12 @@ LEVER_BOT_USER = 'e6414a92-e785-46eb-ad30-181c18db19b5'
 AUTO_TAG_PREFIX = '🤖 [auto] '
 BOT_TAG_PREFIX = '🤖 [bot] '
 
+BOT_LINK_PREFIX = 'http://🤖/'
+
 LAST_CHANGE_TAG_PREFIX = BOT_TAG_PREFIX + "last change detected: "
 TAG_CHECKSUM_PREFIX = BOT_TAG_PREFIX + "tag checksum: "
+
+LINK_CHECKSUM_PREFIX = BOT_LINK_PREFIX + "checksum/"
 
 TAG_ASSIGN_TO_LOCATION_NONE_FOUND = AUTO_TAG_PREFIX + 'no location tag detected'
 TAG_ASSIGN_TO_LOCATION_PREFIX = AUTO_TAG_PREFIX + 'auto-assigned to cohort: '

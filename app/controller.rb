@@ -70,7 +70,7 @@ class Controller
     summary = Hash.new(0)
     contacts = Hash.new(0)
 
-    client.batch_tag_updates
+    client.batch_updates
 
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false, expand: ['applications','stage','sourcedBy','owner']}, 'active opportunities') { |opp|
     
@@ -90,7 +90,7 @@ class Controller
       log.log(JSON.pretty_generate(summary)) if summary[:opportunities] % 500 == 0
       # break if summary[:opportunities] % 100 == 0
     }
-    client.batch_tag_updates(false)
+    client.batch_updates(false)
 
     log.log(JSON.pretty_generate(summary))
   end
@@ -119,11 +119,12 @@ class Controller
 
     # detect_duplicate_opportunities(opp)
 
-    tags_changed_update = tags_have_changed?(opp)
-    unless tags_changed_update.nil?
-      last_update = tags_changed_update
-      notify = true
-    end
+    [tags_have_changed?(opp), links_have_changed(opp)].each{ |update|
+      unless update.nil?
+        last_update = update
+        notify = true
+      end
+    }
 
     if notify
       # send webhook of change
@@ -208,13 +209,14 @@ class Controller
   def latest_change(opp)
     [
       {time: opp["lastInteractionAt"], source: 'a new interaction'},
-      tags_have_changed?(opp)
+      tags_have_changed?(opp),
+      links_have_changed?(opp)
     ].reject {|x| x.nil?}.max_by {|x| x[:time]}
   end
 
   # detect if tags have changed since we last checked, based on special checksum tag
   def tags_have_changed?(opp)
-    checksum = tag_checksum(opp)
+    checksum = attribute_checksum(opp, 'tags')
     existing = existing_tag_checksum(opp)
     
     if existing != checksum
@@ -228,15 +230,40 @@ class Controller
     } if existing != checksum && !existing.nil?
   end
   
-  # calculate checksum for tags
-  # - excludes bot-applied tags
-  def tag_checksum(opp)
-    Digest::MD5.hexdigest(opp["tags"].reject {|t| t.start_with?(LAST_CHANGE_TAG_PREFIX) || t.start_with?(TAG_CHECKSUM_PREFIX)}.sort.join(";;"))
+  # detect if links have changed since we last checked, based on special checksum link
+  def links_have_changed?(opp)
+    checksum = attribute_checksum(opp, 'links')
+    existing = existing_link_checksum(opp)
+    
+    if existing != checksum
+      client.remove_links_with_prefix(opp, LINK_CHECKSUM_PREFIX)
+      client.add_links(opp, LINK_CHECKSUM_PREFIX + checksum)
+    end
+
+    {
+      time: Time.now.to_i*1000,
+      source: "links updated\n📎" + opp['links'].sort.reject {|t| t.start_with?(BOT_LINK_PREFIX)}.join("\n📎")
+    } if existing != checksum && !existing.nil?
+  end
+  
+  # calculate checksum for tags/links
+  # - excludes bot-applied
+  def attribute_checksum(opp, type)
+    Digest::MD5.hexdigest(opp[type].reject {|t|
+      t.start_with?(type == 'tags' ? BOT_TAG_PREFIX : BOT_LINK_PREFIX)
+      }.sort.join(";;"))
   end
   
   def existing_tag_checksum(opp)
-    opp["tags"].each { |t|
+    opp['tags'].each { |t|
       return t.delete_prefix TAG_CHECKSUM_PREFIX if t.start_with? TAG_CHECKSUM_PREFIX
+    }
+    nil
+  end
+  
+  def existing_link_checksum(opp)
+    opp['links'].each { |t|
+      return t.delete_prefix LINK_CHECKSUM_PREFIX if t.start_with? LINK_CHECKSUM_PREFIX
     }
     nil
   end
