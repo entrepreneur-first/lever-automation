@@ -69,8 +69,8 @@ class Rules
   end
 
   def self.summarise_feedback(f)
-    return = {}
+    result = {}
     
-    return
+    result
   end
 end
