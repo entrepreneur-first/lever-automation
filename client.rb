@@ -51,6 +51,8 @@ class Client
   def initialize(username)
     @username = username
     @password = ''
+
+    @log_verbose = false
     
     @log = Logger.new(ENV['LOG_FILE'].nil? ? STDOUT : LOG_FILE)
     @log.formatter = proc { |severity, datetime, progname, msg| ENV['LOG_FILE'].nil? ? "#{msg}\n" : "#{severity}, #{datetime}, #{msg}\n" }
@@ -708,9 +710,9 @@ class Client
   end
 
   def api_call_log(resource, page)
-    log("Lever API #{resource} page=#{page} start")
+    log("Lever API #{resource} page=#{page} start") if @log_verbose
     yield
-    log("Lever API #{resource} page=#{page} end")
+    log("Lever API #{resource} page=#{page} end") if @log_verbose
     true
   end
 
