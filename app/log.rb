@@ -19,6 +19,7 @@ class Log
   
   def verbose(v=true)
     @verbose = v
+  end
   
   def verbose?
     @verbose
