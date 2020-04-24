@@ -174,7 +174,7 @@ class Controller
   end
   
   def send_webhook(opp, update_time)
-    log("Sending webhook - change detected") #: " + opp["id"])
+    log.log("Sending webhook - change detected") #: " + opp["id"])
     OPPORTUNITY_CHANGED_WEBHOOK_URLS.each {|url|
       result = HTTParty.post(
         url,
