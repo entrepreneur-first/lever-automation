@@ -68,4 +68,9 @@ class Rules
     nil
   end
 
+  def self.summarise_feedback(f)
+    return = {}
+    
+    return
+  end
 end

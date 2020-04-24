@@ -52,6 +52,10 @@ class Client
     opportunities(posting_ids) + archived_opportunities(posting_ids)
   end
   
+  def feedback_for_opp(opp)
+    get_paged_result(feedback_url(opp['id'], {}, 'feedback')
+  end
+  
   def feedback(opportunities_ids = [])
     arr = []
     total = opportunities_ids.count
@@ -62,7 +66,7 @@ class Client
       end
     end
     arr
-  end  
+  end
 
   #
   # Updating data

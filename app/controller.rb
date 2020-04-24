@@ -116,6 +116,8 @@ class Controller
       result['assigned_to_job'] = true
     end
     result['added_source_tag'] if tag_source_from_application(opp)
+    
+    summarise_feedbacks(opp)
 
     # detect_duplicate_opportunities(opp)
 
@@ -303,7 +305,30 @@ class Controller
     end
     true
   end
-    
+  
+  def summarise_feedbacks(opp)
+    client.feedback_for_opp(opp).each {|f|
+      link = feedback_summary_link(f)
+      next if opp['links'].include?(link)
+      remove_links_with_prefix(opp, feedback_summary_link_prefix(f))
+      add_links(opp, link)
+    }
+  end
+  
+  def feedback_summary_link_prefix(f)
+    BOT_LINK_PREFIX + "feedback/#{f['id']}/"
+  end
+  
+  def feedback_summary_link(f)
+    feedback_summary_link_prefix(f) + '?' + URI.encode_www_form({
+        'title': f['text'],
+        'user': f['user'],
+        'createdAt': f['createdAt'],
+        'completedAt': f['completedAt']
+      }.reject{|k,v| v.nil?}.merge(Rules.summarise_feedback(f)
+    )
+  end
+  
   # detect duplicate opportunities for a candidate
   def detect_duplicate_opportunities(opp)
     client.remove_tags_with_prefix(opp, TAG_DUPLICATE_OPPS_PREFIX) if opp["applications"].count < 2
