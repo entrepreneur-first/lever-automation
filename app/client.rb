@@ -17,9 +17,15 @@ OPPORTUNITIES_PARAMS = {
 }.freeze
 
 class Client
-  def initialize(username)
+
+  def initialize(username, log)
     @username = username
     @password = ''
+    @log = log
+  end
+  
+  def log
+    @log
   end
 
   #
@@ -239,22 +245,22 @@ class Client
   #
 
   def api_call_log(resource, page)
-    log("Lever API #{resource} page=#{page} start") if @log_verbose
+    log.log("Lever API #{resource} page=#{page} start") if log.verbose?
     yield
-    log("Lever API #{resource} page=#{page} end") if @log_verbose
+    log.log("Lever API #{resource} page=#{page} end") if log.verbose?
     true
   end
 
   def api_action_log(msg)
-    log(msg)
+    log.log(msg)
     result = yield
     # retry on occasional bad gateway error
     if result.code == 502
-      warn('502 error, retrying')
+      log.warn('502 error, retrying')
       result = yield
     end
     unless result.code >= 200 && result.code < 300
-      error(result.code.to_s || '' + ': ' + result.parsed_response['code'] || '<no code>' + ': ' + result.parsed_response['message'] || '<no message>')
+      log.error(result.code.to_s || '' + ': ' + result.parsed_response['code'] || '<no code>' + ': ' + result.parsed_response['message'] || '<no message>')
     end
     result.parsed_response
   end

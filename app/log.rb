@@ -8,13 +8,20 @@ ERROR_LOG_FILE = 'logs/' + Time.now().strftime('%Y-%m-%d') + '_error.log'
 class Log
 
   def initialize
-    @log_verbose = false
+    @verbose = false
     @log_prefix = []
     
     @log = Logger.new(ENV['LOG_FILE'].nil? ? STDOUT : LOG_FILE)
     @error_log = Logger.new(ENV['LOG_FILE'].nil? ? STDOUT : ERROR_LOG_FILE)
 
     @log.formatter = @error_log.formatter = proc { |severity, datetime, progname, msg| ENV['LOG_FILE'].nil? ? "#{msg}\n" : "#{severity}, #{datetime}, #{msg}\n" }
+  end
+  
+  def verbose(v=true)
+    @verbose = v
+  
+  def verbose?
+    @verbose
   end
 
   def log(msg)

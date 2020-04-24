@@ -9,8 +9,8 @@ require_relative '../config/rules'
 class Controller
 
   def initialize
-    @client = Client.new(ENV['LKEY'])
     @log = Log.new
+    @client = Client.new(ENV['LKEY'], @log)
   end
   
   def client
