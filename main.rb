@@ -4,7 +4,7 @@ require_relative 'app/controller'
 controller = Controller.new
 
 loop do
-  puts "\nEnter 'summarise', 'process', 'fix tags', 'check links', or '[view] <email>' to view/process one candidate:"
+  puts "\nEnter 'summarise', 'process', 'fix tags', 'check links', or '[view|feedback] <email>' to view/process one candidate:"
   command = gets.chomp
 
   case command
@@ -30,6 +30,8 @@ loop do
     case command
     when 'view'
       puts JSON.pretty_generate(os)
+    when 'feedback'
+      os.each{ |opp| puts JSON.pretty_generate controller.client.feedback_for_opp(opp) }
     else
       os.each { |opp| controller.process_opportunity(opp) }
     end
