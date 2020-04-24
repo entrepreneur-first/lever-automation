@@ -20,10 +20,13 @@ COHORT_JOB_TAG = 'EF Cohort'
 
 LEVER_BOT_USER = 'e6414a92-e785-46eb-ad30-181c18db19b5'
 
+# AUTO_.. prefixes are used for auto-added attributes relating to the candidate data 
+# BOT_.. prefixes are used for auto-added attributed used by our bot
+#        - ignored for the purpose of detecting data changes
 AUTO_TAG_PREFIX = '🤖 [auto] '
 BOT_TAG_PREFIX = '🤖 [bot] '
-
-BOT_LINK_PREFIX = 'http://🤖/'
+AUTO_LINK_PREFIX = 'http://🤖/'
+BOT_LINK_PREFIX = AUTO_LINK_PREFIX + 'bot/'
 
 LAST_CHANGE_TAG_PREFIX = BOT_TAG_PREFIX + "last change detected: "
 TAG_CHECKSUM_PREFIX = BOT_TAG_PREFIX + "tag checksum: "

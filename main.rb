@@ -20,6 +20,9 @@ loop do
   when 'fix tags'
       controller.fix_auto_assigned_tags
   
+  when 'fix links'
+      controller.fix_checksum_links
+  
   when 'check links'
       controller.check_links
 

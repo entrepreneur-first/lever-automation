@@ -312,7 +312,7 @@ class Controller
   end
   
   def feedback_summary_link_prefix(f)
-    BOT_LINK_PREFIX + "feedback/#{f['id']}/"
+    AUTO_LINK_PREFIX + "feedback/#{f['id']}/"
   end
   
   def feedback_summary_link(f)
@@ -395,6 +395,10 @@ class Controller
       client.add_tag(opp, TAG_ASSIGNED_TO_LOCATION, true) if opp['applications'][0]['user'] == LEVER_BOT_USER && !opp['tags'].include?(TAG_ASSIGNED_TO_LOCATION)
       client.remove_tag(opp, TAG_SOURCE_FROM_APPLICATION_ERROR) if !Util.has_application(opp) || !Util.is_cohort_app(opp)
     }
+  end
+
+  def fix_checksum_links
+    client.remove_links_with_prefix(AUTO_LINK_PREFIX + 'checksum/')
   end
 
 end

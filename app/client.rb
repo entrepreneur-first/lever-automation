@@ -311,12 +311,4 @@ class Client
     API_URL + "opportunities/#{opportunity_id}/feedback"
   end
   
-  #def add_bot_tag(opp, tag)
-  #  add_tag(opp, BOT_TAG_PREFIX + tag)
-  #end
-  #
-  #def remove_bot_tag(opp, tag)
-  #  remove_tag(opp, BOT_TAG_PREFIX + tag)
-  #end
-  
 end
