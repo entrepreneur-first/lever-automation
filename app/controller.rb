@@ -3,6 +3,7 @@
 require_relative '../config/config'
 require_relative 'util'
 require_relative 'log'
+require_relative 'client'
 require_relative '../config/rules'
 
 class Controller
@@ -218,7 +219,7 @@ class Controller
     
     if existing != checksum
       client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
-      client.add_tag(opp, TAG_CHECKSUM_PREFIX + checksum))
+      client.add_tag(opp, TAG_CHECKSUM_PREFIX + checksum)
     end
 
     {

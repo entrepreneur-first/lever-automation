@@ -46,7 +46,7 @@ class Log
   end
   
   def log_prefix_lines(msg)
-    @log_prefix + msg.gsub("\n", "\n" + @log_prefix + '  ')
+    log_prefix + msg.gsub("\n", "\n" + @log_prefix + '  ')
   end
 
 end
