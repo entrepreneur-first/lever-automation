@@ -132,7 +132,7 @@ class Client
     return queue_remove_annotations(opp, type, values) if @batch_updates && !commit
     ltype = type.downcase
     
-    api_action_log("Removing #{ltype}: " + tags.join(',')) do
+    api_action_log("Removing #{ltype}: " + values.join(',')) do
       result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + "/remove#{type}?" + Util.to_query({ perform_as: LEVER_BOT_USER }),
         body: {
           "#{ltype}": values

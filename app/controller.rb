@@ -119,7 +119,7 @@ class Controller
 
     # detect_duplicate_opportunities(opp)
 
-    [tags_have_changed?(opp), links_have_changed(opp)].each{ |update|
+    [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
       unless update.nil?
         last_update = update
         notify = true
@@ -242,7 +242,7 @@ class Controller
 
     {
       time: Time.now.to_i*1000,
-      source: "links updated\n📎" + opp['links'].sort.reject {|t| t.start_with?(BOT_LINK_PREFIX)}.join("\n📎")
+      source: "links updated\n📎 " + opp['links'].sort{|a,b| a.sub(/[a-z]+:\/\//,'') <=> b.sub(/[a-z]+:\/\//,'')}.reject {|t| t.start_with?(BOT_LINK_PREFIX)}.join("\n📎 ")
     } if existing != checksum && !existing.nil?
   end
   
