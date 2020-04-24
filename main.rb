@@ -27,8 +27,8 @@ loop do
       controller.check_links
 
   else
-    command = command.gsub('mailto:', '')
-    command, email = command.split(' ') if command.include?(' ')
+    email = command.gsub('mailto:', '')
+    command, email = email.split(' ') if email.include?(' ')
     os = controller.client.opportunities_for_contact(email)
     case command
     when 'view'

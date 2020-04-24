@@ -261,7 +261,7 @@ class Client
     arr = []
     result = HTTParty.get(url + '?' + Util.to_query(params), basic_auth: auth)
     arr += result.fetch('data')
-    page = 
+    page = 1
     while result.fetch('hasNext')
       next_batch = result.fetch('next')
       page += 1
@@ -269,7 +269,6 @@ class Client
         result = HTTParty.get(url + '?' + Util.to_query(params.merge(offset: next_batch)), basic_auth: auth)
       end
       arr += result.fetch('data')
-      page += 1
     end
     arr
   end  
