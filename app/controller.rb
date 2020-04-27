@@ -201,7 +201,7 @@ class Controller
     if update_time.nil?
       update_time = client.get_opportunity(opp['id']).fetch('lastInteractionAt', Time.now.to_i*1000)
     end
-    set_bot_metadata(opp, ‘last_change_detected’, update_time)
+    set_bot_metadata(opp, 'last_change_detected', update_time)
   end
   
   # detect when opportunity was last updated
