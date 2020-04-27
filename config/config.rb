@@ -27,10 +27,11 @@ AUTO_TAG_PREFIX = '🤖 [auto] '
 BOT_TAG_PREFIX = '🤖 [bot] '
 AUTO_LINK_PREFIX = 'http://🤖/'
 BOT_LINK_PREFIX = AUTO_LINK_PREFIX + 'bot/'
+BOT_METADATA_PREFIX = BOT_LINK_PREFIX + 'data'
 
+# deprecated: now storing under BOT_METADATA
 LAST_CHANGE_TAG_PREFIX = BOT_TAG_PREFIX + "last change detected: "
 TAG_CHECKSUM_PREFIX = BOT_TAG_PREFIX + "tag checksum: "
-
 LINK_CHECKSUM_PREFIX = BOT_LINK_PREFIX + "checksum/"
 
 TAG_ASSIGN_TO_LOCATION_NONE_FOUND = AUTO_TAG_PREFIX + 'no location tag detected'
