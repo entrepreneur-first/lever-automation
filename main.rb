@@ -2,6 +2,7 @@
 
 require_relative 'app/controller'
 controller = Controller.new
+controller.log.verbose
 
 loop do
   puts "\nEnter 'summarise', 'process', 'fix tags', 'check links', or '[view|feedback] <email>' to view/process one candidate:"

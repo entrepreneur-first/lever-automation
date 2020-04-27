@@ -54,7 +54,7 @@ class Controller
       summary[:leads_assigned_to_cohort_posting] += 1 if opp['applications'].length > 0 && opp['applications'][0]['type'] != 'posting' && Util.is_cohort_app(opp)
       summary[:leads_assigned_to_team_posting] += 1 if opp['applications'].length > 0 && opp['applications'][0]['type'] != 'posting' && !Util.is_cohort_app(opp)
       
-      if summary[:opportunities] % 50 == 0
+      if summary[:opportunities] % 500 == 0
         # log.log(JSON.pretty_generate(contacts))
         puts JSON.pretty_generate(summary)
         puts JSON.pretty_generate(tagable)
@@ -87,7 +87,7 @@ class Controller
       summary[:added_source_tag] += 1 if result['added_source_tag']
 
       # log.log(JSON.pretty_generate(summary)) if summary[:opportunities] % 500 == 0
-      log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job") if summary[:opportunities] % 5000 == 0
+      log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job") if summary[:opportunities] % 1000 == 0
     }
     client.batch_updates(false)
 
@@ -367,8 +367,8 @@ class Controller
     page = 0
     while result.fetch('hasNext')
       next_batch = result.fetch('next')
-      api_call_log(log_string, page) do
-        result = HTTParty.get(OPPORTUNITIES_URL + Util.to_query(params.merge(offset: next_batch)), basic_auth: auth)
+      result = api_call_log(log_string, page) do
+        HTTParty.get(OPPORTUNITIES_URL + Util.to_query(params.merge(offset: next_batch)), basic_auth: auth)
       end
       result.fetch('data').each { |o|
         next if o["applications"].count > 0

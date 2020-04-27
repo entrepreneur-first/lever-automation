@@ -33,7 +33,7 @@ class Client
   #
 
   def get_opportunity(id)
-    get_single_result(OPPORTUNITIES_URL.chomp('?') + '/' + id)
+    get_single_result(OPPORTUNITIES_URL.chomp('?') + '/' + id, {}, 'retrieve single opportunity')
   end
 
   def opportunities_for_contact(email)
@@ -60,10 +60,10 @@ class Client
     arr = []
     total = opportunities_ids.count
     opportunities_ids.each_with_index.each do |opportunity_id, index|
-      api_call_log('feedback', "#{index + 1}/#{total}") do
-        result = HTTParty.get(feedback_url(opportunity_id), basic_auth: auth)
-        arr += result.fetch('data').map { |x| x.merge('opportunity_id' => opportunity_id) }
+      result = api_call_log('feedback', "#{index + 1}/#{total}") do
+        HTTParty.get(feedback_url(opportunity_id), basic_auth: auth)
       end
+      arr += result.fetch('data').map { |x| x.merge('opportunity_id' => opportunity_id) }
     end
     arr
   end
@@ -236,40 +236,29 @@ class Client
   
   def get_single_result(url, params={}, log_string='')
     u = url + '?' + Util.to_query(params)
-    result = HTTParty.get(u, basic_auth: auth)
-    unless result.code >= 200 && result.code < 300
-      error(result.parsed_response['code'] + ': ' + result.parsed_response['message'] + ' - ' + u)
+    result = api_call_log(log_string, '<single>') do
+      result = HTTParty.get(u, basic_auth: auth)
     end
     result.fetch('data')
   end
-    
+   
   def process_paged_result(url, params, log_string)
-    result = HTTParty.get(url + '?' + Util.to_query(params), basic_auth: auth)
-    result.fetch('data').each { |row| yield(row) }
     page = 1
-    while result.fetch('hasNext')
-      next_batch = result.fetch('next')
-      page += 1
-      api_call_log(log_string, page) do
-        result = HTTParty.get(url + '?' + Util.to_query(params.merge(offset: next_batch)), basic_auth: auth)
+    next_batch = nil
+    loop do
+      result = api_call_log(log_string, page) do
+        HTTParty.get(url + '?' + Util.to_query(params.merge(offset: next_batch).reject{|k,v| v.nil?}), basic_auth: auth)
       end
       result.fetch('data').each { |row| yield(row) }
+      break unless result.fetch('hasNext')
+      next_batch = result.fetch('next')
+      page += 1
     end
   end
 
   def get_paged_result(url, params={}, log_string='')
     arr = []
-    result = HTTParty.get(url + '?' + Util.to_query(params), basic_auth: auth)
-    arr += result.fetch('data')
-    page = 1
-    while result.fetch('hasNext')
-      next_batch = result.fetch('next')
-      page += 1
-      api_call_log(log_string, page) do
-        result = HTTParty.get(url + '?' + Util.to_query(params.merge(offset: next_batch)), basic_auth: auth)
-      end
-      arr += result.fetch('data')
-    end
+    process_paged_result(url, params, log_string) { |row| arr << row }
     arr
   end  
 
@@ -278,10 +267,10 @@ class Client
   #
 
   def api_call_log(resource, page)
-    log.log("Lever API #{resource} page=#{page} start") if log.verbose?
-    yield
-    log.log("Lever API #{resource} page=#{page} end") if log.verbose?
-    true
+    log.log("Lever API #{resource} page=#{page}") if log.verbose?
+    result = yield
+    log_if_api_error(result)
+    result
   end
 
   def api_action_log(msg)
@@ -292,9 +281,7 @@ class Client
       log.warn('502 error, retrying')
       result = yield
     end
-    unless result.code >= 200 && result.code < 300
-      log.error(result.code.to_s || '' + ': ' + result.parsed_response['code'] || '<no code>' + ': ' + result.parsed_response['message'] || '<no message>')
-    end
+    log_if_api_error(result)
     result.parsed_response
   end
 
@@ -310,4 +297,9 @@ class Client
     API_URL + "opportunities/#{opportunity_id}/feedback"
   end
   
+  def log_if_api_error(result)
+    # if not an error
+    return if result.code.between?(200, 299)
+    log.error((result.code.to_s || '') + ': ' + (result.parsed_response['code'] || '<no code>') + ': ' + (result.parsed_response['message'] || '<no message>'))
+  end
 end
