@@ -136,7 +136,7 @@ class Controller
       update_changed_tag(opp, opp['_addedNoteTimestamp'])
     end
 
-    update_bot_metadata(opp)
+    commit_bot_metadata(opp)
     client.commit_opp(opp)
 
     log.pop_log_prefix
@@ -286,7 +286,7 @@ class Controller
   #   or a webhook we send ourselves via this script (recorded via tag)
   def last_webhook_change(opp)
     (
-      [opp["createdAt"], opp["lastAdvancedAt"], bot_metadata(opp)['last_change_detected']] +
+      [opp["createdAt"], opp["lastAdvancedAt"], bot_metadata(opp)['last_change_detected'].to_i] +
       opp["applications"].map {|a| a["createdAt"]} +
       
       # legacy
@@ -320,7 +320,7 @@ class Controller
   end
   
   def summarise_feedbacks(opp)
-    if opp['lastInteractionAt'] > (feedback_summarised_at(opp) || 0)
+    if opp['lastInteractionAt'] > (feedback_summarised_at(opp).to_i || 0)
       # summarise each feedback
       client.feedback_for_opp(opp).each {|f|
         link = one_feedback_summary_link(f)
@@ -344,12 +344,12 @@ class Controller
     fsa = bot_metadata(opp)['feedback_summarised_at']
     return if fsa.nil?
     
-    rules_checksum, ts = fsa.split(':')
+    rules_checksum, ts = fsa.split('-')
     rules_checksum == feedback_rules_checksum ? ts : nil
   end
   
   def update_feedback_summary_time(opp)
-    set_bot_metadata('feedback_summarised_at', "#{feedback_rules_checksum}:#{opp['lastInteractionAt']}")
+    set_bot_metadata(opp, 'feedback_summarised_at', "#{feedback_rules_checksum}-#{opp['lastInteractionAt']}")
   end
   
   def feedback_rules_checksum
@@ -361,12 +361,12 @@ class Controller
   end
   
   def one_feedback_summary_link(f)
-    feedback_summary_link_prefix(f) + '?' + URI.encode_www_form({
+    one_feedback_summary_link_prefix(f) + '?' + URI.encode_www_form(({
         'title': f['text'],
         'user': f['user'],
         'createdAt': f['createdAt'],
         'completedAt': f['completedAt']
-      }.merge(Rules.summarise_one_feedback(f).reject{|k,v| v.nil?}.sort)
+      }.merge(Rules.summarise_one_feedback(f).reject{|k,v| v.nil?}).sort)
     )
   end
   
