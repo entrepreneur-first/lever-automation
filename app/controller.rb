@@ -107,8 +107,11 @@ class Controller
     # should notify of change based on state before we executed?
     notify = last_update[:time] > last_webhook_change(opp) + 100
 
+    check_linkedin_optout(opp)
+
     if check_no_posting(opp)
-      # if we added to a job then reload as tags etc will have changed
+      # if we added to a job then reload as tags etc will have changed automagically 
+      # based on new posting assignment
       opp.merge!(client.get_opportunity(opp['id']))
       result['assigned_to_job'] = true
     end
@@ -152,13 +155,30 @@ class Controller
     result
   end
 
+  def check_linkedin_optout(opp)
+    # attempt to identify LinkedIn Inmail responses that have opted-out
+    # we don't have a way to read the inmail responses, so instead look for opportunities
+    # that haven't had an interaction since within a few seconds of creation
+    # (leads appear to be created when the recipient opts in/out, and before they type their reply)
+    if !Util.has_posting(opp) && 
+        opp['stage'] == 'lead-responded' && 
+        opp['origin'] == 'sourced' && 
+        opp['sources'] == ['LinkedIn'] &&
+        opp['lastInteractionAt'] < opp['createdAt'] + 5000
+      client.add_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT)
+    else
+      client.remove_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT) if opp['tags'].include? TAG_LINKEDIN_SUSPECTED_OPTOUT
+    end    
+  end
+
   # process leads not assigned to any posting
   # ~~
   # Note slight confusion between Lever interface vs API:
   # - Leads not assigned to a job posting show up in Lever as candidates with "no opportunity", but are returned in the API as opportunities without an application
   # - Leads assigned to a job posting show up in Lever as opportunities - potentially multiple per candidate. These show up in the API as applications against the opportunity - even when no actual application submitted
   def check_no_posting(opp)
-    return if opp["applications"].count > 0
+    return if Util.has_posting(opp)
+    
     location = location_from_tags(opp)
     if location.nil?
       # unable to determine target location from tags
