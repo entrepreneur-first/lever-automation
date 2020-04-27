@@ -201,12 +201,7 @@ class Controller
     if update_time.nil?
       update_time = client.get_opportunity(opp['id']).fetch('lastInteractionAt', Time.now.to_i*1000)
     end
-    
-    # tidy up legacy
-    client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
-    
-    set_bot_metadata(opp, 'last_change_detected', update_time)
-    # client.add_tag(opp, LAST_CHANGE_TAG_PREFIX + Util.timestamp_to_datetimestr(update_time))
+    set_bot_metadata(opp, ‘last_change_detected’, update_time)
   end
   
   # detect when opportunity was last updated
@@ -225,10 +220,7 @@ class Controller
     existing = existing_tag_checksum(opp)
     
     if existing != checksum
-      # legacy
-      client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
       set_bot_metadata(opp, 'tag_checksum', checksum)
-      # client.add_tag(opp, TAG_CHECKSUM_PREFIX + checksum)
     end
 
     {
@@ -243,10 +235,7 @@ class Controller
     existing = existing_link_checksum(opp)
     
     if existing != checksum
-      # legacy
-      client.remove_links_with_prefix(opp, LINK_CHECKSUM_PREFIX)
       set_bot_metadata(opp, 'link_checksum', checksum)
-      # client.add_links(opp, LINK_CHECKSUM_PREFIX + checksum)
     end
 
     {
@@ -267,7 +256,11 @@ class Controller
     bot_metadata(opp)['tag_checksum'] if bot_metadata(opp)['tag_checksum']
     # legacy
     opp['tags'].each { |t|
-      return t.delete_prefix TAG_CHECKSUM_PREFIX if t.start_with? TAG_CHECKSUM_PREFIX
+      if t.start_with? TAG_CHECKSUM_PREFIX
+        checksum = t.delete_prefix TAG_CHECKSUM_PREFIX
+        set_bot_metadata(opp, 'tag_checksum', checksum)
+        return checksum
+      end
     }
     nil
   end
@@ -276,7 +269,11 @@ class Controller
     bot_metadata(opp)['link_checksum'] if bot_metadata(opp)['link_checksum']
     # legacy
     opp['links'].each { |t|
-      return t.delete_prefix LINK_CHECKSUM_PREFIX if t.start_with? LINK_CHECKSUM_PREFIX
+      if t.start_with? LINK_CHECKSUM_PREFIX
+        checksum = t.delete_prefix LINK_CHECKSUM_PREFIX
+        set_bot_metadata(opp, 'link_checksum', checksum)
+        return checksum
+      end
     }
     nil
   end
@@ -417,6 +414,9 @@ class Controller
 
     # tidy up legacy
     client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX.chomp('/') + '?')
+    client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
+    client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
+    client.remove_links_with_prefix(opp, LINK_CHECKSUM_PREFIX)
   end
 
   # TEMP
