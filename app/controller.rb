@@ -383,7 +383,7 @@ class Controller
         'user': f['user'],
         'createdAt': f['createdAt'],
         'completedAt': f['completedAt']
-      }.merge(Rules.summarise_one_feedback(f).reject{|k,v| v.nil?}).sort)
+      }.merge(Rules.summarise_one_feedback(f)))
     )
   end
   
