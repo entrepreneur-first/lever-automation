@@ -134,7 +134,6 @@ class Controller
       # which will update lastInteractionAt
       # so update LAST_CHANGE_TAG to avoid falsely detecting update next time
       update_changed_tag(opp, opp['_addedNoteTimestamp'])
-      update_feedback_summary_time(opp, opp['_addedNoteTimestamp'])
     end
 
     commit_bot_metadata(opp)
@@ -170,7 +169,7 @@ class Controller
   def notify_of_change(opp, last_update)
     unless opp['applications'].length == 0
       send_webhook(opp, last_update[:time])
-      client.add_note(opp, 'Updated reporting data after detecting ' + last_update[:source])
+      # client.add_note(opp, 'Updated reporting data after detecting ' + last_update[:source])
     end
     update_changed_tag(opp)
   end
@@ -284,12 +283,16 @@ class Controller
   #   or a webhook we send ourselves via this script (recorded via tag)
   def last_webhook_change(opp)
     (
-      [opp["createdAt"], opp["lastAdvancedAt"], bot_metadata(opp)['last_change_detected'].to_i] +
+      [opp["createdAt"], opp["lastAdvancedAt"], last_change_detected(opp)] +
       opp["applications"].map {|a| a["createdAt"]} +
       
       # legacy
       (opp["tags"].select {|t| t.start_with? LAST_CHANGE_TAG_PREFIX}.map {|t| Util.datetimestr_to_timestamp(t.delete_prefix(LAST_CHANGE_TAG_PREFIX)) })
     ).reject {|x| x.nil?}.max
+  end
+
+  def last_change_detected(opp)
+    bot_metadata(opp)['last_change_detected'].to_i
   end
   
   # automatically add tag for the opportunity source based on self-reported data in the application
@@ -318,7 +321,7 @@ class Controller
   end
   
   def summarise_feedbacks(opp)
-    if opp['lastInteractionAt'] > (feedback_summarised_at(opp).to_i || 0)
+    if opp['lastInteractionAt'] > last_change_detected(opp)
       # summarise each feedback
       client.feedback_for_opp(opp).each {|f|
         link = one_feedback_summary_link(f)
@@ -326,7 +329,6 @@ class Controller
         client.remove_links_with_prefix(opp, one_feedback_summary_link_prefix(f))
         client.add_links(opp, link)
       }
-      update_feedback_summary_time(opp, opp['lastInteractionAt'])
     end
 
     all_link = all_feedback_summary_link(opp)
@@ -338,18 +340,6 @@ class Controller
     end
   end
   
-  def feedback_summarised_at(opp)
-    fsa = bot_metadata(opp)['feedback_summarised_at']
-    return if fsa.nil?
-    
-    rules_checksum, ts = fsa.split('-')
-    rules_checksum == feedback_rules_checksum ? ts : nil
-  end
-  
-  def update_feedback_summary_time(opp, update_time)
-    set_bot_metadata(opp, 'feedback_summarised_at', "#{feedback_rules_checksum}-#{update_time}")
-  end
-  
   def feedback_rules_checksum
     @feedback_rules_checksum ||= Digest::MD5.hexdigest(Rules.method('summarise_one_feedback').source)
   end
@@ -359,7 +349,7 @@ class Controller
   end
   
   def one_feedback_summary_link(f)
-    one_feedback_summary_link_prefix(f) + '?' + URI.encode_www_form(({
+    one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(({
         'title': f['text'],
         'user': f['user'],
         'createdAt': f['createdAt'],
