@@ -165,7 +165,7 @@ class Controller
         opp['origin'] == 'sourced' && 
         opp['sources'] == ['LinkedIn'] &&
         opp['lastInteractionAt'] < opp['createdAt'] + 5000
-      client.add_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT)
+      client.add_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT) unless opp['tags'].include? TAG_LINKEDIN_SUSPECTED_OPTOUT
     else
       client.remove_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT) if opp['tags'].include? TAG_LINKEDIN_SUSPECTED_OPTOUT
     end    

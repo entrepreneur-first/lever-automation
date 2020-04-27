@@ -30,6 +30,8 @@ loop do
   else
     email = command.gsub('mailto:', '')
     command, email = email.split(' ') if email.include?(' ')
+    email = (email.match(/https:\/\/hire.lever.co\/candidates\/([^?]+)/) || [])[1] || email
+
     if email.include? '@'
       os = controller.client.opportunities_for_contact(email)
     else
