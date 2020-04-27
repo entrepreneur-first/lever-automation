@@ -27,7 +27,7 @@ AUTO_TAG_PREFIX = '🤖 [auto] '
 BOT_TAG_PREFIX = '🤖 [bot] '
 AUTO_LINK_PREFIX = 'http://🤖/'
 BOT_LINK_PREFIX = AUTO_LINK_PREFIX + 'bot/'
-BOT_METADATA_PREFIX = BOT_LINK_PREFIX + 'data'
+BOT_METADATA_PREFIX = BOT_LINK_PREFIX + 'data/'
 
 # deprecated: now storing under BOT_METADATA
 LAST_CHANGE_TAG_PREFIX = BOT_TAG_PREFIX + "last change detected: "
