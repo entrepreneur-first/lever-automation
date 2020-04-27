@@ -133,11 +133,11 @@ class Controller
         # send webhook of change
         notify_of_change(opp, last_update)
         result['sent_webhook'] = true
-      elsif opp['_addedNoteTimestamp']
+      else 
         # we didn't have a change to notify, but we added one or more notes
         # which will update lastInteractionAt
         # so update LAST_CHANGE_TAG to avoid falsely detecting update next time
-        update_changed_tag(opp, opp['_addedNoteTimestamp'])
+        update_changed_tag(opp, [opp['_addedNoteTimestamp'], opp['lastInteractionAt']].reject{ |v|v.nil? }.max)
       end
 
       commit_bot_metadata(opp)  
