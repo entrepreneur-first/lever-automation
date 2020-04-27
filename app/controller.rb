@@ -134,6 +134,7 @@ class Controller
       # which will update lastInteractionAt
       # so update LAST_CHANGE_TAG to avoid falsely detecting update next time
       update_changed_tag(opp, opp['_addedNoteTimestamp'])
+      update_feedback_summary_time(opp, opp['_addedNoteTimestamp'])
     end
 
     commit_bot_metadata(opp)
@@ -325,7 +326,7 @@ class Controller
         client.remove_links_with_prefix(opp, one_feedback_summary_link_prefix(f))
         client.add_links(opp, link)
       }
-      update_feedback_summary_time(opp)
+      update_feedback_summary_time(opp, opp['lastInteractionAt'])
     end
 
     all_link = all_feedback_summary_link(opp)
@@ -345,8 +346,8 @@ class Controller
     rules_checksum == feedback_rules_checksum ? ts : nil
   end
   
-  def update_feedback_summary_time(opp)
-    set_bot_metadata(opp, 'feedback_summarised_at', "#{feedback_rules_checksum}-#{opp['lastInteractionAt']}")
+  def update_feedback_summary_time(opp, update_time)
+    set_bot_metadata(opp, 'feedback_summarised_at', "#{feedback_rules_checksum}-#{update_time}")
   end
   
   def feedback_rules_checksum
