@@ -68,9 +68,16 @@ class Rules
     nil
   end
 
-  def self.summarise_feedback(f)
+  def self.summarise_one_feedback(f)
     result = {}
     
     result
   end
+
+  def self.summarise_all_feedback(summaries)
+    result = {}
+    
+    result
+  end
+
 end

@@ -6,10 +6,14 @@ class Util
 
   # common lever logic
 
+  def self.has_posting(opp)
+    opp['applications'].any?
+  end
+
   def self.has_application(opp)
-    opp['applications'].length > 0 &&
+    opp['applications'].any? &&
       opp['applications'][0]['type'] == 'posting' &&
-      opp['applications'][0]['customQuestions'].length > 0
+      opp['applications'][0]['customQuestions'].any?
   end
   
   def self.is_cohort_app(opp)

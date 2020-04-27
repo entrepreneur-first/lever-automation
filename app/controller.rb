@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'method_source'
 require_relative '../config/config'
 require_relative 'util'
 require_relative 'log'
@@ -106,39 +107,68 @@ class Controller
     # should notify of change based on state before we executed?
     notify = last_update[:time] > last_webhook_change(opp) + 100
 
+    check_linkedin_optout(opp)
+
     if check_no_posting(opp)
-      # if we added to a job then reload as tags etc will have changed
+      # if we added to a job then reload as tags etc will have changed automagically 
+      # based on new posting assignment
       opp.merge!(client.get_opportunity(opp['id']))
       result['assigned_to_job'] = true
     end
     result['added_source_tag'] if tag_source_from_application(opp)
     
-    summarise_feedbacks(opp)
+    if !Util.has_posting(opp) || Util.is_cohort_app(opp)
+      summarise_feedbacks(opp)
+ 
+      # detect_duplicate_opportunities(opp)
 
-    # detect_duplicate_opportunities(opp)
+      [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
+        unless update.nil?
+          last_update = update
+          notify = true
+        end
+      }
 
-    [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
-      unless update.nil?
-        last_update = update
-        notify = true
+      if notify
+        # send webhook of change
+        notify_of_change(opp, last_update)
+        result['sent_webhook'] = true
+      else 
+        # we didn't have a change to notify, but we added one or more notes
+        # which will update lastInteractionAt
+        # so update LAST_CHANGE_TAG to avoid falsely detecting update next time
+        update_changed_tag(opp, [opp['_addedNoteTimestamp'], opp['lastInteractionAt']].reject{ |v|v.nil? }.max)
       end
-    }
 
-    if notify
-      # send webhook of change
-      notify_of_change(opp, last_update)
-      result['sent_webhook'] = true
-    elsif opp['_addedNoteTimestamp']
-      # we didn't have a change to notify, but we added one or more notes
-      # which will update lastInteractionAt
-      # so update LAST_CHANGE_TAG to avoid falsely detecting update next time
-      update_changed_tag(opp, opp['_addedNoteTimestamp'])
+      commit_bot_metadata(opp)  
     end
+    
+    # tidy up legacy
+    client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX.chomp('/') + '?')
+    client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
+    client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
+    client.remove_links_with_prefix(opp, LINK_CHECKSUM_PREFIX)
 
     client.commit_opp(opp)
 
     log.pop_log_prefix
     result
+  end
+
+  def check_linkedin_optout(opp)
+    # attempt to identify LinkedIn Inmail responses that have opted-out
+    # we don't have a way to read the inmail responses, so instead look for opportunities
+    # that haven't had an interaction since within a few seconds of creation
+    # (leads appear to be created when the recipient opts in/out, and before they type their reply)
+    if !Util.has_posting(opp) && 
+        opp['stage'] == 'lead-responded' && 
+        opp['origin'] == 'sourced' && 
+        opp['sources'] == ['LinkedIn'] &&
+        opp['lastInteractionAt'] < opp['createdAt'] + 5000
+      client.add_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT) unless opp['tags'].include? TAG_LINKEDIN_SUSPECTED_OPTOUT
+    else
+      client.remove_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT) if opp['tags'].include? TAG_LINKEDIN_SUSPECTED_OPTOUT
+    end    
   end
 
   # process leads not assigned to any posting
@@ -147,7 +177,8 @@ class Controller
   # - Leads not assigned to a job posting show up in Lever as candidates with "no opportunity", but are returned in the API as opportunities without an application
   # - Leads assigned to a job posting show up in Lever as opportunities - potentially multiple per candidate. These show up in the API as applications against the opportunity - even when no actual application submitted
   def check_no_posting(opp)
-    return if opp["applications"].count > 0
+    return if Util.has_posting(opp)
+    
     location = location_from_tags(opp)
     if location.nil?
       # unable to determine target location from tags
@@ -167,7 +198,7 @@ class Controller
   def notify_of_change(opp, last_update)
     unless opp['applications'].length == 0
       send_webhook(opp, last_update[:time])
-      client.add_note(opp, 'Updated reporting data after detecting ' + last_update[:source])
+      # client.add_note(opp, 'Updated reporting data after detecting ' + last_update[:source])
     end
     update_changed_tag(opp)
   end
@@ -199,8 +230,7 @@ class Controller
     if update_time.nil?
       update_time = client.get_opportunity(opp['id']).fetch('lastInteractionAt', Time.now.to_i*1000)
     end
-    client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
-    client.add_tag(opp, LAST_CHANGE_TAG_PREFIX + Util.timestamp_to_datetimestr(update_time))
+    set_bot_metadata(opp, 'last_change_detected', update_time)
   end
   
   # detect when opportunity was last updated
@@ -219,8 +249,7 @@ class Controller
     existing = existing_tag_checksum(opp)
     
     if existing != checksum
-      client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
-      client.add_tag(opp, TAG_CHECKSUM_PREFIX + checksum)
+      set_bot_metadata(opp, 'tag_checksum', checksum)
     end
 
     {
@@ -235,8 +264,7 @@ class Controller
     existing = existing_link_checksum(opp)
     
     if existing != checksum
-      client.remove_links_with_prefix(opp, LINK_CHECKSUM_PREFIX)
-      client.add_links(opp, LINK_CHECKSUM_PREFIX + checksum)
+      set_bot_metadata(opp, 'link_checksum', checksum)
     end
 
     {
@@ -254,15 +282,27 @@ class Controller
   end
   
   def existing_tag_checksum(opp)
+    bot_metadata(opp)['tag_checksum'] if bot_metadata(opp)['tag_checksum']
+    # legacy
     opp['tags'].each { |t|
-      return t.delete_prefix TAG_CHECKSUM_PREFIX if t.start_with? TAG_CHECKSUM_PREFIX
+      if t.start_with? TAG_CHECKSUM_PREFIX
+        checksum = t.delete_prefix TAG_CHECKSUM_PREFIX
+        set_bot_metadata(opp, 'tag_checksum', checksum)
+        return checksum
+      end
     }
     nil
   end
   
   def existing_link_checksum(opp)
+    bot_metadata(opp)['link_checksum'] if bot_metadata(opp)['link_checksum']
+    # legacy
     opp['links'].each { |t|
-      return t.delete_prefix LINK_CHECKSUM_PREFIX if t.start_with? LINK_CHECKSUM_PREFIX
+      if t.start_with? LINK_CHECKSUM_PREFIX
+        checksum = t.delete_prefix LINK_CHECKSUM_PREFIX
+        set_bot_metadata(opp, 'link_checksum', checksum)
+        return checksum
+      end
     }
     nil
   end
@@ -272,10 +312,16 @@ class Controller
   #   or a webhook we send ourselves via this script (recorded via tag)
   def last_webhook_change(opp)
     (
-      [opp["createdAt"], opp["lastAdvancedAt"]] +
+      [opp["createdAt"], opp["lastAdvancedAt"], last_change_detected(opp)] +
       opp["applications"].map {|a| a["createdAt"]} +
+      
+      # legacy
       (opp["tags"].select {|t| t.start_with? LAST_CHANGE_TAG_PREFIX}.map {|t| Util.datetimestr_to_timestamp(t.delete_prefix(LAST_CHANGE_TAG_PREFIX)) })
     ).reject {|x| x.nil?}.max
+  end
+
+  def last_change_detected(opp)
+    bot_metadata(opp)['last_change_detected'].to_i
   end
   
   # automatically add tag for the opportunity source based on self-reported data in the application
@@ -304,27 +350,90 @@ class Controller
   end
   
   def summarise_feedbacks(opp)
-    client.feedback_for_opp(opp).each {|f|
-      link = feedback_summary_link(f)
-      next if opp['links'].include?(link)
-      client.remove_links_with_prefix(opp, feedback_summary_link_prefix(f))
-      client.add_links(opp, link)
-    }
+    if opp['lastInteractionAt'] > last_change_detected(opp)
+      # summarise each feedback
+      client.feedback_for_opp(opp).each {|f|
+        link = one_feedback_summary_link(f)
+        next if opp['links'].include?(link)
+        client.remove_links_with_prefix(opp, one_feedback_summary_link_prefix(f))
+        client.add_links(opp, link)
+      }
+    end
+
+    all_link = all_feedback_summary_link(opp)
+    unless opp['links'].include?(all_link)
+      client.remove_links_with_prefix(opp, all_feedback_summary_link_prefix)
+    end
+    unless all_link.nil?
+      client.add_links(opp, all_link)
+    end
   end
   
-  def feedback_summary_link_prefix(f)
+  def feedback_rules_checksum
+    @feedback_rules_checksum ||= Digest::MD5.hexdigest(Rules.method('summarise_one_feedback').source)
+  end
+  
+  def one_feedback_summary_link_prefix(f)
     AUTO_LINK_PREFIX + "feedback/#{f['id']}/"
   end
   
-  def feedback_summary_link(f)
-    feedback_summary_link_prefix(f) + '?' + URI.encode_www_form({
+  def one_feedback_summary_link(f)
+    one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(({
         'title': f['text'],
         'user': f['user'],
         'createdAt': f['createdAt'],
         'completedAt': f['completedAt']
-      }.reject{|k,v| v.nil?}.merge(Rules.summarise_feedback(f))
+      }.merge(Rules.summarise_one_feedback(f).reject{|k,v| v.nil?}).sort)
     )
   end
+  
+  def all_feedback_summary_link_prefix
+    AUTO_LINK_PREFIX + "feedback/all/"
+  end
+  
+  def all_feedback_summary_link(opp)
+    feedback_data = opp['links'].select { |l|
+        l.start_with? AUTO_LINK_PREFIX + 'feedback/'
+      }.map { |l|
+        URI.decode_www_form(l.sub(/[^?]*\?/, '')).to_h
+      }
+    return unless feedback_data.any?
+    
+    summary = Rules.summarise_all_feedback(feedback_data)
+    return unless summary.any?
+    
+    all_feedback_summary_link_prefix + '?' + URI.encode_www_form(summary)
+  end
+  
+  # determine intended cohort location from lead tags
+  def location_from_tags(opp)
+    opp["tags"].each { |tag|
+      COHORT_JOBS.each { |cohort|
+        return cohort if tag.downcase.include?(cohort[:name])
+      }
+    }
+    nil
+  end
+
+  def bot_metadata(opp)
+    opp['_bot_metadata'] ||= URI.decode_www_form((opp['links'].select {|l| l.start_with? BOT_METADATA_PREFIX + opp['id'] }.first || '').sub(/[^?]*\?/, '')).to_h
+  end
+  
+  def set_bot_metadata(opp, key, value)
+    bot_metadata(opp)
+    opp['_bot_metadata'][key] = value
+  end
+  
+  def commit_bot_metadata(opp)
+    return unless (opp['_bot_metadata'] || {}).any?
+    link = BOT_METADATA_PREFIX + opp['id'] + '?' + URI.encode_www_form(opp['_bot_metadata'].sort)
+    return if opp['links'].include? link
+    
+    client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX + opp['id'])
+    client.add_links(opp, link)
+  end
+
+  # TEMP
   
   # detect duplicate opportunities for a candidate
   def detect_duplicate_opportunities(opp)
@@ -339,18 +448,6 @@ class Controller
     client.add_tag(opp, TAG_DUPLICATE_OPPS_PREFIX + " without posting") if posting_ids.reject {|p| p == 'none' }.length > 0 && posting_ids.include?("none")
   end
 
-  # determine intended cohort location from lead tags
-  def location_from_tags(opp)
-    opp["tags"].each { |tag|
-      COHORT_JOBS.each { |cohort|
-        return cohort if tag.downcase.include?(cohort[:name])
-      }
-    }
-    nil
-  end
-
-  # TEMP
-  
   def opportunities_without_posting
     log_string = 'opportunities_without_posting'
     params = {}
