@@ -5,7 +5,7 @@ controller = Controller.new
 controller.log.verbose
 
 loop do
-  puts "\nEnter 'summarise', 'process', 'fix tags', 'check links', or '[view|feedback] <email>' to view/process one candidate:"
+  puts "\nEnter 'summarise', 'process', 'fix tags', 'check links', or '[view|feedback] <email>|<opportunity_id>' to view/process one candidate:"
   command = gets.chomp
 
   case command
@@ -30,12 +30,19 @@ loop do
   else
     email = command.gsub('mailto:', '')
     command, email = email.split(' ') if email.include?(' ')
-    os = controller.client.opportunities_for_contact(email)
+    if email.include? '@'
+      os = controller.client.opportunities_for_contact(email)
+    else
+      os = [controller.client.get_opportunity(email)]
+    end
+
     case command
     when 'view'
       puts JSON.pretty_generate(os)
     when 'feedback'
       os.each{ |opp| puts JSON.pretty_generate controller.client.feedback_for_opp(opp) }
+    when 'notes'
+      os.each{ |opp| puts JSON.pretty_generate controller.client.get_paged_result("#{API_URL}opportunities/#{opp['id']}/notes", {}, 'notes') }
     else
       os.each { |opp| controller.process_opportunity(opp) }
     end
