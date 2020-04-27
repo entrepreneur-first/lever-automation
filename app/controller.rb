@@ -399,7 +399,7 @@ class Controller
   end
 
   def bot_metadata(opp)
-    opp['_bot_metadata'] ||= URI.decode_www_form((opp['links'].select {|l| l.start_with? BOT_METADATA_PREFIX }.first || '').sub(/[^?]*\?/, '')).to_h
+    opp['_bot_metadata'] ||= URI.decode_www_form((opp['links'].select {|l| l.start_with? BOT_METADATA_PREFIX + opp['id'] }.first || '').sub(/[^?]*\?/, '')).to_h
   end
   
   def set_bot_metadata(opp, key, value)
@@ -409,11 +409,14 @@ class Controller
   
   def commit_bot_metadata(opp)
     return unless (opp['_bot_metadata'] || {}).any?
-    link = BOT_METADATA_PREFIX + '?' + URI.encode_www_form(opp['_bot_metadata'].sort)
+    link = BOT_METADATA_PREFIX + opp['id'] + '?' + URI.encode_www_form(opp['_bot_metadata'].sort)
     return if opp['links'].include? link
     
-    client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX)
+    client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX + opp['id'])
     client.add_links(opp, link)
+
+    # tidy up legacy
+    client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX.chomp('/') + '?')
   end
 
   # TEMP
