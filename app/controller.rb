@@ -305,26 +305,64 @@ class Controller
   
   def summarise_feedbacks(opp)
     client.feedback_for_opp(opp).each {|f|
-      link = feedback_summary_link(f)
+      link = one_feedback_summary_link(f)
       next if opp['links'].include?(link)
-      client.remove_links_with_prefix(opp, feedback_summary_link_prefix(f))
+      client.remove_links_with_prefix(opp, one_feedback_summary_link_prefix(f))
       client.add_links(opp, link)
     }
+
+    all_link = all_feedback_summary_link(opp)
+    unless opp['links'].include?(all_link)
+      client.remove_links_with_prefix(opp, all_feedback_summary_link_prefix)
+    end
+    unless all_link.nil?
+      client.add_links(opp, all_link)
+    end
   end
   
-  def feedback_summary_link_prefix(f)
+  def one_feedback_summary_link_prefix(f)
     AUTO_LINK_PREFIX + "feedback/#{f['id']}/"
   end
   
-  def feedback_summary_link(f)
+  def one_feedback_summary_link(f)
     feedback_summary_link_prefix(f) + '?' + URI.encode_www_form({
         'title': f['text'],
         'user': f['user'],
         'createdAt': f['createdAt'],
         'completedAt': f['completedAt']
-      }.reject{|k,v| v.nil?}.merge(Rules.summarise_feedback(f))
+      }.merge(Rules.summarise_one_feedback(f).reject{|k,v| v.nil?}.sort)
     )
   end
+  
+  def all_feedback_summary_link_prefix
+    AUTO_LINK_PREFIX + "feedback/all/"
+  end
+  
+  def all_feedback_summary_link(opp)
+    feedback_data = opp['links'].select { |l|
+        l.start_with? AUTO_LINK_PREFIX + 'feedback/'
+      }.map { |l|
+        URI.decode_www_form(l.sub(/[^?]*\?/, ''))
+      }
+    return unless feedback_data.any?
+    
+    summary = Rules.summarise_all_feedback(feedback_data)
+    return unless summary.any?
+    
+    all_feedback_summary_link_prefix + '?' + URI.encode_www_form(summary)
+  end
+  
+  # determine intended cohort location from lead tags
+  def location_from_tags(opp)
+    opp["tags"].each { |tag|
+      COHORT_JOBS.each { |cohort|
+        return cohort if tag.downcase.include?(cohort[:name])
+      }
+    }
+    nil
+  end
+
+  # TEMP
   
   # detect duplicate opportunities for a candidate
   def detect_duplicate_opportunities(opp)
@@ -339,18 +377,6 @@ class Controller
     client.add_tag(opp, TAG_DUPLICATE_OPPS_PREFIX + " without posting") if posting_ids.reject {|p| p == 'none' }.length > 0 && posting_ids.include?("none")
   end
 
-  # determine intended cohort location from lead tags
-  def location_from_tags(opp)
-    opp["tags"].each { |tag|
-      COHORT_JOBS.each { |cohort|
-        return cohort if tag.downcase.include?(cohort[:name])
-      }
-    }
-    nil
-  end
-
-  # TEMP
-  
   def opportunities_without_posting
     log_string = 'opportunities_without_posting'
     params = {}
