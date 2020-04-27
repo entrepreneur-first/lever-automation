@@ -114,29 +114,38 @@ class Controller
     end
     result['added_source_tag'] if tag_source_from_application(opp)
     
-    summarise_feedbacks(opp)
+    if !Util.has_posting(opp) || Util.is_cohort_app(opp)
+      summarise_feedbacks(opp)
+ 
+      # detect_duplicate_opportunities(opp)
 
-    # detect_duplicate_opportunities(opp)
+      [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
+        unless update.nil?
+          last_update = update
+          notify = true
+        end
+      }
 
-    [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
-      unless update.nil?
-        last_update = update
-        notify = true
+      if notify
+        # send webhook of change
+        notify_of_change(opp, last_update)
+        result['sent_webhook'] = true
+      elsif opp['_addedNoteTimestamp']
+        # we didn't have a change to notify, but we added one or more notes
+        # which will update lastInteractionAt
+        # so update LAST_CHANGE_TAG to avoid falsely detecting update next time
+        update_changed_tag(opp, opp['_addedNoteTimestamp'])
       end
-    }
 
-    if notify
-      # send webhook of change
-      notify_of_change(opp, last_update)
-      result['sent_webhook'] = true
-    elsif opp['_addedNoteTimestamp']
-      # we didn't have a change to notify, but we added one or more notes
-      # which will update lastInteractionAt
-      # so update LAST_CHANGE_TAG to avoid falsely detecting update next time
-      update_changed_tag(opp, opp['_addedNoteTimestamp'])
+      commit_bot_metadata(opp)  
     end
+    
+    # tidy up legacy
+    client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX.chomp('/') + '?')
+    client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
+    client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
+    client.remove_links_with_prefix(opp, LINK_CHECKSUM_PREFIX)
 
-    commit_bot_metadata(opp)
     client.commit_opp(opp)
 
     log.pop_log_prefix
@@ -402,12 +411,6 @@ class Controller
     
     client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX + opp['id'])
     client.add_links(opp, link)
-
-    # tidy up legacy
-    client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX.chomp('/') + '?')
-    client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
-    client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
-    client.remove_links_with_prefix(opp, LINK_CHECKSUM_PREFIX)
   end
 
   # TEMP
