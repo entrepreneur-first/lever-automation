@@ -278,7 +278,7 @@ class Controller
   end
   
   def existing_tag_checksum(opp)
-    bot_metadata(opp)['tag_checksum'] if bot_metadata(opp)['tag_checksum']
+    return bot_metadata(opp)['tag_checksum'] if bot_metadata(opp)['tag_checksum']
     # legacy
     opp['tags'].each { |t|
       if t.start_with? TAG_CHECKSUM_PREFIX
@@ -291,7 +291,7 @@ class Controller
   end
   
   def existing_link_checksum(opp)
-    bot_metadata(opp)['link_checksum'] if bot_metadata(opp)['link_checksum']
+    return bot_metadata(opp)['link_checksum'] if bot_metadata(opp)['link_checksum']
     # legacy
     opp['links'].each { |t|
       if t.start_with? LINK_CHECKSUM_PREFIX
