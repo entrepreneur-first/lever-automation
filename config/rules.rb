@@ -89,25 +89,39 @@ class Rules
   # helpers
   #
 
-  def update_tags(opp, add, remove, add_note)
-    tag_source_from_application(opp, add, remove, add_note)
+  def update_tags(opp)
+    opp(opp)
+    tag_source_from_application(opp)
   end
   
   # automatically add tag for the opportunity source based on self-reported data in the application
-  def tag_source_from_application(opp, add, remove, add_note)
+  def tag_source_from_application(opp)
     return if !Util.has_application(opp) || !Util.is_cohort_app(opp)
 
     tag = tags(:source, :error) # default
     source = source_from_application(opp)
     tag = source[:source] unless source.nil? || source[:source].nil?
     
-    add.(TAG_SOURCE_FROM_APPLICATION + tag)
-    remove.(tags(:source).reject {|k,v| k == tag}.values.map{|t| TAG_SOURCE_FROM_APPLICATION + t})
+    add(TAG_SOURCE_FROM_APPLICATION + tag)
+    remove(tags(:source).reject {|k,v| k == tag}.values.map{|t| TAG_SOURCE_FROM_APPLICATION + t})
     
     log.log("Added tag #{TAG_SOURCE_FROM_APPLICATION}#{tag} because field \"#{source[:field]}\" is \"#{Array(source[:value]).join('; ')}\"")
   end
 
   private
+
+  def initialize(client)
+    @client = client
+  end
+  
+  def client
+    @client
+  end
+  
+  def opp(opp=nil)
+    @opp = opp unless opp.nil?
+    @opp
+  end
 
   def tags(category=nil, name=nil)
     if category.nil?
@@ -117,6 +131,18 @@ class Rules
     else
       all_tags[category][name]
     end
+  end
+  
+  def add(tags)
+    @client.add_tags_if_unset(@opp, tags)
+  end
+  
+  def remove(tags)
+    @client.remove_tags_if_set(@opp, tags)
+  end
+  
+  def add_note(note)
+    @client.add_note(@opp, note)
   end
   
 end

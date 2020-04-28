@@ -12,7 +12,7 @@ class Controller
   def initialize
     @log = Log.new
     @client = Client.new(ENV['LKEY'], @log)
-    @rules = Rules.new
+    @rules = Rules.new(@client)
   end
   
   def client
@@ -132,7 +132,7 @@ class Controller
       # detect_duplicate_opportunities(opp)
       remove_legacy_attributes(opp)
 
-      rules.update_tags(opp, client.method(:add_tags_if_unset).curry.call(opp), client.method(:remove_tags_if_set).curry.call(opp), client.method(:add_note).curry.call(opp))
+      rules.update_tags(opp)
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
         unless update.nil?
