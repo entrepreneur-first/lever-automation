@@ -27,6 +27,10 @@ class Client
   def log
     @log
   end
+  
+  def OPP_EXPAND_VALUES
+    ['applications','stage','sourcedBy','owner']
+  end
 
   #
   # Reading data
@@ -37,7 +41,7 @@ class Client
   end
 
   def opportunities_for_contact(email)
-    get_paged_result(OPPORTUNITIES_URL, {email: email, expand: 'applications'}, 'opportunities_for_contact')
+    get_paged_result(OPPORTUNITIES_URL, {email: email, expand: OPP_EXPAND_VALUES}, 'opportunities_for_contact')
   end
 
   def opportunities(posting_ids = [])

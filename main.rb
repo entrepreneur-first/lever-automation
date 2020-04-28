@@ -35,7 +35,7 @@ loop do
     if email.include? '@'
       os = controller.client.opportunities_for_contact(email)
     else
-      os = [controller.client.get_opportunity(email, {expand: 'applications'})]
+      os = [controller.client.get_opportunity(email, {expand: controller.client.OPP_EXPAND_VALUES})]
     end
 
     case command

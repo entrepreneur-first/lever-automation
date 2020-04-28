@@ -28,7 +28,7 @@ class Controller
     tagable = Hash.new(0)
     untagable = Hash.new(0)
     
-    client.process_paged_result(OPPORTUNITIES_URL, {archived: false, expand: ['applications','stage','sourcedBy','owner']}, 'active opportunities') { |opp|
+    client.process_paged_result(OPPORTUNITIES_URL, {archived: false, expand: client.OPP_EXPAND_VALUES}, 'active opportunities') { |opp|
     
       contacts[opp['contact']] += 1
       summary[:opportunities] += 1
@@ -75,7 +75,7 @@ class Controller
     
     log.log("Processing all active opportunities..")
 
-    client.process_paged_result(OPPORTUNITIES_URL, {archived: false, expand: ['applications','stage','sourcedBy','owner']}, 'active opportunities') { |opp|
+    client.process_paged_result(OPPORTUNITIES_URL, {archived: false, expand: client.OPP_EXPAND_VALUES}, 'active opportunities') { |opp|
     
       contacts[opp['contact']] += 1
       summary[:opportunities] += 1
@@ -111,7 +111,7 @@ class Controller
     if check_no_posting(opp)
       # if we added to a job then reload as tags etc will have changed automagically 
       # based on new posting assignment
-      opp.merge!(client.get_opportunity(opp['id']))
+      opp.merge!(client.get_opportunity(opp['id'], {expand: client.OPP_EXPAND_VALUES}))
       result['assigned_to_job'] = true
     end
     
