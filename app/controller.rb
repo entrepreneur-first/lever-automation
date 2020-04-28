@@ -102,7 +102,7 @@ class Controller
     }
     client.batch_updates(false)
 
-    log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job; #{summary[:contacts_with_duplicates]} contacts with multiple opportunities, of which #{summary[:contacts_with_3_plus]} have 3+")
+    log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent), #{summary[:assigned_to_job]} assigned to job; #{summary[:contacts_with_duplicates]} contacts with multiple opportunities, of which #{summary[:contacts_with_3_plus]} have 3+")
   end
 
   # process a single opportunity
