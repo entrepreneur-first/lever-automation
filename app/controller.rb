@@ -332,7 +332,7 @@ class Controller
     responses.map! { |qu|
       qu.merge!({
         _text: qu['text'].downcase.gsub(/[^a-z ]/, ''),
-        _value: (qu['value'].class == Array ? qu['value'].join(' ') : qu['value']).downcase.gsub(/[^a-z ]/, ''),
+        _value: Array(qu['value']).join(' ').downcase.gsub(/[^a-z ]/, ''),
       })
     }
   end

@@ -160,7 +160,7 @@ class Client
   end
     
   def queue_add_annotations(opp, type, values)
-    values = [values] if values.class != Array
+    values = Array(values)
     ltype = type.downcase
     values.each { |value|
       opp['_add'+type] = [] if opp['_add'+type].nil?
@@ -171,7 +171,7 @@ class Client
   end
   
   def queue_remove_annotations(opp, type, values)
-    values = [values] if values.class != Array
+    values = Array(values)
     ltype = type.downcase
     values.each { |value|
       opp['_remove'+type] = [] if opp['_remove'+type].nil?
