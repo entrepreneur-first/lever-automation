@@ -93,7 +93,7 @@ class Rules
     return if !Util.has_application(opp) || !Util.is_cohort_app(opp)
 
     tag = tags(:source, :error) # default
-    source = Rules.source_from_application(opp, opp['_app_responses'])
+    source = source_from_application(opp, opp['_app_responses'])
     tag = source[:source] unless source.nil? || source[:source].nil?
     
     add(TAG_SOURCE_FROM_APPLICATION + tag)
