@@ -5,26 +5,30 @@
 #
 
 class Rules
-  
-  def self.source_from_application(opp)
-    return {msg: 'No application'} if !Util.has_application(opp)
-    
-    # responses to questions are subdivided by custom question set - need to combine them together
-    responses = opp['applications'][0]['customQuestions'].reduce([]) {|a, b| a+b['fields']} if opp.dig('applications', 0, 'customQuestions')
-    return {msg: "Couldn't find custom question responses."} if responses.nil?
 
-    # simply question titles to lowercase a-z only to minimise mismatch due to inconsistent naming
-    responses.map! { |qu|
-      qu.merge!({
-        _text: qu['text'].downcase.gsub(/[^a-z ]/, ''),
-        _value: (qu['value'].class == Array ? qu['value'].join(' ') : qu['value']).downcase.gsub(/[^a-z ]/, ''),
-      })
-    }
+  # list of tags for each category, so we can remove when updating with new values
+  def all_tags
+    {
+      source: {
+        sourced: 'Sourced',
+        referral: 'Referral',
+        organic: 'Organic',
+        offline: 'Offline',
+        offline_organic: 'Offline-or-Organic',
+        error: '<error:unknown>'
+      }
+    }  
+  end
+  
+  def self.source_from_application(opp, responses)
+    return {msg: 'No application'} if !Util.has_application(opp)
+    return {msg: "Couldn't find custom question responses."} if responses.nil?
 
     # 1: "who referred you"
     responses.each {|qu|
+      tags = tags(:source)
       if qu[:_text].include?('who referred you')
-        return {source: "Referral", field: qu['text'], value: "<not empty>"} if qu['value'] > ''
+        return {tag: tags[:referral], field: qu['text'], value: "<not empty>"} if qu['value'] > ''
         break
       end
     }
@@ -32,16 +36,16 @@ class Rules
     responses.each {|qu|
       if qu[:_text].include?('who told you about ef')
         map = [
-          ['been on the ef programme', 'Referral'],
-          ['worked at ef', 'Referral'],
-          ['professional network', 'Organic'],
-          ['friends or family', 'Organic']
+          ['been on the ef programme', tag: tags[:referral]],
+          ['worked at ef', tag: tags[:referral]],
+          ['professional network', tag: tags[:organicl]],
+          ['friends or family', tag: tags[:organic]]
         ]
         source = nil
         map.each { |m|
           source = m[1] if qu[:_value].include? m[0]
         }
-        return {source: source, field: qu['text'], value: qu['value']} unless source.nil?
+        return {tag: source, field: qu['text'], value: qu['value']} unless source.nil?
         break
       end
     }
@@ -49,11 +53,11 @@ class Rules
     responses.each {|qu|
       if qu[:_text].include?('how did you hear about ef')
         map = [
-          ['directly contacted by ef', 'Sourced'],
-          ['cohort member', 'Referral'],
-          ['someone else', 'Organic'], # if not already covered above by latter questions
-          ['came across ef', 'Offline-or-Organic'],
-          ['event', 'Offline']
+          ['directly contacted by ef', tags[:sourced]],
+          ['cohort member', tags[:referral]],
+          ['someone else', tags[:organic]], # if not already covered above by latter questions
+          ['came across ef', tags[:offline_organic]],
+          ['event', tags[:offline]]
         ]
         source = nil
         map.each { |m|
@@ -80,4 +84,34 @@ class Rules
     result
   end
 
+  def self.update_tags(opp, add, remove, add_note)
+    self.tag_source_from_application(opp, add, remove, add_note)
+  end
+  
+  # automatically add tag for the opportunity source based on self-reported data in the application
+  def self.tag_source_from_application(opp, add, remove, add_note)
+    return if !Util.has_application(opp) || !Util.is_cohort_app(opp)
+
+    tag = tags(:source, :error) # default
+    source = Rules.source_from_application(opp, opp['_app_responses'])
+    tag = source[:source] unless source.nil? || source[:source].nil?
+    
+    add(TAG_SOURCE_FROM_APPLICATION + tag)
+    remove(tags(:source).reject {|k,v| k == tag}.values.map{|t| TAG_SOURCE_FROM_APPLICATION + t})
+    
+    log.log("Added tag #{TAG_SOURCE_FROM_APPLICATION}#{tag} because field \"#{source[:field]}\" is \"#{Array(source[:value]).join('; ')}\"")
+  end
+
+  # helpers
+
+  def tags(category=nil, name=nil)
+    if category.nil?
+      all_tags
+    elsif name.nil?
+      all_tags[category]
+    else
+      all_tags[category][name]
+    end
+  end
+  
 end
