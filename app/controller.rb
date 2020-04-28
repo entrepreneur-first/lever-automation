@@ -161,7 +161,7 @@ class Controller
         opp['origin'] == 'sourced' && 
         opp['sources'] == ['LinkedIn'] &&
         opp['lastInteractionAt'] < opp['createdAt'] + 5000
-      client.add_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT)
+      client.add_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT) unless opp['tags'].include? TAG_LINKEDIN_SUSPECTED_OPTOUT
     else
       client.remove_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT) if opp['tags'].include? TAG_LINKEDIN_SUSPECTED_OPTOUT
     end    
@@ -372,7 +372,7 @@ class Controller
         'user': f['user'],
         'createdAt': f['createdAt'],
         'completedAt': f['completedAt']
-      }.merge(Rules.summarise_one_feedback(f).reject{|k,v| v.nil?}).sort)
+      }.merge(Rules.summarise_one_feedback(f)))
     )
   end
   

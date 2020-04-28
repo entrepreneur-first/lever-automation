@@ -32,8 +32,8 @@ class Client
   # Reading data
   #
 
-  def get_opportunity(id)
-    get_single_result(OPPORTUNITIES_URL.chomp('?') + '/' + id, {}, 'retrieve single opportunity')
+  def get_opportunity(id, params={})
+    get_single_result(OPPORTUNITIES_URL.chomp('?') + '/' + id, params, 'retrieve single opportunity')
   end
 
   def opportunities_for_contact(email)
