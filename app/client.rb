@@ -81,10 +81,12 @@ class Client
   end
 
   def commit_opp(opp)
+    updated = false
     ['Tags','Links'].each{|type|
-      add_annotations(opp, type, opp['_add'+type], true) if (opp['_add'+type] || []).any?
-      remove_annotations(opp, type, opp['_remove'+type], true) if (opp['_remove'+type] || []).any?
+      (updated = true; add_annotations(opp, type, opp['_add'+type], true)) if Array(opp['_add'+type]).any?
+      (updated = true; remove_annotations(opp, type, opp['_remove'+type], true)) if Array(opp['_remove'+type]).any?
     }
+    updated
   end
   
   def add_tag(opp, tags, commit=false)

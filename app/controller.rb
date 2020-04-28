@@ -74,6 +74,7 @@ class Controller
     client.batch_updates
     
     log.log("Processing all active opportunities..")
+    log_index = 0
 
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false, expand: client.OPP_EXPAND_VALUES}, 'active opportunities') { |opp|
     
@@ -85,10 +86,14 @@ class Controller
 
       result = process_opportunity(opp)
       
+      summary[:updated] += 1 if result['updated']
       summary[:sent_webhook] += 1 if result['sent_webhook']
       summary[:assigned_to_job] += 1 if result['assigned_to_job']
 
-      log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job") if summary[:sent_webhook] > 0 && summary[:sent_webhook] % 50 == 0
+      if summary[:opportunities] > log_index && summary[:updated] % 50 == 0
+        log_index = summary[:opportunities]
+        log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job")
+      end
     }
     client.batch_updates(false)
 
@@ -134,7 +139,7 @@ class Controller
       if notify
         # send webhook of change
         notify_of_change(opp, last_update)
-        result['sent_webhook'] = true
+        result['sent_webhook'] = result['updated'] = true
       else 
         # we didn't have a change to notify, but we added one or more notes
         # which will update lastInteractionAt
@@ -142,10 +147,10 @@ class Controller
         update_changed_tag(opp, [opp['_addedNoteTimestamp'], opp['lastInteractionAt']].reject{ |v|v.nil? }.max)
       end
 
-      commit_bot_metadata(opp)  
+      result['updated'] ||= commit_bot_metadata(opp)
     end
 
-    client.commit_opp(opp)
+    result['updated'] ||= client.commit_opp(opp)
 
     log.pop_log_prefix
     result
@@ -420,6 +425,7 @@ class Controller
     
     client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX + opp['id'])
     client.add_links(opp, link)
+    true
   end
 
   def remove_legacy_attributes(opp)
