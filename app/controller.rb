@@ -122,7 +122,7 @@ class Controller
       # detect_duplicate_opportunities(opp)
       remove_legacy_attributes(opp)
 
-      Rules.update_tags(opp, client.method(:add_tag).curry.call(opp), client.method(:remove_tag).curry.call(opp), client.method(:add_note).curry.call(opp))
+      Rules.update_tags(opp, client.method(:add_tags_if_unset).curry.call(opp), client.method(:remove_tags_if_set).curry.call(opp), client.method(:add_note).curry.call(opp))
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
         unless update.nil?
@@ -161,9 +161,9 @@ class Controller
         opp['origin'] == 'sourced' && 
         opp['sources'] == ['LinkedIn'] &&
         (opp['lastInteractionAt'] < opp['createdAt'] + 5000)
-      client.add_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT) unless opp['tags'].include? TAG_LINKEDIN_SUSPECTED_OPTOUT
+      client.add_tags_if_unset(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT)
     else
-      client.remove_tag(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT) if opp['tags'].include? TAG_LINKEDIN_SUSPECTED_OPTOUT
+      client.remove_tags_if_set(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT)
     end    
   end
 
@@ -178,10 +178,10 @@ class Controller
     location = location_from_tags(opp)
     if location.nil?
       # unable to determine target location from tags
-      client.add_tag(opp, TAG_ASSIGN_TO_LOCATION_NONE_FOUND) unless opp['tags'].include?(TAG_ASSIGN_TO_LOCATION_NONE_FOUND)
+      client.add_tags_if_unset(opp, TAG_ASSIGN_TO_LOCATION_NONE_FOUND)
       nil
     else
-      client.remove_tag(opp, TAG_ASSIGN_TO_LOCATION_NONE_FOUND) if opp['tags'].include?(TAG_ASSIGN_TO_LOCATION_NONE_FOUND)
+      client.remove_tags_if_set(opp, TAG_ASSIGN_TO_LOCATION_NONE_FOUND)
       client.add_tag(opp, TAG_ASSIGN_TO_LOCATION_PREFIX + location[:name])
       client.add_tag(opp, TAG_ASSIGNED_TO_LOCATION)
       # add_note(opp, 'Assigned to cohort job: ' + location[:name] + ' based on tags')
@@ -487,7 +487,7 @@ class Controller
   def fix_auto_assigned_tags
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false, expand: ['applications']}, 'fixing auto-assigned tags for active opportunities') { |opp|
       next if opp['applications'].length == 0
-      client.add_tag(opp, TAG_ASSIGNED_TO_LOCATION, true) if opp['applications'][0]['user'] == LEVER_BOT_USER && !opp['tags'].include?(TAG_ASSIGNED_TO_LOCATION)
+      client.add_tags_if_unset(opp, TAG_ASSIGNED_TO_LOCATION, true) if opp['applications'][0]['user'] == LEVER_BOT_USER
       client.remove_tag(opp, TAG_SOURCE_FROM_APPLICATION_ERROR) if !Util.has_application(opp) || !Util.is_cohort_app(opp)
     }
   end

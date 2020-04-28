@@ -87,8 +87,16 @@ class Client
     add_annotations(opp, 'Tags', tags, commit)
   end
   
+  def add_tags_if_unset(opp, tags, commit=false)
+    add_annotations(opp, 'Tags', tags.reject {|t| opp['tags'].include? t}, commit)
+  end
+  
   def remove_tag(opp, tags, commit=false)
     remove_annotations(opp, 'Tags', tags, commit)
+  end
+  
+  def remove_tags_if_set(opp, tags, commit=false)
+    remove_annotations(opp, 'Tags', tags.select {|t| opp['tags'].include? t}, commit)
   end
   
   def remove_tags_with_prefix(opp, prefix)
