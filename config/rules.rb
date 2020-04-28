@@ -20,8 +20,21 @@ class Rules
     }  
   end
   
-  def source_from_application(opp, responses)
+  def summarise_one_feedback(f)
+    result = {}
+    
+    result
+  end
+
+  def summarise_all_feedback(summaries)
+    result = {}
+    
+    result
+  end
+
+  def source_from_application(opp)
     return {msg: 'No application'} if !Util.has_application(opp)
+    responses = opp['_app_responses']
     return {msg: "Couldn't find custom question responses."} if responses.nil?
 
     # 1: "who referred you"
@@ -72,17 +85,9 @@ class Rules
     nil
   end
 
-  def summarise_one_feedback(f)
-    result = {}
-    
-    result
-  end
-
-  def summarise_all_feedback(summaries)
-    result = {}
-    
-    result
-  end
+  #
+  # helpers
+  #
 
   def update_tags(opp, add, remove, add_note)
     tag_source_from_application(opp, add, remove, add_note)
@@ -93,16 +98,15 @@ class Rules
     return if !Util.has_application(opp) || !Util.is_cohort_app(opp)
 
     tag = tags(:source, :error) # default
-    source = source_from_application(opp, opp['_app_responses'])
+    source = source_from_application(opp)
     tag = source[:source] unless source.nil? || source[:source].nil?
     
-    add(TAG_SOURCE_FROM_APPLICATION + tag)
-    remove(tags(:source).reject {|k,v| k == tag}.values.map{|t| TAG_SOURCE_FROM_APPLICATION + t})
+    add.(TAG_SOURCE_FROM_APPLICATION + tag)
+    remove.(tags(:source).reject {|k,v| k == tag}.values.map{|t| TAG_SOURCE_FROM_APPLICATION + t})
     
     log.log("Added tag #{TAG_SOURCE_FROM_APPLICATION}#{tag} because field \"#{source[:field]}\" is \"#{Array(source[:value]).join('; ')}\"")
   end
 
-  # helpers
   private
 
   def tags(category=nil, name=nil)
