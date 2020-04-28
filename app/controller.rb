@@ -95,7 +95,7 @@ class Controller
       summary[:sent_webhook] += 1 if result['sent_webhook']
       summary[:assigned_to_job] += 1 if result['assigned_to_job']
 
-      if summary[:opportunities] > log_index && summary[:updated] % 50 == 0
+      if summary[:updated] > 0 && summary[:updated] % 50 == 0 && summary[:opportunities] > log_index
         log_index = summary[:opportunities]
         log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job")
       end
