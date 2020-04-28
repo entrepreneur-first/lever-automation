@@ -99,7 +99,6 @@ class Controller
   # apply changes & trigger webhook as necessary
   def process_opportunity(opp)
     result = {}
-    # log('Processing Opportunity: ' + opp['id'])
     log.log_prefix(opp['id'] + ': ')
 
     # checks lastInteractionAt and tag checksum, creating checksum tag if necessary
@@ -115,12 +114,15 @@ class Controller
       opp.merge!(client.get_opportunity(opp['id']))
       result['assigned_to_job'] = true
     end
-    result['added_source_tag'] if tag_source_from_application(opp)
     
     if !Util.has_posting(opp) || Util.is_cohort_app(opp)
+    
+      prepare_app_responses(opp)
       summarise_feedbacks(opp)
- 
       # detect_duplicate_opportunities(opp)
+      remove_legacy_attributes(opp)
+
+      Rules.update_tags(opp, client.method(:add_tag).curry.call(opp), client.method(:remove_tag).curry.call(opp), client.method(:add_note).curry.call(opp))
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
         unless update.nil?
@@ -142,12 +144,6 @@ class Controller
 
       commit_bot_metadata(opp)  
     end
-    
-    # tidy up legacy
-    client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX.chomp('/') + '?')
-    client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
-    client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
-    client.remove_links_with_prefix(opp, LINK_CHECKSUM_PREFIX)
 
     client.commit_opp(opp)
 
@@ -324,35 +320,28 @@ class Controller
     bot_metadata(opp)['last_change_detected'].to_i
   end
   
-  # automatically add tag for the opportunity source based on self-reported data in the application
-  def tag_source_from_application(opp)
-    client.remove_tag(opp, TAG_SOURCE_FROM_APPLICATION_ERROR) if opp['tags'].include? TAG_SOURCE_FROM_APPLICATION_ERROR
-    
-    # we need an application of type posting, to the cohort (not team job)
-    return if !Util.has_application(opp) || !Util.is_cohort_app(opp)
-    
-    # skip if already applied
-    opp['tags'].each {|tag|
-      return if tag.start_with?(TAG_SOURCE_FROM_APPLICATION) && tag != TAG_SOURCE_FROM_APPLICATION_ERROR
+  def prepare_app_responses(opp)
+    # responses to questions are subdivided by custom question set - need to combine them together
+    opp['_app_responses'] = {}
+    opp['_app_responses'] = opp['applications'][0]['customQuestions'].reduce([]) {|a, b| a+b['fields']} if opp.dig('applications', 0, 'customQuestions')
+    simple_response_text(opp['_app_responses'])    
+  end
+  
+  def simple_response_text(responses)
+    # simply question titles to lowercase a-z only to minimise mismatch due to inconsistent naming
+    responses.map! { |qu|
+      qu.merge!({
+        _text: qu['text'].downcase.gsub(/[^a-z ]/, ''),
+        _value: (qu['value'].class == Array ? qu['value'].join(' ') : qu['value']).downcase.gsub(/[^a-z ]/, ''),
+      })
     }
-    
-    source = Rules.source_from_application(opp)
-    unless source.nil? || source[:source].nil?
-      client.add_tag(opp, TAG_SOURCE_FROM_APPLICATION + source[:source])
-      client.remove_tag(opp, TAG_SOURCE_FROM_APPLICATION_ERROR) if opp['tags'].include? TAG_SOURCE_FROM_APPLICATION_ERROR
-      client.add_note(opp, 'Added tag ' + TAG_SOURCE_FROM_APPLICATION + source[:source] + "\nbecause field \"" + source[:field] + "\"\nis \"" + (source[:value].class == Array ?
-        source[:value].join('; ') :
-        source[:value]) + '"')
-    else
-      client.add_tag(opp, TAG_SOURCE_FROM_APPLICATION_ERROR) if !opp['tags'].include? TAG_SOURCE_FROM_APPLICATION_ERROR
-    end
-    true
   end
   
   def summarise_feedbacks(opp)
     if opp['lastInteractionAt'] > last_change_detected(opp)
       # summarise each feedback
       client.feedback_for_opp(opp).each {|f|
+        simple_response_text(f['fields'])
         link = one_feedback_summary_link(f)
         next if opp['links'].include?(link)
         client.remove_links_with_prefix(opp, one_feedback_summary_link_prefix(f))
@@ -431,6 +420,14 @@ class Controller
     
     client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX + opp['id'])
     client.add_links(opp, link)
+  end
+
+  def remove_legacy_attributes(opp)
+    client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX.chomp('/') + '?')
+    client.remove_links_with_prefix(opp, LINK_CHECKSUM_PREFIX)
+    client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
+    client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
+    client.remove_tags_with_prefix(opp, '🤖 [auto]')
   end
 
   # TEMP

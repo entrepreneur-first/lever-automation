@@ -6,20 +6,9 @@
 
 class Rules
   
-  def self.source_from_application(opp)
+  def self.source_from_application(opp, responses)
     return {msg: 'No application'} if !Util.has_application(opp)
-    
-    # responses to questions are subdivided by custom question set - need to combine them together
-    responses = opp['applications'][0]['customQuestions'].reduce([]) {|a, b| a+b['fields']} if opp.dig('applications', 0, 'customQuestions')
     return {msg: "Couldn't find custom question responses."} if responses.nil?
-
-    # simply question titles to lowercase a-z only to minimise mismatch due to inconsistent naming
-    responses.map! { |qu|
-      qu.merge!({
-        _text: qu['text'].downcase.gsub(/[^a-z ]/, ''),
-        _value: (qu['value'].class == Array ? qu['value'].join(' ') : qu['value']).downcase.gsub(/[^a-z ]/, ''),
-      })
-    }
 
     # 1: "who referred you"
     responses.each {|qu|
@@ -80,4 +69,33 @@ class Rules
     result
   end
 
+  def self.update_tags(opp, add, remove, add_note)
+    tag_source_from_application(opp, add, remove, add_note)
+  end
+  
+  # automatically add tag for the opportunity source based on self-reported data in the application
+  def tag_source_from_application(opp, add, remove, add_note)
+    remove(TAG_SOURCE_FROM_APPLICATION_ERROR) if opp['tags'].include? TAG_SOURCE_FROM_APPLICATION_ERROR
+    
+    # we need an application of type posting, to the cohort (not team job)
+    return if !Util.has_application(opp) || !Util.is_cohort_app(opp)
+    
+    # skip if already applied
+    opp['tags'].each {|tag|
+      return if tag.start_with?(TAG_SOURCE_FROM_APPLICATION) && tag != TAG_SOURCE_FROM_APPLICATION_ERROR
+    }
+    
+    source = Rules.source_from_application(opp, opp['_app_responses'])
+    unless source.nil? || source[:source].nil?
+      add(TAG_SOURCE_FROM_APPLICATION + source[:source])
+      remove(TAG_SOURCE_FROM_APPLICATION_ERROR) if opp['tags'].include? TAG_SOURCE_FROM_APPLICATION_ERROR
+      add_note('Added tag ' + TAG_SOURCE_FROM_APPLICATION + source[:source] + "\nbecause field \"" + source[:field] + "\"\nis \"" + (source[:value].class == Array ?
+        source[:value].join('; ') :
+        source[:value]) + '"')
+    else
+      add(TAG_SOURCE_FROM_APPLICATION_ERROR) if !opp['tags'].include? TAG_SOURCE_FROM_APPLICATION_ERROR
+    end
+    true
+  end
+  
 end
