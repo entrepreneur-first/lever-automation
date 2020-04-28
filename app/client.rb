@@ -88,7 +88,7 @@ class Client
   end
   
   def add_tags_if_unset(opp, tags, commit=false)
-    add_annotations(opp, 'Tags', tags.reject {|t| opp['tags'].include? t}, commit)
+    add_annotations(opp, 'Tags', Array(tags).reject {|t| opp['tags'].include? t}, commit)
   end
   
   def remove_tag(opp, tags, commit=false)
@@ -96,7 +96,7 @@ class Client
   end
   
   def remove_tags_if_set(opp, tags, commit=false)
-    remove_annotations(opp, 'Tags', tags.select {|t| opp['tags'].include? t}, commit)
+    remove_annotations(opp, 'Tags', Array(tags).select {|t| opp['tags'].include? t}, commit)
   end
   
   def remove_tags_with_prefix(opp, prefix)
@@ -119,8 +119,9 @@ class Client
     }
   end
 
-  def add_annotations(opp, type, values, commit)  
-    values = [values] if values.class != Array
+  def add_annotations(opp, type, values, commit)
+    values = Array(values)
+    return if !values.any?
     return queue_add_annotations(opp, type, values) if @batch_updates && !commit    
     ltype = type.downcase
 
@@ -140,7 +141,8 @@ class Client
   end
   
   def remove_annotations(opp, type, values, commit=false)
-    values = [values] if values.class != Array
+    values = Array(values)
+    return if !values.any?
     return queue_remove_annotations(opp, type, values) if @batch_updates && !commit
     ltype = type.downcase
     

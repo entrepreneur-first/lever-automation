@@ -322,7 +322,7 @@ class Controller
   
   def prepare_app_responses(opp)
     # responses to questions are subdivided by custom question set - need to combine them together
-    opp['_app_responses'] = {}
+    opp['_app_responses'] = []
     opp['_app_responses'] = opp['applications'][0]['customQuestions'].reduce([]) {|a, b| a+b['fields']} if opp.dig('applications', 0, 'customQuestions')
     simple_response_text(opp['_app_responses'])    
   end
