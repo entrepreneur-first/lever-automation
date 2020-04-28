@@ -195,7 +195,10 @@ class Client
       )
       # record that we have left a note, since this will update the lastInteractionAt timestamp
       # so we should update our LAST_CHANGE_TAG
-      opp['_addedNoteTimestamp'] = [opp['_addedNote'] || 0, timestamp || Time.now.to_i*1000]
+      opp['_addedNoteTimestamp'] = [
+        opp['_addedNoteTimestamp'] || 0,
+        timestamp || get_opportunity(opp['id']).fetch('lastInteractionAt', Time.now.to_i*1000)
+      ].max
       result
     end
   end

@@ -196,7 +196,7 @@ class Controller
       send_webhook(opp, last_update[:time])
       # client.add_note(opp, 'Updated reporting data after detecting ' + last_update[:source])
     end
-    update_changed_tag(opp)
+    update_changed_tag(opp, last_update[:time])
   end
   
   def send_webhook(opp, update_time)
