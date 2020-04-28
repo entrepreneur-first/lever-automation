@@ -322,7 +322,7 @@ class Controller
   
   def prepare_app_responses(opp)
     # responses to questions are subdivided by custom question set - need to combine them together
-    opp['_app_responses'] = {}
+    opp['_app_responses'] = []
     opp['_app_responses'] = opp['applications'][0]['customQuestions'].reduce([]) {|a, b| a+b['fields']} if opp.dig('applications', 0, 'customQuestions')
     simple_response_text(opp['_app_responses'])    
   end
@@ -332,7 +332,7 @@ class Controller
     responses.map! { |qu|
       qu.merge!({
         _text: qu['text'].downcase.gsub(/[^a-z ]/, ''),
-        _value: (qu['value'].class == Array ? qu['value'].join(' ') : qu['value']).downcase.gsub(/[^a-z ]/, ''),
+        _value: Array(qu['value']).join(' ').downcase.gsub(/[^a-z ]/, ''),
       })
     }
   end

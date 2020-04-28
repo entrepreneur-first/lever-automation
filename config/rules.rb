@@ -56,7 +56,7 @@ class Rules
           ['directly contacted by ef', tags[:sourced]],
           ['cohort member', tags[:referral]],
           ['someone else', tags[:organic]], # if not already covered above by latter questions
-          ['came across ef', tags[:offline_organic],
+          ['came across ef', tags[:offline_organic]],
           ['event', tags[:offline]]
         ]
         source = nil
@@ -85,11 +85,11 @@ class Rules
   end
 
   def self.update_tags(opp, add, remove, add_note)
-    tag_source_from_application(opp, add, remove, add_note)
+    self.tag_source_from_application(opp, add, remove, add_note)
   end
   
   # automatically add tag for the opportunity source based on self-reported data in the application
-  def tag_source_from_application(opp, add, remove, add_note)
+  def self.tag_source_from_application(opp, add, remove, add_note)
     return if !Util.has_application(opp) || !Util.is_cohort_app(opp)
 
     tag = tags(:source, :error) # default
