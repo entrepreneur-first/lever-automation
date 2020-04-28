@@ -72,6 +72,8 @@ class Controller
     contacts = Hash.new(0)
 
     client.batch_updates
+    
+    log.log("Processing all active opportunities..")
 
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false, expand: ['applications','stage','sourcedBy','owner']}, 'active opportunities') { |opp|
     
@@ -85,14 +87,12 @@ class Controller
       
       summary[:sent_webhook] += 1 if result['sent_webhook']
       summary[:assigned_to_job] += 1 if result['assigned_to_job']
-      summary[:added_source_tag] += 1 if result['added_source_tag']
 
-      # log.log(JSON.pretty_generate(summary)) if summary[:opportunities] % 500 == 0
-      log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job") if summary[:opportunities] % 1000 == 0
+      log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job") if summary[:sent_webhook] % 50 == 0
     }
     client.batch_updates(false)
 
-    log.log(JSON.pretty_generate(summary))
+    log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job; #{summary[:contacts_with_duplicates]} contacts with multiple opportunities, of which #{summary[:contacts_with_3_plus]} have 3+")
   end
 
   # process a single opportunity
