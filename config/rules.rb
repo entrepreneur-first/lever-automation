@@ -118,6 +118,10 @@ class Rules
     @client
   end
   
+  def log
+    @client.log
+  end
+  
   def opp(opp=nil)
     @opp = opp unless opp.nil?
     @opp
