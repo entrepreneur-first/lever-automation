@@ -4,7 +4,7 @@ require 'daemons'
 require_relative 'app/controller'
 
 # check daemon is enabled
-exit if ENV['ENABLE_DAEMON'].nil? || ENV['ENABLE_DAEMON'].empty? || ['0', 'false'].include? ENV['ENABLE_DAEMON'].downcase
+exit if ENV['ENABLE_DAEMON'].nil? || ENV['ENABLE_DAEMON'].empty? || ['0', 'false'].include?(ENV['ENABLE_DAEMON'].downcase)
 
 controller = Controller.new
 
