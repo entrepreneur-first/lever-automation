@@ -20,7 +20,7 @@ class Rules
     }  
   end
   
-  def self.source_from_application(opp, responses)
+  def source_from_application(opp, responses)
     return {msg: 'No application'} if !Util.has_application(opp)
     return {msg: "Couldn't find custom question responses."} if responses.nil?
 
@@ -72,24 +72,24 @@ class Rules
     nil
   end
 
-  def self.summarise_one_feedback(f)
+  def summarise_one_feedback(f)
     result = {}
     
     result
   end
 
-  def self.summarise_all_feedback(summaries)
+  def summarise_all_feedback(summaries)
     result = {}
     
     result
   end
 
-  def self.update_tags(opp, add, remove, add_note)
-    self.tag_source_from_application(opp, add, remove, add_note)
+  def update_tags(opp, add, remove, add_note)
+    tag_source_from_application(opp, add, remove, add_note)
   end
   
   # automatically add tag for the opportunity source based on self-reported data in the application
-  def self.tag_source_from_application(opp, add, remove, add_note)
+  def tag_source_from_application(opp, add, remove, add_note)
     return if !Util.has_application(opp) || !Util.is_cohort_app(opp)
 
     tag = tags(:source, :error) # default
@@ -103,6 +103,7 @@ class Rules
   end
 
   # helpers
+  private
 
   def tags(category=nil, name=nil)
     if category.nil?

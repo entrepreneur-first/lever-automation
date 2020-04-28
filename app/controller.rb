@@ -12,6 +12,7 @@ class Controller
   def initialize
     @log = Log.new
     @client = Client.new(ENV['LKEY'], @log)
+    @rules = Rules.new
   end
   
   def client
@@ -20,6 +21,10 @@ class Controller
   
   def log
     @log
+  end
+  
+  def rules
+    @rules
   end
 
   def summarise_opportunities
@@ -127,7 +132,7 @@ class Controller
       # detect_duplicate_opportunities(opp)
       remove_legacy_attributes(opp)
 
-      Rules.update_tags(opp, client.method(:add_tags_if_unset).curry.call(opp), client.method(:remove_tags_if_set).curry.call(opp), client.method(:add_note).curry.call(opp))
+      rules.update_tags(opp, client.method(:add_tags_if_unset).curry.call(opp), client.method(:remove_tags_if_set).curry.call(opp), client.method(:add_note).curry.call(opp))
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
         unless update.nil?
@@ -377,7 +382,7 @@ class Controller
         'user': f['user'],
         'createdAt': f['createdAt'],
         'completedAt': f['completedAt']
-      }.merge(Rules.summarise_one_feedback(f)))
+      }.merge(rules.summarise_one_feedback(f)))
     )
   end
   
@@ -393,7 +398,7 @@ class Controller
       }
     return unless feedback_data.any?
     
-    summary = Rules.summarise_all_feedback(feedback_data)
+    summary = rules.summarise_all_feedback(feedback_data)
     return unless summary.any?
     
     all_feedback_summary_link_prefix + '?' + URI.encode_www_form(summary)
