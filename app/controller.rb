@@ -257,10 +257,14 @@ class Controller
       set_bot_metadata(opp, 'tag_checksum', checksum)
     end
 
-    {
-      time: Time.now.to_i*1000,
-      source: "tags updated\n#" + opp['tags'].sort.reject {|t| t.start_with?(BOT_TAG_PREFIX)}.map {|t| t.gsub(/[ \(\):]/, '-').sub('🤖-[auto]-', '')}.join(' #')
-    } if existing != checksum && !existing.nil?
+    if existing != checksum && !existing.nil?
+      {
+        time: Time.now.to_i*1000,
+        source: "tags updated\n#" + opp['tags'].sort.reject {|t| t.start_with?(BOT_TAG_PREFIX)}.map {|t| t.gsub(/[ \(\):]/, '-').sub('🤖-[auto]-', '')}.join(' #')
+      }
+    else
+      nil
+    end
   end
   
   # detect if links have changed since we last checked, based on special checksum link
@@ -272,10 +276,14 @@ class Controller
       set_bot_metadata(opp, 'link_checksum', checksum)
     end
 
-    {
-      time: Time.now.to_i*1000,
-      source: "links updated\n📎 " + opp['links'].sort{|a,b| a.sub(/[a-z]+:\/\//,'') <=> b.sub(/[a-z]+:\/\//,'')}.reject {|t| t.start_with?(BOT_LINK_PREFIX)}.join("\n📎 ")
-    } if existing != checksum && !existing.nil?
+    if existing != checksum && !existing.nil?
+      {
+        time: Time.now.to_i*1000,
+        source: "links updated\n📎 " + opp['links'].sort{|a,b| a.sub(/[a-z]+:\/\//,'') <=> b.sub(/[a-z]+:\/\//,'')}.reject {|t| t.start_with?(BOT_LINK_PREFIX)}.join("\n📎 ")
+      }
+    else
+      nil
+    end
   end
   
   # calculate checksum for tags/links
