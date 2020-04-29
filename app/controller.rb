@@ -369,7 +369,7 @@ class Controller
   end
   
   def feedback_rules_checksum
-    @feedback_rules_checksum ||= Digest::MD5.hexdigest(Rules.method('summarise_one_feedback').source)
+    @feedback_rules_checksum ||= Digest::MD5.hexdigest(rules.method('summarise_one_feedback').source)
   end
   
   def one_feedback_summary_link_prefix(f)
