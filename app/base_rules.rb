@@ -15,7 +15,7 @@ class BaseRules
     tag = source[:source] || tags(:source, :error)
     
     add(TAG_SOURCE_FROM_APPLICATION + tag)
-    remove(tags(:source).reject {|k,v| k == tag}.values.map{|t| TAG_SOURCE_FROM_APPLICATION + t})
+    remove(tags(:source).reject {|k,v| v == tag}.values.map{|t| TAG_SOURCE_FROM_APPLICATION + t})
     
     log.log("Added tag #{TAG_SOURCE_FROM_APPLICATION}#{tag} because field \"#{source[:field]}\" is \"#{Array(source[:value]).join('; ')}\"")
   end
