@@ -116,8 +116,6 @@ class Controller
     # should notify of change based on state before we executed?
     notify = last_update[:time] > last_webhook_change(opp) + 100
 
-    check_linkedin_optout(opp)
-
     if check_no_posting(opp)
       # if we added to a job then reload as tags etc will have changed automagically 
       # based on new posting assignment
@@ -125,13 +123,14 @@ class Controller
       result['assigned_to_job'] = true
     end
     
+    check_linkedin_optout(opp)
+
     if !Util.has_posting(opp) || Util.is_cohort_app(opp)
     
       prepare_app_responses(opp)
       summarise_feedbacks(opp)
       # detect_duplicate_opportunities(opp)
       remove_legacy_attributes(opp)
-
       rules.update_tags(opp)
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|

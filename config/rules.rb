@@ -38,9 +38,10 @@ class Rules < BaseRules
     responses = opp['_app_responses']
     return {msg: "Couldn't find custom question responses."} if responses.nil?
 
+    tags = tags(:source)
+
     # 1: "who referred you"
     responses.each {|qu|
-      tags = tags(:source)
       if qu[:_text].include?('who referred you')
         return {tag: tags[:referral], field: qu['text'], value: "<not empty>"} if qu['value'] > ''
         break
