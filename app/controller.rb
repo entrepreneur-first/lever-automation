@@ -126,7 +126,6 @@ class Controller
     check_linkedin_optout(opp)
 
     if !Util.has_posting(opp) || Util.is_cohort_app(opp)
-    
       prepare_app_responses(opp)
       summarise_feedbacks(opp)
       # detect_duplicate_opportunities(opp)
@@ -148,13 +147,17 @@ class Controller
         # we didn't have a change to notify, but we added one or more notes
         # which will update lastInteractionAt
         # so update LAST_CHANGE_TAG to avoid falsely detecting update next time
-        update_changed_tag(opp, [opp['_addedNoteTimestamp'], opp['lastInteractionAt']].reject{ |v|v.nil? }.max)
+        update_changed_tag(opp, [opp['_addedNoteTimestamp'], opp['lastInteractionAt'], last_change_detected(opp)].reject{ |v|v.nil? }.max)
       end
 
-      result['updated'] ||= commit_bot_metadata(opp)
+      if commit_bot_metadata(opp)
+        result['updated'] = true
+      end
     end
 
-    result['updated'] ||= client.commit_opp(opp)
+    if client.commit_opp(opp)
+      result['updated'] = true
+    end
 
     log.pop_log_prefix
     result
@@ -166,7 +169,7 @@ class Controller
     # that haven't had an interaction since within a few seconds of creation
     # (leads appear to be created when the recipient opts in/out, and before they type their reply)
     if !Util.has_posting(opp) && 
-        opp['stage'] == 'lead-responded' && 
+        [opp['stage'], opp['stage']['id']].include?('lead-responded') && 
         opp['origin'] == 'sourced' && 
         opp['sources'] == ['LinkedIn'] &&
         (opp['lastInteractionAt'] < opp['createdAt'] + 5000)
@@ -271,7 +274,7 @@ class Controller
   def links_have_changed?(opp)
     checksum = attribute_checksum(opp, 'links')
     existing = existing_link_checksum(opp)
-    
+
     if existing != checksum
       set_bot_metadata(opp, 'link_checksum', checksum)
     end
