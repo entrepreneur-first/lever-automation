@@ -509,12 +509,13 @@ class Controller
     }
   end
 
-  def delete_bot_links
+  def delete_bot_notes
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false}, 'bot links for active opps') { |opp|
-      client.process_paged_result(#{client.opp_url(opp)}/notes', {}, 'notes') { |note|
-        return if note['user'] != LEVER_BOT_USER
+      client.process_paged_result("#{client.opp_url(opp)}/notes", {}, 'notes') { |note|
+        break if note['user'] != LEVER_BOT_USER
         puts JSON.pretty_generate(note)
-        # client.delete("#{opp_url(opp)}/notes/#{note['id']}"
+        client.delete("#{client.opp_url(opp)}/notes/#{note['id']}")
       }
     }
+  end
 end
