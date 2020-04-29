@@ -41,7 +41,7 @@ class Client
   end
 
   def opportunities_for_contact(email)
-    get_paged_result(OPPORTUNITIES_URL, {email: email, expand: OPP_EXPAND_VALUES}, 'opportunities_for_contact')
+    get_paged_result(OPPORTUNITIES_URL, {email: email, expand: self.OPP_EXPAND_VALUES}, 'opportunities_for_contact')
   end
 
   def opportunities(posting_ids = [])
@@ -212,7 +212,7 @@ class Client
     opps_without_posting.each { |o|
       result += add_candidate_to_posting(o["id"], posting_id)
     }
-    puts result
+    result
   end
 
   def add_candidate_to_posting(candidate_id, posting_id)
