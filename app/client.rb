@@ -37,7 +37,7 @@ class Client
   #
 
   def get_opportunity(id, params={})
-    get_single_result(OPPORTUNITIES_URL.chomp('?') + '/' + id, params, 'retrieve single opportunity')
+    get_single_result(opp_url(id), params, 'retrieve single opportunity')
   end
 
   def opportunities_for_contact(email)
@@ -57,7 +57,7 @@ class Client
   end
   
   def feedback_for_opp(opp)
-    get_paged_result(feedback_url(opp['id']), {}, 'feedback')
+    get_paged_result(feedback_url(opp), {}, 'feedback')
   end
   
   def feedback(opportunities_ids = [])
@@ -132,13 +132,7 @@ class Client
     ltype = type.downcase
 
     api_action_log("Adding #{ltype}: " + values.join(',')) do
-      result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + "/add#{type}?" + Util.to_query({ perform_as: LEVER_BOT_USER }),
-        body: {
-          "#{ltype}": values
-        }.to_json,
-        headers: { 'Content-Type' => 'application/json' },
-        basic_auth: auth
-      )
+      result = post("#{opp_url(opp)}/add#{type}?", {"#{ltype}": values})
       values.each {|value|
         opp[ltype] += [value] if !opp[ltype].include?(value)
       }
@@ -153,13 +147,7 @@ class Client
     ltype = type.downcase
     
     api_action_log("Removing #{ltype}: " + values.join(',')) do
-      result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + "/remove#{type}?" + Util.to_query({ perform_as: LEVER_BOT_USER }),
-        body: {
-          "#{ltype}": values
-        }.to_json,
-        headers: { 'Content-Type' => 'application/json' },
-        basic_auth: auth
-      )
+      result = post("#{opp_url(opp)}/remove#{type}?", {"#{ltype}": values})
       values.each {|value|
         opp[ltype].delete(value)
       }
@@ -191,14 +179,7 @@ class Client
   
   def add_note(opp, msg, timestamp=nil)
     api_action_log("Adding note: " + msg) do
-      result = HTTParty.post(API_URL + 'opportunities/' + opp["id"] + '/notes?' + Util.to_query({ perform_as: LEVER_BOT_USER }),
-        body: {
-          value: msg,
-          createdAt: timestamp
-        }.reject {|k,v| v.nil?}.to_json,
-        headers: { 'Content-Type' => 'application/json' },
-        basic_auth: auth
-      )
+      result = post("#{opp_url(opp)}/notes?", {value: msg, createdAt: timestamp}.reject {|k,v| v.nil?})
       # record that we have left a note, since this will update the lastInteractionAt timestamp
       # so we should update our LAST_CHANGE_TAG
       opp['_addedNoteTimestamp'] = [
@@ -279,7 +260,43 @@ class Client
     arr = []
     process_paged_result(url, params, log_string) { |row| arr << row }
     arr
-  end  
+  end
+  
+  def post(url, body)
+    result = _post(url, body)
+    # retry on occasional bad gateway error
+    if result.code == 502
+      log.warn('502 error, retrying')
+      result = _post(url, body)
+    end
+    log_if_api_error(result)
+    result.parsed_response
+  end
+  
+  def _post(url, body)
+    HTTParty.post(url + Util.to_query({
+        perform_as: LEVER_BOT_USER
+      }),
+      body: body.to_json,
+      headers: {'Content-Type' => 'application/json'},
+      basic_auth: auth
+    )
+  end
+
+  def delete(url)
+    result = _delete(url)
+    # retry on occasional bad gateway error
+    if result.code == 502
+      log.warn('502 error, retrying')
+      result = _delete(url)
+    end
+    log_if_api_error(result)
+    result.parsed_response
+  end
+  
+  def _delete(url)
+    HTTParty.delete(url, basic_auth: auth)
+  end
 
   #
   # Wrappers for making API calls with logging
@@ -295,13 +312,11 @@ class Client
   def api_action_log(msg)
     log.log(msg)
     result = yield
-    # retry on occasional bad gateway error
-    if result.code == 502
-      log.warn('502 error, retrying')
-      result = yield
-    end
-    log_if_api_error(result)
-    result.parsed_response
+  end
+
+  def opp_url(opp)
+    "#{API_URL}opportunities/#{opp.class == Hash ?
+      opp['id'] : opp}"
   end
 
   #
@@ -312,8 +327,8 @@ class Client
     { username: @username, password: @password }
   end
   
-  def feedback_url(opportunity_id)
-    API_URL + "opportunities/#{opportunity_id}/feedback"
+  def feedback_url(opp)
+    "#{opp_url(opp)}/feedback"
   end
   
   def log_if_api_error(result)

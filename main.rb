@@ -26,6 +26,9 @@ loop do
   
   when 'check links'
       controller.check_links
+      
+  when 'delete bot links'
+      controller.delete_bot_links
 
   else
     email = command.gsub('mailto:', '')
