@@ -449,6 +449,7 @@ class Controller
     client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
     client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
     client.remove_tags_with_prefix(opp, '🤖 [auto]')
+    delete_opp_bot_notes(opp)
   end
 
   # TEMP
@@ -521,11 +522,14 @@ class Controller
 
   def delete_bot_notes
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false}, 'bot links for active opps') { |opp|
-      client.process_paged_result("#{client.opp_url(opp)}/notes", {}, 'notes') { |note|
-        break if note['user'] != LEVER_BOT_USER
-        puts JSON.pretty_generate(note)
-        client.delete("#{client.opp_url(opp)}/notes/#{note['id']}")
-      }
+      delete_opp_bot_notes(opp)
+    }
+  end
+  
+  def delete_opp_bot_notes(opp)
+    client.process_paged_result("#{client.opp_url(opp)}/notes", {}, 'notes') { |note|
+      break if note['user'] != LEVER_BOT_USER
+      client.delete("#{client.opp_url(opp)}/notes/#{note['id']}")
     }
   end
 end
