@@ -449,7 +449,6 @@ class Controller
     client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
     client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
     client.remove_tags_with_prefix(opp, '🤖 [auto]')
-    delete_opp_bot_notes(opp)
   end
 
   # TEMP
