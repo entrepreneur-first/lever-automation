@@ -130,7 +130,7 @@ class Controller
       summarise_feedbacks(opp)
       # detect_duplicate_opportunities(opp)
       remove_legacy_attributes(opp)
-      rules.update_tags(opp)
+      rules.do_update_tags(opp)
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
         unless update.nil?

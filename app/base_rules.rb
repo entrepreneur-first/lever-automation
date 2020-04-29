@@ -2,24 +2,11 @@
 
 class BaseRules
 
-  def update_tags(opp)
+  def do_update_tags(opp)
     opp(opp)
-    tag_source_from_application(opp)
+    update_tags
   end
   
-  # automatically add tag for the opportunity source based on self-reported data in the application
-  def tag_source_from_application(opp)
-    return if !Util.has_application(opp) || !Util.is_cohort_app(opp)
-
-    source = source_from_application(opp) || {}
-    tag = source[:source] || tags(:source, :error)
-    
-    update = add(TAG_SOURCE_FROM_APPLICATION + tag)
-    update ||= remove(tags(:source).reject {|k,v| v == tag}.values.map{|t| TAG_SOURCE_FROM_APPLICATION + t})
-    
-    log.log("Added tag #{TAG_SOURCE_FROM_APPLICATION}#{tag} because field \"#{source[:field]}\" is \"#{Array(source[:value]).join('; ')}\"") unless update.nil?
-  end
-
   private
 
   def initialize(client)
@@ -61,4 +48,14 @@ class BaseRules
     @client.add_note(@opp, note)
   end
   
+  def apply_single_tag(prefix, tag_context, tag_set)
+    tag_context = Hash(tag_context)
+    tag = tag_context[:tag] || tag_set[:error])
+    update = add(prefix + tag)
+    if remove(tag_set.reject {|k,v| v == tag}.values.map{|t| prefix + t})
+      update = true
+    end
+    log.log("Added tag #{prefix}#{tag} because field \"#{tag_context[:field]}\" is \"#{Array(tag_context[:value]).join('; ')}\"") unless update.nil?
+  end
+
 end

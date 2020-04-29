@@ -17,7 +17,12 @@ class Rules < BaseRules
         offline: 'Offline',
         offline_organic: 'Offline-or-Organic',
         error: '<error:unknown>'
-      }
+      },
+      gender: {
+        female: 'Female',
+        male: 'Male',
+        other: 'Other',
+        prefer_not_say: 'Prefer not to say'
     }  
   end
   
@@ -33,8 +38,16 @@ class Rules < BaseRules
     result
   end
 
-  def source_from_application(opp)
-    return {msg: 'No application'} if !Util.has_application(opp)
+  def update_tags
+    # application
+    if Util.has_application(@opp) && Util.is_cohort_app(@opp)  
+      # automatically add tag for the opportunity source based on self-reported data in the application
+      apply_single_tag(TAG_FROM_APPLICATION, source_from_app(@opp), tags(:source))
+      apply_single_tag(TAG_FROM_APPLICATION, gender_from_app(@opp), tags(:gender))
+    end
+  end
+
+  def source_from_app(opp)
     responses = opp['_app_responses']
     return {msg: "Couldn't find custom question responses."} if responses.nil?
 
@@ -44,7 +57,6 @@ class Rules < BaseRules
     responses.each {|qu|
       if qu[:_text].include?('who referred you')
         return {tag: tags[:referral], field: qu['text'], value: "<not empty>"} if qu['value'] > ''
-        break
       end
     }
 
@@ -58,10 +70,8 @@ class Rules < BaseRules
         ]
         source = nil
         map.each { |m|
-          source = m[1] if qu[:_value].include? m[0]
+          return {tag: m[1], field: qu['text'], value: qu['value']} if qu[:_value].include? m[0]
         }
-        return {tag: source, field: qu['text'], value: qu['value']} unless source.nil?
-        break
       end
     }
 
@@ -76,10 +86,8 @@ class Rules < BaseRules
         ]
         source = nil
         map.each { |m|
-          source = m[1] if qu[:_value].include? m[0]
+          return {tag: m[1], field: qu['text'], value: qu['value']} if qu[:_value].include? m[0]
         }
-        return {source: source, field: qu['text'], value: qu['value']} unless source.nil?
-        break
       end
     }
     
@@ -87,4 +95,18 @@ class Rules < BaseRules
     nil
   end
 
+  def gender_from_app(opp)
+    responses = opp['_app_responses']
+    return {msg: "Couldn't find custom question responses."} if responses.nil?
+
+    tags = tags(:gender)
+    
+    responses.each {|qu|
+      if qu[:_text] == 'gender'
+        tags.each { |t|
+          return {tag: t[1], field: qu['text'], value: qu['value']} if qu[:_value] == m[1].downcase
+        }
+      end
+    nil
+  end
 end
