@@ -95,14 +95,14 @@ class Controller
       summary[:sent_webhook] += 1 if result['sent_webhook']
       summary[:assigned_to_job] += 1 if result['assigned_to_job']
 
-      if summary[:updated] > 0 && summary[:updated] % 50 == 0 && summary[:opportunities] > log_index
-        log_index = summary[:opportunities]
-        log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:sent_webhook]} changed; #{summary[:assigned_to_job]} assigned to job")
+      if summary[:updated] > 0 && summary[:updated] % 50 == 0 && summary[:updated] > log_index
+        log_index = summary[:updated]
+        log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
       end
     }
     client.batch_updates(false)
 
-    log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent), #{summary[:assigned_to_job]} assigned to job; #{summary[:contacts_with_duplicates]} contacts with multiple opportunities, of which #{summary[:contacts_with_3_plus]} have 3+")
+    log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
   end
 
   # process a single opportunity
