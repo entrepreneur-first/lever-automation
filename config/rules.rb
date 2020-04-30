@@ -123,9 +123,10 @@ class Rules < BaseRules
     responses.each {|qu|
       if qu[:_text] == 'gender'
         tags.each { |t|
-          return {tag: t[1], field: qu['text'], value: qu['value']} if qu[:_value] == m[1].downcase
+          return {tag: t[1], field: qu['text'], value: qu['value']} if qu[:_value] == t[1].downcase
         }
       end
+    }
     nil
   end
 end
