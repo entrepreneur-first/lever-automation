@@ -82,10 +82,10 @@ class Rules < BaseRules
     responses.each {|qu|
       if qu[:_text].include?('who told you about ef')
         map = [
-          ['been on the ef programme', tag: tags[:referral]],
-          ['worked at ef', tag: tags[:referral]],
-          ['professional network', tag: tags[:organicl]],
-          ['friends or family', tag: tags[:organic]]
+          ['been on the ef programme', tags[:referral]],
+          ['worked at ef', tags[:referral]],
+          ['professional network', tags[:organicl]],
+          ['friends or family', tags[:organic]]
         ]
         source = nil
         map.each { |m|
