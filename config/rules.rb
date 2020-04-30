@@ -5,6 +5,10 @@ require_relative '../app/base_rules.rb'
 # Logic for rules we wish to apply
 #
 
+TAG_FROM_APPLICATION = AUTO_TAG_PREFIX + 'App: '
+TAG_FROM_APP_REVIEW = AUTO_TAG_PREFIX + 'AR: '
+TAG_FROM_DEBRIEF = AUTO_TAG_PREFIX + 'Debrief: '
+
 class Rules < BaseRules
 
   # list of tags for each category, so we can remove when updating with new values
@@ -23,12 +27,27 @@ class Rules < BaseRules
         male: 'Male',
         other: 'Other',
         prefer_not_say: 'Prefer not to say'
+      }
     }  
   end
   
   def summarise_one_feedback(f)
     result = {}
     
+    # feedback type
+    type = f['text'].downcase.gsub(/[^a-z ]/, '')
+    result['type'] =
+      if type.include?('coffee')
+        'coffee'
+      elsif type.include?('app review')
+        'app_review'
+      elsif type.include?('interview debrief')
+        'debrief'
+      else
+        'unknown'
+      end
+      
+    result['rating'] = (f['fields'].select{|f| f['_text'] == 'rating'}.first || {})['_value']
     result
   end
 
@@ -104,9 +123,10 @@ class Rules < BaseRules
     responses.each {|qu|
       if qu[:_text] == 'gender'
         tags.each { |t|
-          return {tag: t[1], field: qu['text'], value: qu['value']} if qu[:_value] == m[1].downcase
+          return {tag: t[1], field: qu['text'], value: qu['value']} if qu[:_value] == t[1].downcase
         }
       end
+    }
     nil
   end
 end
