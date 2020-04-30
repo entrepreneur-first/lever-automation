@@ -526,7 +526,7 @@ class Controller
   end
   
   def delete_opp_bot_notes(opp)
-    client.process_paged_result("#{client.opp_url(opp)}/notes", {}, 'notes') { |note|
+    client.process_paged_result("#{client.opp_url(opp)}/notes", {}) { |note|
       break if note['user'] != LEVER_BOT_USER
       client.delete("#{client.opp_url(opp)}/notes/#{note['id']}")
     }

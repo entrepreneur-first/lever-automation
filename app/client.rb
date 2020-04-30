@@ -242,7 +242,7 @@ class Client
     result.fetch('data')
   end
    
-  def process_paged_result(url, params, log_string)
+  def process_paged_result(url, params, log_string=nil)
     page = 1
     next_batch = nil
     loop do
@@ -284,6 +284,7 @@ class Client
   end
 
   def delete(url)
+    log.log("DELETE: #{url}") if log.verbose?
     result = _delete(url)
     # retry on occasional bad gateway error
     if result.code == 502
@@ -303,14 +304,14 @@ class Client
   #
 
   def api_call_log(resource, page)
-    log.log("Lever API #{resource} page=#{page}") if log.verbose?
+    log.log("Lever API #{resource} page=#{page}") if log.verbose? && !resource.nil?
     result = yield
     log_if_api_error(result)
     result
   end
 
   def api_action_log(msg)
-    log.log(msg)
+    log.log(msg) unless msg.nil?
     result = yield
   end
 
