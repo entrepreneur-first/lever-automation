@@ -540,11 +540,19 @@ class Controller
   end
   
   def delete_opp_bot_notes(opp)
-    client.process_paged_result("#{client.opp_url(opp)}/notes", {}) { |note|
+    client.process_paged_result("#{client.opp_url(opp)}/notes", {}) { |note|    
+      if !note['deletedAt'].nil? && note['fields'][0]['value'].start_with?('Referred by')
+        if opp['lastInteractionAt'] > (note['deletedAt'] + 60000)
+          log.log('Not reinstating note due to more recent interaction: ' + note['id'])
+        else
+          client.add_note(opp, note['fields'][0]['value'])
+        end
+      end
+
       next unless note['deletedAt'].nil?
       next if note['user'] != LEVER_BOT_USER
       
-      next unless note['fields']['value'].start_with?('Updated reporting')
+      next unless note['fields'][0]['value'].start_with?('Updated reporting') || note['fields'][0]['value'].start_with?('Assigned to ')
       client.delete("#{client.opp_url(opp)}/notes/#{note['id']}")
     }
   end
