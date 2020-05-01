@@ -452,10 +452,11 @@ class Controller
   
   def commit_bot_metadata(opp)
     return unless (opp['_bot_metadata'] || {}).any?
-    link = BOT_METADATA_PREFIX + opp['id'] + '?' + URI.encode_www_form(opp['_bot_metadata'].sort)
-    return if opp['links'].include? link
+    prefix = BOT_METADATA_PREFIX + opp['id'] + '?'
+    link = prefix + URI.encode_www_form(opp['_bot_metadata'].sort)
+    return if opp['links'].select{|l| l.start_with?(prefix)} == [link]
     
-    client.remove_links_with_prefix(opp, BOT_METADATA_PREFIX + opp['id'])
+    client.remove_links_with_prefix(opp, prefix)
     client.add_links(opp, link)
     true
   end
