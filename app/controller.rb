@@ -13,6 +13,11 @@ class Controller
     @log = Log.new
     @client = Client.new(ENV['LKEY'], @log)
     @rules = Rules.new(@client)
+    
+    @terminating = false
+    trap('TERM') do
+      @terminating = true
+    end
   end
   
   def client
@@ -25,6 +30,10 @@ class Controller
   
   def rules
     @rules
+  end
+  
+  def terminating?
+    @terminating
   end
 
   def summarise_opportunities
@@ -98,6 +107,11 @@ class Controller
       if summary[:updated] > 0 && summary[:updated] % 50 == 0 && summary[:updated] > log_index
         log_index = summary[:updated]
         log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
+      end
+      
+      if @terminating
+        log.log('Graceful shutdown')
+        break
       end
     }
     client.batch_updates(false)
