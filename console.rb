@@ -10,7 +10,7 @@ loop do
 
   if command.start_with?('i ')
     # perform interactively
-    Router.route(command.delete_prefix('i ')
+    Router.route(command.delete_prefix('i '))
   else
     # perform via worker
     # -> so we don't die on dropped client connection, record logs, etc
