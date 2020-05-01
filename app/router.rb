@@ -8,15 +8,15 @@ class Router
     "Enter 'summarise', 'process', 'fix tags', 'check links', or '[view|feedback] <email>|<opportunity_id>' to view/process one candidate:"
   end
 
-  def self.route(command)
+  def self.route(command)  
+    return if command == ''
   
     controller = Controller.new
     controller.log.verbose
+    
+    controller.log.log('Command: ' + command)
 
     case command
-    when ''
-        return
-        
     when 'summarise'
         controller.summarise_opportunities
         
