@@ -53,6 +53,8 @@ class Router
         os.each{ |opp| puts JSON.pretty_generate controller.client.feedback_for_opp(opp) }
       when 'notes'
         os.each{ |opp| puts JSON.pretty_generate controller.client.get_paged_result("#{API_URL}opportunities/#{opp['id']}/notes", {}, 'notes') }
+      when 'delete_bot_notes'
+        os.each{ |opp| controller.delete_opp_bot_notes(opp) }
       else
         os.each { |opp| controller.process_opportunity(opp) }
       end
