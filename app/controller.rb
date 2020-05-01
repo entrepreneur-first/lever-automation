@@ -543,6 +543,8 @@ class Controller
     client.process_paged_result("#{client.opp_url(opp)}/notes", {}) { |note|
       next unless note['deletedAt'].nil?
       next if note['user'] != LEVER_BOT_USER
+      
+      next unless note['fields']['value'].start_with?('Updated reporting')
       client.delete("#{client.opp_url(opp)}/notes/#{note['id']}")
     }
   end
