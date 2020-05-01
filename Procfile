@@ -1,2 +1,2 @@
-daemon: bundle exec ruby daemon.rb start -t
-console: bundle exec ruby main.rb
+daemon: bundle exec ruby daemon.rb start -t & wait -n
+console: bundle exec ruby console.rb

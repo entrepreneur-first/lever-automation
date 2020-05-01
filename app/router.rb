@@ -3,6 +3,11 @@
 require_relative 'controller'
 
 class Router
+
+  def self.interactive_prompt_str
+    "Enter 'summarise', 'process', 'fix tags', 'check links', or '[view|feedback] <email>|<opportunity_id>' to view/process one candidate:"
+  end
+
   def self.route(command)
   
     controller = Controller.new
