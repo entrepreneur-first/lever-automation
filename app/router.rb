@@ -32,8 +32,8 @@ class Router
     when 'check links'
         controller.check_links
         
-    when 'delete bot notes'
-        controller.delete_bot_notes
+    when 'tidy bot notes'
+        controller.tidy_bot_notes
 
     else
       email = command.gsub('mailto:', '')
@@ -53,8 +53,8 @@ class Router
         os.each{ |opp| puts JSON.pretty_generate controller.client.feedback_for_opp(opp) }
       when 'notes'
         os.each{ |opp| puts JSON.pretty_generate controller.client.get_paged_result("#{API_URL}opportunities/#{opp['id']}/notes", {}, 'notes') }
-      when 'delete_bot_notes'
-        os.each{ |opp| controller.delete_opp_bot_notes(opp) }
+      when 'tidy_bot_notes'
+        os.each{ |opp| controller.tidy_opp_bot_notes(opp) }
       else
         os.each { |opp| controller.process_opportunity(opp) }
       end

@@ -533,17 +533,17 @@ class Controller
     }
   end
 
-  def delete_bot_notes
+  def tidy_bot_notes
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false}, 'bot links for active opps') { |opp|
       delete_opp_bot_notes(opp)
     }
   end
   
-  def delete_opp_bot_notes(opp)
+  def tidy_opp_bot_notes(opp)
     client.process_paged_result("#{client.opp_url(opp)}/notes", {}) { |note|    
       if !note['deletedAt'].nil? && note['fields'][0]['value'].start_with?('Referred by')
         if opp['lastInteractionAt'] > (note['deletedAt'] + 60000)
-          log.log('Not reinstating note due to more recent interaction: ' + note['id'])
+          log.log('Not reinstating note due to more recent interaction: ' + opp['id'] + ':' + note['id'])
         else
           client.add_note(opp, note['fields'][0]['value'])
         end
