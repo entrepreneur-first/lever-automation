@@ -533,7 +533,7 @@ class Controller
 
   def tidy_bot_notes
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false}, 'bot links for active opps') { |opp|
-      delete_opp_bot_notes(opp)
+      tidy_opp_bot_notes(opp)
       break if terminating?
     }
   end
