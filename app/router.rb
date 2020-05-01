@@ -57,5 +57,6 @@ class Router
         os.each { |opp| controller.process_opportunity(opp) }
       end
     end
+  end
 
 end
