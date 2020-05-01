@@ -37,6 +37,10 @@ class Controller
     @terminating
   end
 
+  def exit_on_sigterm
+    exit 1 if terminating?
+  end
+
   def summarise_opportunities
     summary = Hash.new(0)
     contacts = Hash.new(0)
@@ -109,7 +113,8 @@ class Controller
         log_index = summary[:updated]
         log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
       end
-      
+
+      # exit normally in case of termination      
       break if terminating?
     }
     client.batch_updates(false)
@@ -533,8 +538,8 @@ class Controller
 
   def tidy_bot_notes
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false}, 'bot links for active opps') { |opp|
+      exit_on_sigterm
       tidy_opp_bot_notes(opp)
-      break if terminating?
     }
   end
   
