@@ -33,6 +33,7 @@ class Controller
   end
   
   def terminating?
+    log.log('Graceful shutdown') if @terminating
     @terminating
   end
 
@@ -109,10 +110,7 @@ class Controller
         log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
       end
       
-      if @terminating
-        log.log('Graceful shutdown')
-        break
-      end
+      break if terminating?
     }
     client.batch_updates(false)
 
@@ -536,6 +534,7 @@ class Controller
   def tidy_bot_notes
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false}, 'bot links for active opps') { |opp|
       delete_opp_bot_notes(opp)
+      break if terminating?
     }
   end
   
