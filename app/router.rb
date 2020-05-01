@@ -59,6 +59,8 @@ class Router
         os.each { |opp| controller.process_opportunity(opp) }
       end
     end
+    
+    controller.log.log('Finished command: ' + command)
   end
 
 end
