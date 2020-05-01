@@ -14,6 +14,7 @@ loop do
   else
     # perform via worker
     # -> so we don't die on dropped client connection, record logs, etc
+    puts "Sending command to async worker queue: " + command
     Worker::perform_async(command)
   end
 end
