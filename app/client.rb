@@ -106,7 +106,7 @@ class Client
   end
   
   def remove_tags_with_prefix(opp, prefix)
-    opp["tags"].each { |tag|
+    opp["tags"].clone.each { |tag|
       remove_tag(opp, tag) if tag.start_with? prefix
     }
   end
@@ -120,7 +120,7 @@ class Client
   end
 
   def remove_links_with_prefix(opp, prefix)
-    opp["links"].each { |link|
+    opp["links"].clone.each { |link|
       remove_links(opp, link) if link.start_with? prefix
     }
   end

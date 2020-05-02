@@ -90,8 +90,6 @@ class Controller
     summary = Hash.new(0)
     contacts = Hash.new(0)
 
-    client.batch_updates
-    
     log.log("Processing all active opportunities..")
     log_index = 0
 
@@ -117,7 +115,6 @@ class Controller
       # exit normally in case of termination      
       break if terminating?
     }
-    client.batch_updates(false)
 
     log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
   end
@@ -127,6 +124,7 @@ class Controller
   def process_opportunity(opp)
     result = {}
     log.log_prefix(opp['id'] + ': ')
+    client.batch_updates
 
     # checks lastInteractionAt and tag checksum, creating checksum tag if necessary
     last_update = latest_change(opp)
@@ -177,6 +175,7 @@ class Controller
     end
 
     log.pop_log_prefix
+    client.batch_updates(false)
     result
   end
 
@@ -455,7 +454,6 @@ class Controller
     prefix = BOT_METADATA_PREFIX + opp['id'] + '?'
     link = prefix + URI.encode_www_form(opp['_bot_metadata'].sort)
     return if opp['links'].select{|l| l.start_with?(prefix)} == [link]
-    
     client.remove_links_with_prefix(opp, prefix)
     client.add_links(opp, link)
     true
