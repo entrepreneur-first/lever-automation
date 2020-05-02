@@ -33,12 +33,12 @@ class Controller
   end
   
   def terminating?
-    log.log('Graceful shutdown') if @terminating
+    log.log('Received SIGTERM') if @terminating
     @terminating
   end
 
   def exit_on_sigterm
-    exit 1 if terminating?
+    raise "SIGTERM: Gracefully aborting job" if terminating?
   end
 
   def summarise_opportunities
