@@ -18,22 +18,28 @@ class Router
 
     case command
     when 'summarise'
-        controller.summarise_opportunities
+      controller.summarise_opportunities
         
     when 'process'
-        controller.process_opportunities
+      controller.process_opportunities
+
+    when 'process_archived'
+      controller.process_opportunities(true)
+        
+    when 'process_all'
+      controller.process_opportunities(nil)
         
     when 'fix tags'
-        controller.fix_auto_assigned_tags
+      controller.fix_auto_assigned_tags
     
     when 'fix links'
-        controller.fix_checksum_links
+      controller.fix_checksum_links
     
     when 'check links'
-        controller.check_links
+      controller.check_links
         
     when 'tidy bot notes'
-        controller.tidy_bot_notes
+      controller.tidy_bot_notes
 
     else
       email = command.gsub('mailto:', '')

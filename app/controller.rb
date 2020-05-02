@@ -86,14 +86,14 @@ class Controller
     log.log(JSON.pretty_generate(untagable))
   end
 
-  def process_opportunities
+  def process_opportunities(archived=false)
     summary = Hash.new(0)
     contacts = Hash.new(0)
 
-    log.log("Processing all active opportunities..")
+    log.log("Processing all #{archived ? 'archived' : (archived.nil? '' : 'active')} opportunities..")
     log_index = 0
 
-    client.process_paged_result(OPPORTUNITIES_URL, {archived: false, expand: client.OPP_EXPAND_VALUES}, 'active opportunities') { |opp|
+    client.process_paged_result(OPPORTUNITIES_URL, {archived: archived, expand: client.OPP_EXPAND_VALUES}, 'active opportunities') { |opp|
     
       contacts[opp['contact']] += 1
       summary[:opportunities] += 1
