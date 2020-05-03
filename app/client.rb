@@ -29,7 +29,7 @@ class Client
   end
   
   def OPP_EXPAND_VALUES
-    ['applications','stage','sourcedBy','owner']
+    ['applications', 'stage','sourcedBy','owner']
   end
 
   #

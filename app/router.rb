@@ -49,7 +49,7 @@ class Router
     else
       key = command.gsub('mailto:', '')
       command, key = key.split(' ') if key.include?(' ')
-      key = (key.match(/https:\/\/hire.lever.co\/candidates\/([^?]+)/) || [])[1] || key
+      key = (key.match(/https:\/\/hire.lever.co\/candidates\/([^\/?]+)/) || [])[1] || key
 
       if key.include? '@'
         # email
