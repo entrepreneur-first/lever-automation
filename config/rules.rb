@@ -44,7 +44,6 @@ class Rules < BaseRules
       end
     }
     links.uniq!
-    nil
   end
   
   def summarise_one_feedback(f)
