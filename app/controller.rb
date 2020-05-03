@@ -89,11 +89,13 @@ class Controller
   def process_opportunities(archived=false)
     summary = Hash.new(0)
     contacts = Hash.new(0)
+    
+    log_opp_type = archived ? 'archived' : (archived.nil? ? '' : 'active')
 
-    log.log("Processing all #{archived ? 'archived' : (archived.nil? ? '' : 'active')} opportunities..")
+    log.log("Processing all #{log_opp_type} opportunities..")
     log_index = 0
 
-    client.process_paged_result(OPPORTUNITIES_URL, {archived: archived, expand: client.OPP_EXPAND_VALUES}, 'active opportunities') { |opp|
+    client.process_paged_result(OPPORTUNITIES_URL, {archived: archived, expand: client.OPP_EXPAND_VALUES}, '#{log_opp_type} opportunities') { |opp|
     
       contacts[opp['contact']] += 1
       summary[:opportunities] += 1
@@ -109,7 +111,7 @@ class Controller
 
       if summary[:updated] > 0 && summary[:updated] % 50 == 0 && summary[:updated] > log_index
         log_index = summary[:updated]
-        log.log("Processed #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
+        log.log("Processed #{summary[:opportunities]} #{log_opp_type} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
       end
 
       # exit normally in case of termination      
