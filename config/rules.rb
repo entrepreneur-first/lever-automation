@@ -35,10 +35,11 @@ class Rules < BaseRules
     links = []
     responses = opp['_app_responses']
     responses.each {|qu|
-      if qu[:_text].include?('url')
-        new_links = qu[:_value].scan(/[^\s]+\.[^\s]+/)
+      if qu[:_text].include?('url') || qu[:_text].include?('links')
+        new_links = qu['value'].scan(/[^\s]+\.[^\s]+/)
+        next unless new_links.any?
         links += new_links
-        log.log("Added links from app field '#{qu[:text]}': " + new_links)
+        log.log("Added links from app field '#{qu[:_text]}': " + new_links.join(', '))
       end
     }
     links.uniq!
