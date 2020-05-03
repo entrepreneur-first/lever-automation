@@ -53,20 +53,189 @@ class Rules < BaseRules
     result['type'] =
       if type.include?('coffee')
         'coffee'
+      elsif type.include?('phone screen')
+        'phone_screen'
       elsif type.include?('app review')
         'app_review'
       elsif type.include?('interview debrief')
         'debrief'
+      elseif type.include?('ability interview')
+        'ability_interview'
+      elseif type.include?('behaviour interview')
+        'behaviour_interview'
       else
         'unknown'
       end
-      
+    
+    # rating  
     result['rating'] = (f['fields'].select{|f| f['_text'] == 'rating'}.first || {})['_value']
+    
+    if result['type'] == 'coffee'
+      # gender
+      result['gender'] = (f['fields'].select{|f| f['_text'] == 'gender'}.first || {})['_value']
+      
+      # eligibile
+      # TODO: question title/format varies
+      result['eligibile'] = (f['fields'].select{|f| f['_text'].include?('eligible for the upcoming cohort')}.first || {})['_value']
+    end
+    
+    if ['app_review', 'ability_interview'].include? result['type']
+      # CEO / CTO
+      result['ceo_cto'] = if type.include? 'ceo'
+          'ceo'
+        elsif type.include? 'cto'
+          'cto'
+        else
+          'unknown'
+        end
+    end
+    
+    if ['app_review', 'interview_debrief'].include?(result['type'])
+      # software/hardware
+      # TODO: question?
+      result['software_hardware'] = (f['fields'].select{|f| f['_text'] == 'software or hardware'}.first || {})['_value']
+     
+      # talker/doer
+      # TODO: question?
+      result['talker_doer'] = (f['fields'].select{|f| f['_text'] == 'talker or doer'}.first || {})['_value']
+
+      # industry
+      # TODO: question?
+      result['industry'] = (f['fields'].select{|f| f['_text'] == 'industry'}.first || {})['_value']
+
+      # industry
+      # TODO: question?
+      result['technology'] = (f['fields'].select{|f| f['_text'] == 'technology'}.first || {})['_value']
+    end    
+    
+    if ['coffee', 'app_review', 'interview_debrief'].include?(result['type'])
+      # edge
+      # TODO: question title varies
+      result['edge'] = (f['fields'].select{|f| f['_text'] == 'edge'}.first || {})['_value']
+    end
+    
+    if result['type'] == 'interview_debrief'
+      # healthcare
+      # TODO: question?
+      result['healthcare'] = (f['fields'].select{|f| f['_text'] == 'healthcare'}.first || {})['_value']
+
+      # visa exposure
+      # TODO: question?
+      result['visa_exposure'] = (f['fields'].select{|f| f['_text'] == 'visa exposure'}.first || {})['_value']
+    end
+        
+    # when scorecard was completed
+    result['submitted_at'] = f['submittedAt']
+    # scorecard submitted by
+    result['submitted_by'] = f['user']
+    
     result
   end
 
   def summarise_all_feedback(summaries)
-    result = {}
+    result = {
+      has_coffee: false,
+      coffee_rating: nil,
+      coffee_edge: nil,
+      coffee_gender: nil,
+      coffee_eligible: nil,
+      coffee_completed_at: nil,
+      coffee_completed_by: nil,
+      
+      has_phone_screen: false,
+      phone_screen_rating: nil,
+      phone_screen_completed_at: nil,
+      phone_screen_completed_by: nil,
+      
+      has_app_reivew: false,
+      app_review_rating: nil,
+      app_review_edge: nil,
+      app_review_software_hardware: nil,
+      app_review_talker_doer: nil,
+      app_review_industry: nil,
+      app_review_technology: nil,
+      app_review_ceo_cto: nil,
+      app_review_completed_at: nil,
+      app_review_completed_by: nil,
+      
+      has_ability: false,
+      ability_rating: nil,
+      f2f_ceo_cto: nil,
+      ability_completed_at: nil,
+      ability_completed_by: nil,
+      
+      has_behaviour: false,
+      behaviour_rating: nil,
+      behaviour_completed_at: nil,
+      behaviour_completed_by: nil,
+      
+      has_debrief: false,
+      debrief_rating: nil,
+      debrief_completed_at: nil,
+      debrief_edge: nil,
+      debrief_software_hardware: nil,
+      debrief_talker_doer: nil,
+      debrief_industry: nil,
+      debrief_technology: nil,
+      debrief_healthcare: nil,
+      debrief_visa_exposure: nil
+    }
+    
+    summaries.each {|f|
+      case f['type']
+      when 'coffee'
+        result['has_coffee'] = true
+        result['coffee_rating'] = f['rating']
+        result['coffee_edge'] = f['edge']
+        result['coffee_gender'] = f['gender']
+        result['coffee_eligible'] = f['eligible']
+        result['coffee_completed_at'] = f['completed_at']
+        result['coffee_completed_by'] = f['completed_by']
+        
+      when 'app_review'
+        result['has_app_review'] = true
+        result['app_review_rating'] = f['rating']
+        result['app_review_edge'] = f['edge']
+        result['app_review_software_hardware'] = f['software_hardware']
+        result['app_review_talker_doer'] = f['talker_doer']
+        result['app_review_industry'] = f['industry']
+        result['app_review_technology'] = f['technology']
+        result['app_review_healthcare'] = f['healthcare']
+        result['app_review_completed_at'] = f['completed_at']
+        result['app_review_completed_by'] = f['completed_by']
+        
+      when 'phone_screen'
+        result['has_phone_screen'] = true
+        result['phone_screen_rating'] = f['rating']
+        result['phone_screen_completed_at'] = f['completed_at']
+        result['phone_screen_completed_by'] = f['completed_by']
+
+      when 'ability_interview'
+        result['has_ability'] = true
+        result['ability_rating'] = f['rating']
+        result['f2f_ceo_cto'] = f['ceo_cto']
+        result['ability_completed_at'] = f['completed_at']
+        result['ability_completed_by'] = f['completed_by']
+        
+      when 'behaviour_interview'
+        result['has_behaviour'] = true
+        result['behaviour_rating'] = f['rating']
+        result['behaviour_completed_at'] = f['completed_at']
+        result['behaviour_completed_by'] = f['completed_by']
+        
+      when 'debrief'
+        result['has_debrief'] = true
+        result['debrief_edge'] = f['edge']
+        result['debrief_software_hardware'] = f['software_hardware']
+        result['debrief_talker_doer'] = f['talker_doer']
+        result['debrief_industry'] = f['industry']
+        result['debrief_technology'] = f['technology']
+        result['debrief_healthcare'] = f['healthcare']
+        result['debrief_visa_exposure'] = f['visa_exposure']
+        result['debrief_rating'] = f['rating']
+        result['debrief_completed_at'] = f['completed_at']
+      end
+    }
     
     result
   end
