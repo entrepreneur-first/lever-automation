@@ -26,7 +26,7 @@ class Rules < BaseRules
         female: 'Female',
         male: 'Male',
         other: 'Other',
-        prefer_not_say: 'Prefer not to say'
+        prefer_not_say: 'Gender: Prefer not to say'
       }
     }  
   end
