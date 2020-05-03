@@ -50,7 +50,7 @@ class BaseRules
   
   def apply_single_tag(prefix, tag_context, tag_set)
     tag_context = Hash(tag_context)
-    tag = tag_context[:tag] || tag_set[:error] || '<error:unknown'>
+    tag = tag_context[:tag] || tag_set[:error] || '<error:unknown>'
     update = add(prefix + tag)
     if remove(tag_set.reject {|k,v| v == tag}.values.map{|t| prefix + t})
       update = true
