@@ -95,7 +95,7 @@ class Controller
     log.log("Processing all #{log_opp_type} opportunities..")
     log_index = 0
 
-    client.process_paged_result(OPPORTUNITIES_URL, {archived: archived, expand: client.OPP_EXPAND_VALUES}, '#{log_opp_type} opportunities') { |opp|
+    client.process_paged_result(OPPORTUNITIES_URL, {archived: archived, expand: client.OPP_EXPAND_VALUES}, "#{log_opp_type} opportunities") { |opp|
     
       contacts[opp['contact']] += 1
       summary[:opportunities] += 1
