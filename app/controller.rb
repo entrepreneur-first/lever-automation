@@ -108,6 +108,7 @@ class Controller
       summary[:updated] += 1 if result['updated']
       summary[:sent_webhook] += 1 if result['sent_webhook']
       summary[:assigned_to_job] += 1 if result['assigned_to_job']
+      summary[:anonymized] += 1 if result['anonymized']
 
       if summary[:updated] > 0 && summary[:updated] % 50 == 0 && summary[:updated] > log_index
         log_index = summary[:updated]
@@ -124,6 +125,8 @@ class Controller
   # process a single opportunity
   # apply changes & trigger webhook as necessary
   def process_opportunity(opp)
+    return {'anonymized': true} if opp['isAnonymized']
+  
     result = {}
     log.log_prefix(opp['id'] + ': ')
     client.batch_updates
