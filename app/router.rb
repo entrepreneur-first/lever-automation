@@ -72,7 +72,7 @@ class Router
     finished_successfully = true
     
     ensure
-      controller.log.log('#{finished_successfully ? 'Finished' : 'Aborted'} command: ' + command)
+      controller.log.log("#{finished_successfully ? 'Finished' : 'Aborted'} command: " + command)
   end
 
 end
