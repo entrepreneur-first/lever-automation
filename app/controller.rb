@@ -190,13 +190,19 @@ class Controller
     # that haven't had an interaction since within a few seconds of creation
     # (leads appear to be created when the recipient opts in/out, and before they type their reply)
     if !Util.has_posting(opp) && 
-        [opp['stage'], opp['stage']['id']].include?('lead-responded') && 
-        opp['origin'] == 'sourced' && 
-        opp['sources'] == ['LinkedIn'] &&
-        (opp['lastInteractionAt'] < opp['createdAt'] + 5000)
-      client.add_tags_if_unset(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT)
+       [opp['stage'], opp['stage']['id']].include?('lead-responded') && 
+       opp['origin'] == 'sourced' && 
+       opp['sources'] == ['LinkedIn'] &&
+       (opp['lastInteractionAt'] < opp['createdAt'] + 5000)
+      if opp['emails'].length == 0 &&
+         opp['phones'].length == 0 &&
+         Util.actual_links(opp).length == 0
+        client.add_tags_if_unset(opp, TAG_LINKEDIN_OPTOUT)
+      else
+        client.add_tags_if_unset(opp, TAG_LINKEDIN_OPTIN)
+      end
     else
-      client.remove_tags_if_set(opp, TAG_LINKEDIN_SUSPECTED_OPTOUT)
+      client.remove_tags_if_set(opp, [TAG_LINKEDIN_OPTOUT, TAG_LINKEDIN_OPTIN])
     end    
   end
 

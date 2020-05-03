@@ -19,6 +19,10 @@ class Util
   def self.is_cohort_app(opp)
     opp['tags'].include?(COHORT_JOB_TAG)
   end
+  
+  def self.actual_links(opp)
+    opp['links'].reject{|l| l.start_with?(AUTO_LINK_PREFIX)}
+  end
 
   # generic util functions
 

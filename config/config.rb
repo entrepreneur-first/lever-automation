@@ -34,7 +34,8 @@ TAG_ASSIGNED_TO_LOCATION = AUTO_TAG_PREFIX + 'Auto-assigned to cohort'
 
 TAG_DUPLICATE_OPPS_PREFIX = AUTO_TAG_PREFIX + "Duplicate: "
 
-TAG_LINKEDIN_SUSPECTED_OPTOUT = AUTO_TAG_PREFIX + 'LinkedIn InMail decline (suspected)'
+TAG_LINKEDIN_OPTOUT = AUTO_TAG_PREFIX + 'LinkedIn InMail decline (suspected)'
+TAG_LINKEDIN_OPTIN = AUTO_TAG_PREFIX + 'LinkedIn InMail accept awaiting followup'
 
 # deprecated: now storing under BOT_METADATA
 BOT_TAG_PREFIX = '🤖 [bot] '
