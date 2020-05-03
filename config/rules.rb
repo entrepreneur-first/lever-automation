@@ -36,6 +36,7 @@ class Rules < BaseRules
     responses = opp['_app_responses']
     responses.each {|qu|
       if qu[:_text].include?('url') || qu[:_text].include?('links')
+        next if qu[:_text].include?('who is')
         new_links = qu['value'].scan(/[^\s]+\.[^\s]+/)
         next unless new_links.any?
         links += new_links
