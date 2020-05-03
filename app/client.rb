@@ -239,6 +239,7 @@ class Client
     result = api_call_log(log_string, '<single>') do
       result = HTTParty.get(u, basic_auth: auth)
     end
+    return nil if is_http_error(result)
     result.fetch('data')
   end
    
@@ -334,7 +335,15 @@ class Client
   
   def log_if_api_error(result)
     # if not an error
-    return if result.code.between?(200, 299)
+    return if is_http_success(result)
     log.error((result.code.to_s || '') + ': ' + (result.parsed_response['code'] || '<no code>') + ': ' + (result.parsed_response['message'] || '<no message>'))
+  end
+  
+  def is_http_success(result)
+    result.code.between?(200, 299)
+  end
+  
+  def is_http_error(result)
+    !is_http_success(result)
   end
 end

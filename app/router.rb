@@ -51,7 +51,7 @@ class Router
         os = controller.client.opportunities_for_contact(key)
       else
         # opportunity ID
-        os = [controller.client.get_opportunity(key, {expand: controller.client.OPP_EXPAND_VALUES})]
+        os = Array(controller.client.get_opportunity(key, {expand: controller.client.OPP_EXPAND_VALUES}))
       end
 
       case command
