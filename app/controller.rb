@@ -438,12 +438,7 @@ class Controller
   end
   
   def one_feedback_summary_link(f)
-    one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(({
-        'title': f['text'],
-        'user': f['user'],
-        'createdAt': f['createdAt'],
-        'completedAt': f['completedAt']
-      }.merge(rules.summarise_one_feedback(f)))
+    one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(rules.summarise_one_feedback(f).sort)
     )
   end
   
@@ -462,7 +457,7 @@ class Controller
     summary = rules.summarise_all_feedback(feedback_data)
     return unless summary.any?
     
-    all_feedback_summary_link_prefix + '?' + URI.encode_www_form(summary)
+    all_feedback_summary_link_prefix + '?' + URI.encode_www_form(summary.sort)
   end
   
   # determine intended cohort location from lead tags

@@ -50,6 +50,7 @@ class Rules < BaseRules
     
     # feedback type
     type = f['text'].downcase.gsub(/[^a-z ]/, '')
+    result['title'] = type
     result['type'] =
       if type.include?('coffee')
         'coffee'
