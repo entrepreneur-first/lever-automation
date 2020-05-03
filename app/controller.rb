@@ -148,6 +148,7 @@ class Controller
 
     if !Util.has_posting(opp) || Util.is_cohort_app(opp)
       prepare_app_responses(opp)
+      add_links(opp)
       summarise_feedbacks(opp)
       # detect_duplicate_opportunities(opp)
       rules.do_update_tags(opp)
@@ -393,6 +394,16 @@ class Controller
         _value: Array(qu['value']).join(' ').downcase.gsub(/[^a-z ]/, ''),
       })
     }
+  end
+  
+  def add_links(opp)
+    return if bot_metadata(opp)['link_rules'] == links_rules_checksum
+    client.add_links(opp, Rules.get_links(opp))
+    set_bot_metadata(opp, 'link_rules', links_rules_checksum)
+  end
+  
+  def links_rules_checksum
+    @links_rules_checksum ||= Digest::MD5.hexdigest(rules.method('get_links').source)
   end
   
   def summarise_feedbacks(opp)
