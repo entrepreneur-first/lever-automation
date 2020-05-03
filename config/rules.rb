@@ -19,8 +19,7 @@ class Rules < BaseRules
         referral: 'Referral',
         organic: 'Organic',
         offline: 'Offline',
-        offline_organic: 'Offline-or-Organic',
-        error: '<error:unknown>'
+        offline_organic: 'Offline-or-Organic'
       },
       gender: {
         female: 'Female',
@@ -138,7 +137,7 @@ class Rules < BaseRules
     responses.each {|qu|
       if qu[:_text] == 'gender'
         tags.each { |t|
-          return {tag: t[1], field: qu['text'], value: qu['value']} if qu[:_value] == t[1].downcase
+          return {tag: t[1], field: qu['text'], value: qu['value']} if qu[:_value] == t[1].downcase.sub('gender: ', '')
         }
       end
     }
