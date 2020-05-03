@@ -146,7 +146,7 @@ class Client
     return queue_remove_annotations(opp, type, values) if @batch_updates && !commit
     ltype = type.downcase
     
-    api_action_log("Removing #{ltype}: " + values.join(',')) do
+    api_action_log("Remove #{ltype}: " + values.join(',')) do
       result = post("#{opp_url(opp)}/remove#{type}?", {"#{ltype}": values})
       values.each {|value|
         opp[ltype].delete(value)
