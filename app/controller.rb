@@ -398,7 +398,9 @@ class Controller
   
   def add_links(opp)
     return if bot_metadata(opp)['link_rules'] == links_rules_checksum
-    client.add_links(opp, rules.get_links(opp))
+    new_links = rules.get_links(opp)
+    return unless Array(new_links).any?
+    client.add_links(opp, new_links)
     set_bot_metadata(opp, 'link_rules', links_rules_checksum)
   end
   
