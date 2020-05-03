@@ -43,7 +43,7 @@ class Rules < BaseRules
         log.log("Added links from app field '#{qu[:_text]}': " + new_links.join(', '))
       end
     }
-    links.uniq!
+    links.uniq
   end
   
   def summarise_one_feedback(f)
