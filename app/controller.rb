@@ -189,22 +189,31 @@ class Controller
     # we don't have a way to read the inmail responses, so instead look for opportunities
     # that haven't had an interaction since within a few seconds of creation
     # (leads appear to be created when the recipient opts in/out, and before they type their reply)
+    
+    # 1. look for opps with no job, stage=responded, origin=sourced, sources=LinkedIn, no interaction since 5s after creation. Otherwise ignore & remove all relevant tags.
     if !Util.has_posting(opp) && 
        [opp['stage'], opp['stage']['id']].include?('lead-responded') && 
        opp['origin'] == 'sourced' && 
        opp['sources'] == ['LinkedIn'] &&
        (opp['lastInteractionAt'] < opp['createdAt'] + 5000)
-      if opp['emails'].length == 0 &&
-         opp['phones'].length == 0
-         # && Util.actual_links(opp).length == 0
-        client.add_tags_if_unset(opp, TAG_LINKEDIN_OPTOUT)
-        client.remove_tags_if_set(opp, TAG_LINKEDIN_OPTIN)
-      else
+        
+      if opp['emails'].length > 0 ||
+         opp['phones'].length > 0
+        # known opt-in since we've had an email and/or phone provided
         client.add_tags_if_unset(opp, TAG_LINKEDIN_OPTIN)
-        client.remove_tags_if_set(opp, TAG_LINKEDIN_OPTOUT)
+        client.remove_tags_if_set(opp, [TAG_LINKEDIN_OPTOUT, TAG_LINKEDIN_OPTIN_LIKELY])
+      elsif opp['lastInteractionAt'] > opp['createdAt'] + 1500
+        # hacky imperfect heuristic: ~majoritiy of opps that indicated intrested in receiving more
+        # appear to have their status updated > 1.5s after creation
+        client.add_tags_if_unset(opp, TAG_LINKEDIN_OPTIN_LIKELY)
+        client.remove_tags_if_set(opp, [TAG_LINKEDIN_OPTIN, TAG_LINKEDIN_OPTOUT])
+      else
+        # majority of opps not updated since 1.5s after creation appear to be opt-outs
+        client.add_tags_if_unset(opp, TAG_LINKEDIN_OPTOUT)
+        client.remove_tags_if_set(opp, [TAG_LINKEDIN_OPTIN, TAG_LINKEDIN_OPTIN_LIKELY])
       end
     else
-      client.remove_tags_if_set(opp, [TAG_LINKEDIN_OPTOUT, TAG_LINKEDIN_OPTIN])
+      client.remove_tags_if_set(opp, [TAG_LINKEDIN_OPTOUT, TAG_LINKEDIN_OPTIN, TAG_LINKEDIN_OPTIN_LIKELY])
     end    
   end
 
@@ -478,6 +487,7 @@ class Controller
     client.remove_tags_with_prefix(opp, TAG_CHECKSUM_PREFIX)
     client.remove_tags_with_prefix(opp, LAST_CHANGE_TAG_PREFIX)
     client.remove_tags_with_prefix(opp, '🤖 [auto]')
+    client.remove_tags_if_set(opp, [TAG_LINKEDIN_OPTOUT_OLD])
   end
 
   # TEMP
