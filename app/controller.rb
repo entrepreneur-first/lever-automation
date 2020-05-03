@@ -195,11 +195,13 @@ class Controller
        opp['sources'] == ['LinkedIn'] &&
        (opp['lastInteractionAt'] < opp['createdAt'] + 5000)
       if opp['emails'].length == 0 &&
-         opp['phones'].length == 0 &&
-         Util.actual_links(opp).length == 0
+         opp['phones'].length == 0
+         # && Util.actual_links(opp).length == 0
         client.add_tags_if_unset(opp, TAG_LINKEDIN_OPTOUT)
+        client.remove_tags_if_set(opp, TAG_LINKEDIN_OPTIN)
       else
         client.add_tags_if_unset(opp, TAG_LINKEDIN_OPTIN)
+        client.remove_tags_if_set(opp, TAG_LINKEDIN_OPTOUT)
       end
     else
       client.remove_tags_if_set(opp, [TAG_LINKEDIN_OPTOUT, TAG_LINKEDIN_OPTIN])
