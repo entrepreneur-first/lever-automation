@@ -12,7 +12,7 @@ class Log
     @log_prefix = []
     
     @log = Logger.new(ENV['LOG_FILE'].nil? ? STDOUT : LOG_FILE)
-    @error_log = Logger.new(ENV['LOG_FILE'].nil? ? STDOUT : ERROR_LOG_FILE)
+    @error_log = Logger.new(ENV['ERROR_LOG_FILE'].nil? ? STDOUT : ERROR_LOG_FILE)
 
     @log.formatter = @error_log.formatter = proc { |severity, datetime, progname, msg| ENV['LOG_FILE'].nil? ? "#{severity}, #{msg}\n" : "#{severity}, #{datetime}, #{msg}\n" }
   end
@@ -41,7 +41,7 @@ class Log
     msg = msg
     puts log_prefix_lines("ERROR: " + msg) unless ENV['LOG_FILE'].nil?
     @log.error(log_prefix_lines(msg))
-    @error_log.error(log_prefix_lines(msg))
+    @error_log.error(log_prefix_lines(msg)) unless ENV['ERROR_LOG_FILE'].nil?
   end
 
   def log_prefix(p=nil)
