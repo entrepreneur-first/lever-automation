@@ -144,12 +144,12 @@ class Controller
     end
     
     check_linkedin_optout(opp)
+    remove_legacy_attributes(opp)
 
     if !Util.has_posting(opp) || Util.is_cohort_app(opp)
       prepare_app_responses(opp)
       summarise_feedbacks(opp)
       # detect_duplicate_opportunities(opp)
-      remove_legacy_attributes(opp)
       rules.do_update_tags(opp)
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
