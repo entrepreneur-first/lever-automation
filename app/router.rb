@@ -42,14 +42,16 @@ class Router
       controller.tidy_bot_notes
 
     else
-      email = command.gsub('mailto:', '')
-      command, email = email.split(' ') if email.include?(' ')
-      email = (email.match(/https:\/\/hire.lever.co\/candidates\/([^?]+)/) || [])[1] || email
+      key = command.gsub('mailto:', '')
+      command, key = email.split(' ') if key.include?(' ')
+      key = (key.match(/https:\/\/hire.lever.co\/candidates\/([^?]+)/) || [])[1] || key
 
-      if email.include? '@'
-        os = controller.client.opportunities_for_contact(email)
+      if key.include? '@'
+        # email
+        os = controller.client.opportunities_for_contact(key)
       else
-        os = [controller.client.get_opportunity(email, {expand: controller.client.OPP_EXPAND_VALUES})]
+        # opportunity ID
+        os = [controller.client.get_opportunity(key, {expand: controller.client.OPP_EXPAND_VALUES})]
       end
 
       case command
