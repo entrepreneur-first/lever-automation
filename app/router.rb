@@ -52,7 +52,7 @@ class Router
         os = controller.client.opportunities_for_contact(key)
       else
         # opportunity ID
-        os = Array(controller.client.get_opportunity(key, {expand: controller.client.OPP_EXPAND_VALUES}))
+        os = [controller.client.get_opportunity(key, {expand: controller.client.OPP_EXPAND_VALUES})].reject{|o| o.nil?}
       end
 
       case command
@@ -65,7 +65,7 @@ class Router
       when 'tidy_bot_notes'
         os.each{ |opp| controller.tidy_opp_bot_notes(opp) }
       else
-        os.each { |opp| controller.process_opportunity(opp) }
+        os.each{ |opp| controller.process_opportunity(opp) }
       end
     end
     
