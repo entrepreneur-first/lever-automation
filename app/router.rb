@@ -10,7 +10,8 @@ class Router
 
   def self.route(command)  
     return if command == ''
-  
+    finished_successfully = false
+      
     controller = Controller.new
     controller.log.verbose
     
@@ -68,7 +69,10 @@ class Router
       end
     end
     
-    controller.log.log('Finished command: ' + command)
+    finished_successfully = true
+    
+    ensure
+      controller.log.log('#{finished_successfully ? 'Finished' : 'Aborted'} command: ' + command)
   end
 
 end
