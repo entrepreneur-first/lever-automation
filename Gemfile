@@ -4,3 +4,5 @@ gem "daemons"
 gem "method_source", "~> 1.0"
 
 gem "sidekiq", "~> 6.0"
+
+gem "aws-sdk-s3", "~> 1.63"
