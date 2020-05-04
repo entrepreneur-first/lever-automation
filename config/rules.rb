@@ -134,6 +134,8 @@ class Rules < BaseRules
   end
 
   def summarise_all_feedback(summaries)
+    return {} unless summaries.any?
+  
     result = {
       has_coffee: false,
       coffee_rating: nil,
