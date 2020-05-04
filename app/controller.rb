@@ -224,7 +224,7 @@ class Controller
   # - Leads not assigned to a job posting show up in Lever as candidates with "no opportunity", but are returned in the API as opportunities without an application
   # - Leads assigned to a job posting show up in Lever as opportunities - potentially multiple per candidate. These show up in the API as applications against the opportunity - even when no actual application submitted
   def check_no_posting(opp)
-    return if Util.has_posting(opp)
+    return if Util.has_posting(opp) || Util.is_archived(opp)
     
     location = location_from_tags(opp)
     if location.nil?

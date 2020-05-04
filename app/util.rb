@@ -20,6 +20,10 @@ class Util
     opp['tags'].include?(COHORT_JOB_TAG)
   end
   
+  def self.is_archived(opp)
+    !opp['archived'].nil? && (opp['archived']['archivedAt'] || 0) > 0
+  end
+  
   def self.actual_links(opp)
     opp['links'].reject{|l| l.start_with?(AUTO_LINK_PREFIX)}
   end
