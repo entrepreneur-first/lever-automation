@@ -6,6 +6,8 @@ require_relative 'util'
 require_relative 'log'
 require_relative 'client'
 require_relative '../config/rules'
+require_relative 'export_filter'
+require_relative 'csv_writer'
 
 class Controller
 
@@ -556,6 +558,20 @@ class Controller
     client.process_paged_result(OPPORTUNITIES_URL, {archived: false}, 'checking for links') { |opp|
       puts JSON.pretty_generate(opp) if opp['links'].length > 1
     }
+  end
+
+  def export_to_csv
+    prefix = Time.now
+    posting_ids = COHORT_JOBS.map{|j| j[:posting_id]}
+
+    opps = client.all_opportunities(posting_ids)
+    url1 = CSV_Writer.new('opportunities.csv', ExportFilter.new(opps).opportunities, prefix).run
+
+    # Feedback
+    feedbacks = client.feedback(opps.map { |opp| opp.fetch('id') })
+    url2 = CSV_Writer.new('feedback.csv', ExportFilter.new(feedbacks).feedback, prefix).run
+
+    { opportunities: url1, feedback: url2 }
   end
 
   # fixes

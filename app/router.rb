@@ -5,7 +5,7 @@ require_relative 'controller'
 class Router
 
   def self.interactive_prompt_str
-    "Enter 'summarise', 'process', 'fix tags', 'check links', or '[view|feedback] <email>|<opportunity_id>' to view/process one candidate:"
+    "Enter 'summarise', 'process', 'fix tags', 'check links', 'export csv', or '[view|feedback] <email>|<opportunity_id>' to view/process one candidate:"
   end
 
   def self.interactive?
@@ -48,6 +48,9 @@ class Router
 
     when 'archive accident'
       controller.archive_accidental_postings
+      
+    when 'export csv'
+      controller.export_to_csv
 
     else
       key = command.gsub('mailto:', '')
