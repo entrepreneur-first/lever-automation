@@ -254,25 +254,25 @@ class Controller
   def send_webhooks(opp, update_time)
     log.log("Sending full webhooks - change detected") if FULL_WEBHOOK_URLS.any?
     FULL_WEBHOOK_URLS.each {|url|
-      _webhook(opp, update_time, true)
+      _webhook(url, opp, update_time, true)
     }
     log.log("Sending webhooks - other change detected") if OPPORTUNITY_CHANGED_WEBHOOK_URLS.any?
     OPPORTUNITY_CHANGED_WEBHOOK_URLS.each {|url|
-      _webhook(opp, update_time, false)
+      _webhook(url, opp, update_time, false)
     }
   end
   
-  def _webhook(opp, update_time, full_data=false)
+  def _webhook(url, opp, update_time, full_data=false)
     p = fork {
       HTTParty.post(
         url,
         body: {
           # id: '',
           triggeredAt: update_time,
-          event: 'candidateOtherChange_EFCustomBot',
+          event: 'candidateChange_EFAutomationBot',
           # signature: '',
           # token: '',
-          data: full_data ? opp : {
+          data: full_data ? full_webhook_data(opp) : {
             candidateId: opp['id'],
             contactId: opp['contact'],
             opportunityId: opp['id']
@@ -281,6 +281,13 @@ class Controller
         headers: { 'Content-Type' => 'application/json' }
       )}
     Process.detach(p)
+  end
+
+  def full_webhook_data(opp)
+    opp.reject{|k,v| k.start_with?('_') || (k == 'applications')}.merge({
+      application: opp['applications'][0],
+      feedback_summary: parse_all_feedback_summary_link(opp)
+    })
   end
 
   def update_changed_tag(opp, update_time=nil)
