@@ -24,53 +24,63 @@ class Rules < BaseRules
         referral: 'Referral',
         organic: 'Organic',
         offline: 'Offline',
-        offline_organic: 'Offline-or-Organic'
+        offline_organic: 'Offline-or-Organic',
+        error: '<source unknown>'
       },
       gender: {
         female: 'Female',
         male: 'Male',
         other: 'Other',
-        prefer_not_say: 'Gender: Prefer not to say'
+        prefer_not_say: 'Gender: Prefer not to say',
+        error: '<gender unknown>'
       },
       rating: {
         _4: '4 - Strong Hire',
         _3: '3 - Hire',
         _2: '2 - No Hire',
-        _1: '1 - Strong No Hire'
+        _1: '1 - Strong No Hire',
+        error: '<rating unknown>'
       },
       edge: {
         technical: 'Technical',
         domain: 'Domain',
         cat_talker: 'Catalyst Talker',
         cat_doer: 'Catalyst Doer',
-        no_edge: 'No edge'
+        no_edge: 'No edge',
+        error: '<edge unknown>'
       },
       eligibility: {
         eligible: 'Eligible',
-        ineligible: 'Ineligible'
+        ineligible: 'Ineligible',
+        error: '<eligibility unknown>'
       },
       software_hardware: {
         software: 'Software',
-        hardware: 'Hardware'
+        hardware: 'Hardware',
+        error: '<soft/hardware unknown>'
       },
       talker_doer: {
         talker: 'Talker',
         doer: 'Doer',
         both: 'Talker/Doer',
         neither: 'TD-Neither',
-        unsure: 'TD-Unsure'
+        unsure: 'TD-Unsure',
+        error: '<talker/doer unknown>'
       },
       ceo_cto: {
         ceo: 'CEO',
-        cto: 'CTO'
+        cto: 'CTO',
+        error: '<ceo/cto unknown>'
       },
       visa_exposure: {
-        yes: 'Visa Exposure=Y',
-        no: 'Visa Exposure=N'
+        yes: 'Visa Exposure',
+        no: 'No Visa Exposure',
+        error: '<visa exposure unknown>'
       },
       healthcare: {
-        yes: 'Healthcare=Y',
-        no: 'Healthcare=N'
+        yes: 'Healthcare',
+        no: 'Not Healthcare',
+        error: '<healthcare unknown>'
       }
     }  
   end
@@ -98,7 +108,7 @@ class Rules < BaseRules
     type = Util.simplify_str(f['text'])
     result['title'] = type
     result['type'] =
-      if type.include?('coffee')
+      if type.include?('coffee') || type.include?('initial call') || type.include?('london call') || type.include?('berlin call') || type.include?('paris call') || type.include?('toronto call')
         'coffee'
       elsif type.include?('phone screen')
         'phone_screen'
@@ -291,7 +301,7 @@ class Rules < BaseRules
 
   def update_tags(opp, feedback_summary)
     @feedback_summary = feedback_summary
-  
+
     # tags from application
     if Util.has_application(opp) && Util.is_cohort_app(opp)
       # automatically add tag for the opportunity source based on self-reported data in the application
@@ -301,41 +311,42 @@ class Rules < BaseRules
     end
     
     # feedback
-    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_rating, :rating)
-    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_edge, :edge)
-    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_gender, :gender)
-    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_eligible, :eligibility)
+    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_rating, :rating, :has_coffee)
+    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_edge, :edge, :has_coffee)
+    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_gender, :gender, :has_coffee)
+    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_eligible, :eligibility, :has_coffee)
 
-    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_rating, :rating)
-    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_edge, :edge)
-    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_software_hardware, :software_hardware)
-    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_talker_doer, :talker_doer)
-    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto, :ceo_cto)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_rating, :rating, :has_app_review)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_edge, :edge, :has_app_review)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_software_hardware, :software_hardware, :has_app_review)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_talker_doer, :talker_doer, :has_app_review)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto, :ceo_cto, :has_app_review)
     
-    apply_feedback_tag(TAG_FROM_PHONE_SCREEN, :phone_screen_rating, :rating)
+    apply_feedback_tag(TAG_FROM_PHONE_SCREEN, :phone_screen_rating, :rating, :has_phone_screen)
 
-    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_rating, :rating)
-    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_edge, :edge)
-    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_software_hardware, :software_hardware)
-    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_talker_doer, :talker_doer)
-    apply_feedback_tag(TAG_FROM_DEBREIF, :debrief_healthcare, :healthcare)
-    apply_feedback_tag(TAG_FROM_DEBREIF, :debrief_visa_exposure, :visa_exposure)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_rating, :rating, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_edge, :edge, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_software_hardware, :software_hardware, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_talker_doer, :talker_doer, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_healthcare, :healthcare, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_visa_exposure, :visa_exposure, :has_debrief)
       
-    apply_feedback_tag(TAG_FROM_ABILITY_INTERVIEW, :ability_rating, :rating)
-    apply_feedback_tag(TAG_FROM_F2F, :f2f_ceo_cto, :ceo_cto))
-    apply_feedback_tag(TAG_FROM_BEHAVIOUR_INTERVIEW, :behaviour_rating, :rating)
+    apply_feedback_tag(TAG_FROM_ABILITY_INTERVIEW, :ability_rating, :rating, :has_ability)
+    apply_feedback_tag(TAG_FROM_F2F, :f2f_ceo_cto, :ceo_cto, :has_ability)
+    apply_feedback_tag(TAG_FROM_BEHAVIOUR_INTERVIEW, :behaviour_rating, :rating, :has_behaviour)
       
   end
   
-  def apply_feedback_tag(prefix, value_key, tag_set_key)
-    value = @feedback_summary[value_key]
+  def apply_feedback_tag(prefix, value_key, tag_set_key, required_key=nil)
+    value = @feedback_summary[value_key.to_s]    
     value = parse_feedback_value(value, tag_set_key) || value unless value.nil?
     
     tag_set = tags(tag_set_key)
-    tag = {:tag: tag_set.values.select{|v| v.downcase == value}.first}
-    tag = {:remove: true} if value.nil? # || tag[:tag].nil?
-    
-    apply_single_tag(prefix, tag, tag_set}
+    tag = {tag: (tag_set.values.select{|v| v.downcase == value}.first)}
+
+    required = @feedback_summary[required_key.to_s] == 'true'
+    tag = {remove: true} if ((value || '') == '') && !required # || tag[:tag].nil?
+    apply_single_tag(prefix, tag, tag_set)
   end
   
   def parse_feedback_value(value, type)
@@ -345,9 +356,10 @@ class Rules < BaseRules
       case value
       when 'tech edge'
         'technical'
+      when 'tech'
+        'technical'
       when 'domain edge'
         'domain'
-      else value
       end    
 
     when :talker_doer
@@ -358,24 +370,25 @@ class Rules < BaseRules
         'td-neither'
       when 'unsure'
         'td-unsure'
-      else value
       end
 
     when :healthcare
       case value
-      when 'Yes'
-        'healthcare=y'
-      when 'No'
-        'healthcare=n'
+      when 'yes'
+        'healthcare'
+      when 'no'
+        'not healthcare'
       end      
 
     when :visa_exposure
       case value
-      when 'Yes'
-        'visa exposure=y'
-      when 'No'
-        'visa exposure=n'
-      end       
+      when 'yes'
+        'visa exposure'
+      when 'no'
+        'no visa exposure'
+      end
+    
+    end
   end
 
   def source_from_app(opp)
