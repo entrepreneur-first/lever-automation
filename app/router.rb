@@ -50,7 +50,7 @@ class Router
       controller.archive_accidental_postings
       
     when 'export csv'
-      controller.export_to_csv
+      puts "CSV Export Complete: #{controller.export_to_csv}"
 
     else
       key = command.gsub('mailto:', '')
