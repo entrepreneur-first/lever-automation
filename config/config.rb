@@ -10,10 +10,12 @@ COHORT_JOBS = [
 ]
 
 OPPORTUNITY_CHANGED_WEBHOOK_URLS = [
-  # test: 'https://hooks.zapier.com/hooks/catch/6688770/o55rf2n/',
-
   # Zap: New app + debrief info - https://zapier.com/app/history?root_id=80954860
   'https://hooks.zapier.com/hooks/catch/3678640/o1tu42p/'
+]
+
+FULL_WEBHOOK_URLS = [
+  'https://hooks.zapier.com/hooks/catch/6688770/o55rf2n/'
 ]
 
 COHORT_JOB_TAG = 'EF Cohort'

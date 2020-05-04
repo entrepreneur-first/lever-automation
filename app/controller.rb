@@ -136,7 +136,7 @@ class Controller
     # checks lastInteractionAt and tag checksum, creating checksum tag if necessary
     last_update = latest_change(opp)
     # should notify of change based on state before we executed?
-    notify = last_update[:time] > last_webhook_change(opp) + 100
+    notify = last_update[:time] > last_change_detected(opp) + 100
 
     if check_no_posting(opp)
       # if we added to a job then reload as tags etc will have changed automagically 
@@ -246,33 +246,41 @@ class Controller
   # record change detected and send webhook
   def notify_of_change(opp, last_update)
     unless opp['applications'].length == 0
-      send_webhook(opp, last_update[:time])
-      # client.add_note(opp, 'Updated reporting data after detecting ' + last_update[:source])
+      send_webhooks(opp, last_update[:time])
     end
     update_changed_tag(opp, last_update[:time])
   end
   
-  def send_webhook(opp, update_time)
-    log.log("Sending webhook - change detected") #: " + opp["id"])
-    OPPORTUNITY_CHANGED_WEBHOOK_URLS.each {|url|
-      p = fork {HTTParty.post(
-          url,
-          body: {
-            # id: '',
-            triggeredAt: update_time,
-            event: 'candidateOtherChange_EFCustomBot',
-            # signature: '',
-            # token: '',
-            data: {
-              candidateId: opp['id'],
-              contactId: opp['contact'],
-              opportunityId: opp['id']
-            }
-          }.to_json,
-          headers: { 'Content-Type' => 'application/json' }
-        )}
-      Process.detach(p)
+  def send_webhooks(opp, update_time)
+    log.log("Sending full webhooks - change detected") if FULL_WEBHOOK_URLS.any?
+    FULL_WEBHOOK_URLS.each {|url|
+      _webhook(opp, update_time, true)
     }
+    log.log("Sending webhooks - other change detected") if OPPORTUNITY_CHANGED_WEBHOOK_URLS.any?
+    OPPORTUNITY_CHANGED_WEBHOOK_URLS.each {|url|
+      _webhook(opp, update_time, false)
+    }
+  end
+  
+  def _webhook(opp, update_time, full_data=false)
+    p = fork {
+      HTTParty.post(
+        url,
+        body: {
+          # id: '',
+          triggeredAt: update_time,
+          event: 'candidateOtherChange_EFCustomBot',
+          # signature: '',
+          # token: '',
+          data: full_data ? opp : {
+            candidateId: opp['id'],
+            contactId: opp['contact'],
+            opportunityId: opp['id']
+          }
+        }.to_json,
+        headers: { 'Content-Type' => 'application/json' }
+      )}
+    Process.detach(p)
   end
 
   def update_changed_tag(opp, update_time=nil)
@@ -362,19 +370,6 @@ class Controller
       end
     }
     nil
-  end
-  
-  # detect time of last change that would have triggered a Lever native webhook
-  # - either a lever Native webhook (created, stage change or application),
-  #   or a webhook we send ourselves via this script (recorded via tag)
-  def last_webhook_change(opp)
-    (
-      [opp["createdAt"], opp["lastAdvancedAt"], last_change_detected(opp)] +
-      opp["applications"].map {|a| a["createdAt"]} +
-      
-      # legacy
-      (opp["tags"].select {|t| t.start_with? LAST_CHANGE_TAG_PREFIX}.map {|t| Util.datetimestr_to_timestamp(t.delete_prefix(LAST_CHANGE_TAG_PREFIX)) })
-    ).reject {|x| x.nil?}.max
   end
 
   def last_change_detected(opp)
