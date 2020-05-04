@@ -44,8 +44,8 @@ class Client
     get_paged_result(OPPORTUNITIES_URL, {email: email, expand: self.OPP_EXPAND_VALUES}, 'opportunities_for_contact')
   end
 
-  def opportunities(posting_ids = [])
-    get_paged_result(OPPORTUNITIES_URL, OPPORTUNITIES_PARAMS.merge(posting_id: posting_ids), 'opportunities')
+  def opportunities(posting_ids = [], params = {})
+    get_paged_result(OPPORTUNITIES_URL, OPPORTUNITIES_PARAMS.merge(posting_id: posting_ids).merge(params), 'opportunities')
   end
 
   def archived_opportunities(posting_ids = [])
@@ -230,6 +230,13 @@ class Client
     end
   end
 
+  def archive(opp, reason=nil)
+    reason ||= '' # default archive reason: 
+    api_action_log('Archiving opportunity with reason: ' + reason) do
+      put("#{opp_url(opp)}/archived?", {reason: reason})
+    end
+  end
+
   #
   # Helpers
   #
@@ -264,42 +271,19 @@ class Client
   end
   
   def post(url, body)
-    result = _post(url, body)
-    # retry on occasional bad gateway error
-    if result.code == 502
-      log.warn('502 error, retrying')
-      result = _post(url, body)
-    end
-    log_if_api_error(result)
-    result.parsed_response
+    http_method(self.method(:_post).curry, url, body)
   end
   
-  def _post(url, body)
-    HTTParty.post(url + Util.to_query({
-        perform_as: LEVER_BOT_USER
-      }),
-      body: body.to_json,
-      headers: {'Content-Type' => 'application/json'},
-      basic_auth: auth
-    )
+  def put(url, body)
+    log.log("PUT: #{url}") if log.verbose?
+    http_method(self.method(:_put).currt, url, body)
   end
-
+  
   def delete(url)
     log.log("DELETE: #{url}") if log.verbose?
-    result = _delete(url)
-    # retry on occasional bad gateway error
-    if result.code == 502
-      log.warn('502 error, retrying')
-      result = _delete(url)
-    end
-    log_if_api_error(result)
-    result.parsed_response
+    http_method(self.method(:_delete).curry, url)
   end
   
-  def _delete(url)
-    HTTParty.delete(url, basic_auth: auth)
-  end
-
   #
   # Wrappers for making API calls with logging
   #
@@ -324,6 +308,41 @@ class Client
   #
   private
   #
+
+  def http_method(method, url, body={})
+    result = method.(url, body)
+    # retry on occasional bad gateway error
+    if result.code == 502
+      log.warn('502 error, retrying')
+      result = method.(url, body)
+    end
+    log_if_api_error(result)
+    result.parsed_response
+  end
+  
+  def _post(url, body)
+    HTTParty.post(url + Util.to_query({
+        perform_as: LEVER_BOT_USER
+      }),
+      body: body.to_json,
+      headers: {'Content-Type' => 'application/json'},
+      basic_auth: auth
+    )
+  end
+  
+  def _put(url, body)
+    HTTParty.put(url + Util.to_query({
+        perform_as: LEVER_BOT_USER
+      }),
+      body: body.to_json,
+      headers: {'Content-Type' => 'application/json'},
+      basic_auth: auth
+    )
+  end
+
+  def _delete(url, body=nil)
+    HTTParty.delete(url, basic_auth: auth)
+  end
 
   def auth
     { username: @username, password: @password }
