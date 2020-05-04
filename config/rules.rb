@@ -30,7 +30,8 @@ class Rules < BaseRules
     }  
   end
 
-  def add_links(opp)
+  def update_links(opp)
+    opp(opp)
     links = []
     responses = opp['_app_responses']
     responses.each {|qu|

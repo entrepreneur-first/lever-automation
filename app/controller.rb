@@ -398,13 +398,13 @@ class Controller
   
   def add_links(opp)
     return if bot_metadata(opp)['link_rules'] == links_rules_checksum
-    new_links = rules.add_links(opp)
+    new_links = rules.update_links(opp)
     return unless Array(new_links).any?
     set_bot_metadata(opp, 'link_rules', links_rules_checksum)
   end
   
   def links_rules_checksum
-    @links_rules_checksum ||= Digest::MD5.hexdigest(rules.method('get_links').source)
+    @links_rules_checksum ||= Digest::MD5.hexdigest(rules.method('update_links').source)
   end
   
   def summarise_feedbacks(opp)
