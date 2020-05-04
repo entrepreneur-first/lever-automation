@@ -54,12 +54,16 @@ class BaseRules
   
   def apply_single_tag(prefix, tag_context, tag_set)
     tag_context = Hash(tag_context)
-    tag = tag_context[:tag] || tag_set[:error] || '<error:unknown>'
-    update = add_tags(prefix + tag)
+    if tag_context[:remove]
+      tag = update = nil
+    else
+      tag = tag_context[:tag] || tag_set[:error] || '<error:unknown>'
+      update = add_tags(prefix + tag)
+    end
     if remove_tags(tag_set.reject {|k,v| v == tag}.values.map{|t| prefix + t})
       update = true
     end
-    log.log("Added tag #{prefix}#{tag} because field \"#{tag_context[:field]}\" is \"#{Array(tag_context[:value]).join('; ')}\"") unless update.nil?
+    log.log("Added tag #{prefix}#{tag} because field \"#{tag_context[:field]}\" is \"#{Array(tag_context[:value]).join('; ')}\"") unless update.nil? || tag_context[:remove] || tag_context[:field].nil?
   end
 
 end

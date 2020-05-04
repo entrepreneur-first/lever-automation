@@ -6,7 +6,12 @@ require_relative '../app/base_rules.rb'
 #
 
 TAG_FROM_APPLICATION = AUTO_TAG_PREFIX + 'App: '
-TAG_FROM_APP_REVIEW = AUTO_TAG_PREFIX + 'AR: '
+TAG_FROM_COFFEE = AUTO_TAG_PREFIX + 'Coffee: '
+TAG_FROM_APP_REVIEW = AUTO_TAG_PREFIX + 'App Review: '
+TAG_FROM_PHONE_SCREEN = AUTO_TAG_PREFIX + 'Phone Screen: '
+TAG_FROM_F2F = AUTO_TAG_PREFIX + 'F2F: '
+TAG_FROM_ABILITY_INTERVIEW = AUTO_TAG_PREFIX + 'Ability: '
+TAG_FROM_BEHAVIOUR_INTERVIEW = AUTO_TAG_PREFIX + 'Behaviour: '
 TAG_FROM_DEBRIEF = AUTO_TAG_PREFIX + 'Debrief: '
 
 class Rules < BaseRules
@@ -26,6 +31,46 @@ class Rules < BaseRules
         male: 'Male',
         other: 'Other',
         prefer_not_say: 'Gender: Prefer not to say'
+      },
+      rating: {
+        _4: '4 - Strong Hire',
+        _3: '3 - Hire',
+        _2: '2 - No Hire',
+        _1: '1 - Strong No Hire'
+      },
+      edge: {
+        technical: 'Technical',
+        domain: 'Domain',
+        cat_talker: 'Catalyst Talker',
+        cat_doer: 'Catalyst Doer',
+        no_edge: 'No edge'
+      },
+      eligibility: {
+        eligible: 'Eligible',
+        ineligible: 'Ineligible'
+      },
+      software_hardware: {
+        software: 'Software',
+        hardware: 'Hardware'
+      },
+      talker_doer: {
+        talker: 'Talker',
+        doer: 'Doer',
+        both: 'Talker/Doer',
+        neither: 'TD-Neither',
+        unsure: 'TD-Unsure'
+      },
+      ceo_cto: {
+        ceo: 'CEO',
+        cto: 'CTO'
+      },
+      visa_exposure: {
+        yes: 'Visa Exposure=Y',
+        no: 'Visa Exposure=N'
+      },
+      healthcare: {
+        yes: 'Healthcare=Y',
+        no: 'Healthcare=N'
       }
     }  
   end
@@ -245,12 +290,92 @@ class Rules < BaseRules
   end
 
   def update_tags(opp, feedback_summary)
-    # application
+    @feedback_summary = feedback_summary
+  
+    # tags from application
     if Util.has_application(opp) && Util.is_cohort_app(opp)
       # automatically add tag for the opportunity source based on self-reported data in the application
       apply_single_tag(TAG_FROM_APPLICATION, source_from_app(opp), tags(:source))
+      
       apply_single_tag(TAG_FROM_APPLICATION, gender_from_app(opp), tags(:gender))
     end
+    
+    # feedback
+    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_rating, :rating)
+    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_edge, :edge)
+    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_gender, :gender)
+    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_eligible, :eligibility)
+
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_rating, :rating)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_edge, :edge)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_software_hardware, :software_hardware)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_talker_doer, :talker_doer)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto, :ceo_cto)
+    
+    apply_feedback_tag(TAG_FROM_PHONE_SCREEN, :phone_screen_rating, :rating)
+
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_rating, :rating)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_edge, :edge)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_software_hardware, :software_hardware)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_talker_doer, :talker_doer)
+    apply_feedback_tag(TAG_FROM_DEBREIF, :debrief_healthcare, :healthcare)
+    apply_feedback_tag(TAG_FROM_DEBREIF, :debrief_visa_exposure, :visa_exposure)
+      
+    apply_feedback_tag(TAG_FROM_ABILITY_INTERVIEW, :ability_rating, :rating)
+    apply_feedback_tag(TAG_FROM_F2F, :f2f_ceo_cto, :ceo_cto))
+    apply_feedback_tag(TAG_FROM_BEHAVIOUR_INTERVIEW, :behaviour_rating, :rating)
+      
+  end
+  
+  def apply_feedback_tag(prefix, value_key, tag_set_key)
+    value = @feedback_summary[value_key]
+    value = parse_feedback_value(value, tag_set_key) || value unless value.nil?
+    
+    tag_set = tags(tag_set_key)
+    tag = {:tag: tag_set.values.select{|v| v.downcase == value}.first}
+    tag = {:remove: true} if value.nil? # || tag[:tag].nil?
+    
+    apply_single_tag(prefix, tag, tag_set}
+  end
+  
+  def parse_feedback_value(value, type)
+    case type
+    
+    when :edge
+      case value
+      when 'tech edge'
+        'technical'
+      when 'domain edge'
+        'domain'
+      else value
+      end    
+
+    when :talker_doer
+      case value
+      when 'both'
+        'talker/doer'
+      when 'neither'
+        'td-neither'
+      when 'unsure'
+        'td-unsure'
+      else value
+      end
+
+    when :healthcare
+      case value
+      when 'Yes'
+        'healthcare=y'
+      when 'No'
+        'healthcare=n'
+      end      
+
+    when :visa_exposure
+      case value
+      when 'Yes'
+        'visa exposure=y'
+      when 'No'
+        'visa exposure=n'
+      end       
   end
 
   def source_from_app(opp)
