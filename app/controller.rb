@@ -601,19 +601,28 @@ class Controller
   
   def archive_accidental_postings
     # 1. get active opportunities
-    => archive
-    client.process_paged_result(OPPORTUNITIES_URL, {archived: false}, 'bot links for active opps') { |opp|
+    i = 0
+    client.process_paged_result(OPPORTUNITIES_URL, {archived: false, expand:['applications']}, 'archiving accidental postings for active opps') { |opp|
       exit_on_sigterm
       # 2. find application with user = BOT_USER_ID
       next if !Util.has_posting(opp)
       next if !Util.is_cohort_app(opp)
+      # puts "cohort app: #{opp['applications'][0]}"
       next if opp['applications'][0]['user'] != LEVER_BOT_USER
+      #puts "App from BOT: #{opp['id']}"
       # 3. check for most recent stage: user = BOT_USER_ID; stage != 'lead-new'
-      latest_stage = opp['applications']['stageChanges'].last
+      latest_stage = opp['stageChanges'].last
+      #puts latest_stage
       next if latest_stage['userId'] != LEVER_BOT_USER
-      next if latest_stage['toStageId'] != 'lead-new'
+      next if ['lead-new','lead-reached-out'].include?(latest_stage['toStageId'])
+      next if (latest_stage['updatedAt']-opp['createdAt']).between?(-5000, 5000)
+      # next if opp['stageChanges'].length == 1
       # archive
-      puts JSON.pretty_generate(opp)
+      i+=1
+      #puts JSON.pretty_generate(opp)
+      puts "#{opp['id']}: #{latest_stage}"
+      client.add_tag(opp, '🤖 fix_unarchived_5')
     }
+    puts "total: #{i}"
   end
 end

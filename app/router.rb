@@ -46,6 +46,9 @@ class Router
     when 'tidy bot notes'
       controller.tidy_bot_notes
 
+    when 'archive accident'
+      controller.archive_accidental_postings
+
     else
       key = command.gsub('mailto:', '')
       command, key = key.split(' ') if key.include?(' ')
