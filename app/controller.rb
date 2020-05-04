@@ -151,7 +151,7 @@ class Controller
       add_links(opp)
       summarise_feedbacks(opp)
       # detect_duplicate_opportunities(opp)
-      rules.do_update_tags(opp)
+      rules.do_update_tags(opp, parse_all_feedback_summary_link(opp))
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
         unless update.nil?
@@ -398,9 +398,8 @@ class Controller
   
   def add_links(opp)
     return if bot_metadata(opp)['link_rules'] == links_rules_checksum
-    new_links = rules.get_links(opp)
+    new_links = rules.add_links(opp)
     return unless Array(new_links).any?
-    client.add_links(opp, new_links)
     set_bot_metadata(opp, 'link_rules', links_rules_checksum)
   end
   
@@ -461,6 +460,12 @@ class Controller
     summary = rules.summarise_all_feedback(feedback_data)
     return unless summary.any?
     all_feedback_summary_link_prefix + '?' + URI.encode_www_form(summary.sort)
+  end
+  
+  def parse_all_feedback_summary_link(opp)
+    URI.decode_www_form((opp['links'].select {|l|
+      l.start_with?(all_feedback_summary_link_prefix)
+    }.first || '').sub(/[^?]*\?/, '')).to_h
   end
   
   # determine intended cohort location from lead tags

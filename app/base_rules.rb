@@ -2,9 +2,9 @@
 
 class BaseRules
 
-  def do_update_tags(opp)
+  def do_update_tags(opp, feedback_summary)
     opp(opp)
-    update_tags
+    update_tags(opp, feedback_summary)
   end
   
   private
@@ -36,12 +36,16 @@ class BaseRules
     end
   end
   
-  def add(tags)
+  def add_tags(tags)
     @client.add_tags_if_unset(@opp, tags)
   end
   
-  def remove(tags)
+  def remove_tags(tags)
     @client.remove_tags_if_set(@opp, tags)
+  end
+  
+  def add_links(links)
+    @client.add_links(@opp, links)
   end
   
   def add_note(note)
@@ -51,8 +55,8 @@ class BaseRules
   def apply_single_tag(prefix, tag_context, tag_set)
     tag_context = Hash(tag_context)
     tag = tag_context[:tag] || tag_set[:error] || '<error:unknown>'
-    update = add(prefix + tag)
-    if remove(tag_set.reject {|k,v| v == tag}.values.map{|t| prefix + t})
+    update = add_tags(prefix + tag)
+    if remove_tags(tag_set.reject {|k,v| v == tag}.values.map{|t| prefix + t})
       update = true
     end
     log.log("Added tag #{prefix}#{tag} because field \"#{tag_context[:field]}\" is \"#{Array(tag_context[:value]).join('; ')}\"") unless update.nil?

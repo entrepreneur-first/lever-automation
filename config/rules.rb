@@ -30,7 +30,7 @@ class Rules < BaseRules
     }  
   end
 
-  def get_links(opp)
+  def add_links(opp)
     links = []
     responses = opp['_app_responses']
     responses.each {|qu|
@@ -42,7 +42,7 @@ class Rules < BaseRules
         log.log("Added links from app field '#{qu[:_text]}': " + new_links.join(', '))
       end
     }
-    links.uniq
+    add_links(links.uniq)
   end
   
   def summarise_one_feedback(f)
@@ -243,12 +243,12 @@ class Rules < BaseRules
     result
   end
 
-  def update_tags
+  def update_tags(opp, feedback_summary)
     # application
-    if Util.has_application(@opp) && Util.is_cohort_app(@opp)
+    if Util.has_application(opp) && Util.is_cohort_app(opp)
       # automatically add tag for the opportunity source based on self-reported data in the application
-      apply_single_tag(TAG_FROM_APPLICATION, source_from_app(@opp), tags(:source))
-      apply_single_tag(TAG_FROM_APPLICATION, gender_from_app(@opp), tags(:gender))
+      apply_single_tag(TAG_FROM_APPLICATION, source_from_app(opp), tags(:source))
+      apply_single_tag(TAG_FROM_APPLICATION, gender_from_app(opp), tags(:gender))
     end
   end
 
