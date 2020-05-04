@@ -598,4 +598,22 @@ class Controller
       client.delete("#{client.opp_url(opp)}/notes/#{note['id']}")
     }
   end
+  
+  def archive_accidental_postings
+    # 1. get active opportunities
+    => archive
+    client.process_paged_result(OPPORTUNITIES_URL, {archived: false}, 'bot links for active opps') { |opp|
+      exit_on_sigterm
+      # 2. find application with user = BOT_USER_ID
+      next if !Util.has_posting(opp)
+      next if !Util.is_cohort_app(opp)
+      next if opp['applications'][0]['user'] != LEVER_BOT_USER
+      # 3. check for most recent stage: user = BOT_USER_ID; stage != 'lead-new'
+      latest_stage = opp['applications']['stageChanges'].last
+      next if latest_stage['userId'] != LEVER_BOT_USER
+      next if latest_stage['toStageId'] != 'lead-new'
+      # archive
+      puts JSON.pretty_generate(opp)
+    }
+  end
 end
