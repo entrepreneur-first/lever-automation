@@ -568,7 +568,7 @@ class Controller
     url1 = CSV_Writer.new('opportunities.csv', ExportFilter.new(opps).opportunities, prefix).run
 
     # Feedback
-    feedbacks = client.feedback(opps.map { |opp| opp.fetch('id') })
+    feedbacks = client.feedback(opps.map{|opp| opp.fetch('id') if Util.has_feedback(opp)}.reject{|o| o.nil?})
     url2 = CSV_Writer.new('feedback.csv', ExportFilter.new(feedbacks).feedback, prefix).run
 
     { opportunities: url1, feedback: url2 }

@@ -28,6 +28,10 @@ class Util
     opp['links'].reject{|l| l.start_with?(AUTO_LINK_PREFIX)}
   end
 
+  def self.has_feedback(opp)
+    opp['links'].select{|l| l.start_with?(AUTO_LINK_PREFIX + 'feedback/')}.any?
+  end
+
   # generic util functions
 
   def self.to_query(hash)
