@@ -32,7 +32,7 @@ class CSV_Writer
   end
 
   def aws_signed_url(obj)
-    signer = Aws::S3::Presigner.new(aws_config)
+    signer = Aws::S3::Presigner.new(client: Aws::S3::Client.new(aws_config))
     signer.presigned_url(
       :get_object,
       bucket: obj.bucket.name,
@@ -43,9 +43,9 @@ class CSV_Writer
 
   def aws_config
     {
-      region: 'eu-west-2',
-      access_key_id: ENV['S3_KEY_ID'],
-      secret_access_key: ENV['S3_SECRET_ACCESS_KEY']
+      region: ENV['AWS_REGION'],
+      access_key_id: ENV['AWS_KEY_ID'],
+      secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
     }
   end
 end
