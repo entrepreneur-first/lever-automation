@@ -44,4 +44,7 @@ class Util
     Time.at((t/1000.0).ceil).utc.to_s
   end
 
+  def self.simplify_str(str)
+    str.downcase.gsub(/[^a-z0-9\-\/\s]/, '').gsub(/\s+/, ' ').strip
+  end
 end

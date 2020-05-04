@@ -390,8 +390,8 @@ class Controller
     # simply question titles to lowercase a-z only to minimise mismatch due to inconsistent naming
     responses.map! { |qu|
       qu.merge!({
-        _text: qu['text'].downcase.gsub(/[^a-z ]/, ''),
-        _value: Array(qu['value']).join(' ').downcase.gsub(/[^a-z ]/, ''),
+        _text: Util.simplify_str(qu['text']),
+        _value: Util.simplify_str(Array(qu['value']).join(' '))
       })
     }
   end
@@ -409,7 +409,7 @@ class Controller
   end
   
   def summarise_feedbacks(opp)
-    if opp['lastInteractionAt'] > last_change_detected(opp)
+    if (opp['lastInteractionAt'] > last_change_detected(opp)) || feedback_outdated(opp)
       # summarise each feedback
       client.feedback_for_opp(opp).each {|f|
         simple_response_text(f['fields'])
@@ -424,11 +424,17 @@ class Controller
     unless opp['links'].include?(all_link)
       client.remove_links_with_prefix(opp, all_feedback_summary_link_prefix)
     end
-    unless all_link.nil?
+    unless all_link.nil? || opp['links'].include?(all_link)
       client.add_links(opp, all_link)
     end
   end
   
+  def feedback_outdated(opp)
+    opp['links'].select { |l|
+      l.start_with?(AUTO_LINK_PREFIX + 'feedback/') && !l.include?('/feedback/all/') && !l.include?("/#{feedback_rules_checksum}?")
+    }.any?
+  end
+
   def feedback_rules_checksum
     @feedback_rules_checksum ||= Digest::MD5.hexdigest(rules.method('summarise_one_feedback').source)
   end
@@ -439,7 +445,6 @@ class Controller
   
   def one_feedback_summary_link(f)
     one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(rules.summarise_one_feedback(f).sort)
-    )
   end
   
   def all_feedback_summary_link_prefix
@@ -448,15 +453,13 @@ class Controller
   
   def all_feedback_summary_link(opp)
     feedback_data = opp['links'].select { |l|
-        l.start_with? AUTO_LINK_PREFIX + 'feedback/'
+        l.start_with?(AUTO_LINK_PREFIX + 'feedback/') && !l.include?('/feedback/all/')
       }.map { |l|
         URI.decode_www_form(l.sub(/[^?]*\?/, '')).to_h
       }
     return unless feedback_data.any?
-    
     summary = rules.summarise_all_feedback(feedback_data)
     return unless summary.any?
-    
     all_feedback_summary_link_prefix + '?' + URI.encode_www_form(summary.sort)
   end
   
