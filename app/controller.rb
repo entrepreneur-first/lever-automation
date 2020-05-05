@@ -576,6 +576,23 @@ class Controller
     { opportunities: url1, feedback: url2 }
   end
 
+  def export_via_webhook(archived)
+    log_opp_type = archived ? 'archived ' : (archived.nil? ? '' : 'active ')
+    log.log("Sending full webhooks for all #{log_opp_type}opportunities..")
+    i = 0
+
+    client.process_paged_result(OPPORTUNITIES_URL, {
+      archived: archived,
+      expand: client.OPP_EXPAND_VALUES
+    }, "#{log_opp_type}opportunities") { |opp|
+      i += 1
+      FULL_WEBHOOK_URLS.each {|url|
+        controller._webhook(url, opp, Time.now*1000, true)
+      }
+      log.log("..exported #{i} opportunities via webhook") if i % 100 == 0
+    }  
+  end
+
   # fixes
 
   def fix_auto_assigned_tags

@@ -51,6 +51,9 @@ class Router
       
     when 'export csv'
       puts "CSV Export Complete: #{controller.export_to_csv}"
+      
+    when 'export webhook'
+      controller.export_via_webhook(nil)
 
     else
       key = command.gsub('mailto:', '')
