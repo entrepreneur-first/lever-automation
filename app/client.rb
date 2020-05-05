@@ -231,9 +231,15 @@ class Client
   end
 
   def archive(opp, reason=nil)
-    reason ||= '' # default archive reason: 
+    reason ||= '4e68ea29-9277-47a2-b48d-8e2b2d875638' # default archive reason: duplicate
     api_action_log('Archiving opportunity with reason: ' + reason) do
       put("#{opp_url(opp)}/archived?", {reason: reason})
+    end
+  end
+
+  def update_stage(opp, stage_id)
+    api_action_log('Moving opportunity to stage: ' + stage_id) do
+      put("#{opp_url(opp)}/stage?", {stage: stage_id})
     end
   end
 
