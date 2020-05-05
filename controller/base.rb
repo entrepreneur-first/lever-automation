@@ -7,7 +7,7 @@ require_relative '../app/log'
 require_relative '../app/client'
 require_relative '../config/rules'
 
-def BaseController
+class BaseController
 
   def initialize
     @log = Log.new

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Controller_ProcessUpdates
+module Controller_ProcessUpdates
 
   # process a single opportunity
   # apply changes & trigger webhook as necessary

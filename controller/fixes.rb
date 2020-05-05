@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Controller_Fixes
+module Controller_Fixes
 
   # temp commands
 
