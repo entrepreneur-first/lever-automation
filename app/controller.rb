@@ -577,6 +577,10 @@ class Controller
   end
 
   def export_via_webhook(archived)
+    # dont do this; it overwhelms zapier/gsheets..
+    log.log('export via webhooks is disabled')
+    return
+
     log_opp_type = archived ? 'archived ' : (archived.nil? ? '' : 'active ')
     log.log("Sending full webhooks for all #{log_opp_type}opportunities..")
     i = 0
@@ -587,7 +591,7 @@ class Controller
     }, "#{log_opp_type}opportunities") { |opp|
       i += 1
       FULL_WEBHOOK_URLS.each {|url|
-        controller._webhook(url, opp, Time.now*1000, true)
+        _webhook(url, opp, Time.now.to_i*1000, true)
       }
       log.log("..exported #{i} opportunities via webhook") if i % 100 == 0
     }  
