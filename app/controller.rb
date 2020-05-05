@@ -666,37 +666,37 @@ class Controller
   end
   
   def fix_archived_stage
+    from_stages = Hash.new(0)
     stages = Hash.new(0)
     users = Hash.new(0)
+    i=0
     
     client.process_paged_result(OPPORTUNITIES_URL, {archived: true, expand:['applications', 'stage']}, 'fixing stage for achived candidates') { |opp|
       exit_on_sigterm
       # 2. find application with user = BOT_USER_ID
       next if !Util.has_posting(opp)
       next if !Util.is_cohort_app(opp)
-      # puts "cohort app: #{opp['applications'][0]}"
       next if opp['applications'][0]['user'] != LEVER_BOT_USER
-      #puts "App from BOT: #{opp['id']}"
       # 3. check for most recent stage: user = BOT_USER_ID; stage != 'lead-new'
       latest_stage = opp['stageChanges'].last
-      #puts latest_stage
       next if latest_stage['userId'] != LEVER_BOT_USER
-      next if ['applied'].include?(latest_stage['toStageId'])
+      next if !['applicant-new'].include?(latest_stage['toStageId'])
       next if opp['stageChanges'].length < 2
+
       # fix stage
       prior_stage = opp['stageChanges'].last(2).first
       next if prior_stage.nil?
-      
-      puts "#{opp['id']}: #{prior_stage}"
+
+      from_stages[latest_stage['toStageId']] += 1
       stages[prior_stage['toStageId']] += 1
       users[prior_stage['userId']] += 1
       
       i+=1
-      
-      puts JSON.pretty_generate(stages)
-      puts JSON.pretty_generate(users)
-      # client.add_tag(opp, '🤖 fix_stage')
+      client.add_tag(opp, '🤖 fix_archived_stage')
+      client.update_stage(opp, prior_stage['toStageId'])
     }
-  
+    puts JSON.pretty_generate(from_stages)
+    puts JSON.pretty_generate(stages)
+    puts JSON.pretty_generate(users)
   end
 end

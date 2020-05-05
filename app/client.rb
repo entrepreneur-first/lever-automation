@@ -282,7 +282,7 @@ class Client
   
   def put(url, body)
     log.log("PUT: #{url}") if log.verbose?
-    http_method(self.method(:_put).currt, url, body)
+    http_method(self.method(:_put).curry, url, body)
   end
   
   def delete(url)
