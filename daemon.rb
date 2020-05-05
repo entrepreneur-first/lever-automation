@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'daemons'
-require_relative 'app/controller'
+require_relative 'controller/controller'
 
 controller = Controller.new
 
