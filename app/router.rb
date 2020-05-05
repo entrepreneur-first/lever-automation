@@ -49,6 +49,9 @@ class Router
     when 'archive accident'
       controller.archive_accidental_postings
       
+    when 'fix archived stage'
+      controller.fix_archived_stage
+      
     when 'export csv'
       puts "CSV Export Complete: #{controller.export_to_csv}"
       
