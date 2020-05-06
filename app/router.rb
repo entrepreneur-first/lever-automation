@@ -36,7 +36,13 @@ class Router
       @controller.fix_archived_stage
     },
     'export csv': -> {
-      puts @controller.export_to_csv
+      puts @controller.export_to_csv(nil, false)
+    },
+    'export csv test': -> {
+      puts @controller.export_to_csv(nil, true, true)
+    },
+    'export csv all fields': -> {
+      puts @controller.export_to_csv(nil, true)
     },
     'export csv v1': -> {
       puts @controller.export_to_csv_v1
