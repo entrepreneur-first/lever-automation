@@ -104,6 +104,7 @@ module Controller_Commands
       next if Util.has_posting(opp) && !Util.is_cohort_app(opp)
       log_index += 1
       data << Util.flatten_hash(Util.opp_view_data(opp).each { |k,v| headers[k] = true })
+      break
     }
     
     headers = CSV_EXPORT_HEADERS + headers.keys.map{|k| k.to_s}.reject{|k| CSV_EXPORT_HEADERS.include?(k)}.sort
