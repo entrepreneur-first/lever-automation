@@ -66,6 +66,9 @@ class Router
     'view_csv': -> (opp) {
       puts JSON.pretty_generate(Util.flatten_hash(Util.opp_view_data(opp)))
     },
+    'csv_headers': -> (opp) {
+      puts JSON.pretty_generate(Util.flatten_hash(Util.opp_view_data(opp)).keys)
+    },
     'feedback': -> (opp) {
       puts JSON.pretty_generate(@controller.client.feedback_for_opp(opp))
     },
