@@ -86,7 +86,44 @@ class Controller_Commands
     log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
   end
 
-  def export_to_csv
+  def export_to_csv(archived=nil)
+    prefix = Time.now
+    log_opp_type = archived ? 'archived ' : (archived.nil? ? '' : 'active ')
+    log.log("Exporting full data for all #{log_opp_type}opportunities to CSV..")
+    log_index = 0
+    data = []
+    headers = {}
+    
+    client.process_paged_result(
+      OPPORTUNITIES_URL, {
+        archived: archived,
+        expand: client.OPP_EXPAND_VALUES
+      }, "#{log_opp_type}opportunities"
+    ) { |opp|
+      # filter to cohort job or no posting
+      next if Util.has_posting(opp) && !Util.is_cohort_app(opp)
+      log_index += 1
+      data << Util.flatten_hash(Util.opp_view_data(opp).each { |k,v| headers[k] = true })
+    }
+    
+    headers = CSV_EXPORT_HEADERS + headers.keys.reject{|k| CSV_EXPORT_HEADERS.include?(k)}.sort
+    
+    url = CSV_Writer.new(
+      'full_data.csv',
+      CSV.generate do |csv|
+        csv << headers
+        data.each do |row|
+          csv << headers.map{|k| row[k]}
+        end
+      end,
+      prefix
+    ).run
+
+    log.log("Finished full export of #{log_index} #{log_opp_type}opportunities to CSV on AWS S3: #{url}")
+    url
+  end
+
+  def export_to_csv_v1(feedback_since=nil)
     prefix = Time.now
     posting_ids = COHORT_JOBS.map{|j| j[:posting_id]}
 
@@ -120,5 +157,15 @@ class Controller_Commands
       log.log("..exported #{i} opportunities via webhook") if i % 100 == 0
     }  
   end
+  
+  def test_rules(opp)
+    client.batch_updates
+    summarise_feedback(opp)
+    update_tags(opp)
+    
+    puts JSON.pretty_generate(Util.opp_view_data(opp))
+    
+    client.batch_updates(false)
+  end  
 
 end

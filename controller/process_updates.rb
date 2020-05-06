@@ -19,7 +19,7 @@ class Controller_ProcessUpdates
     if check_no_posting(opp)
       # if we added to a job then reload as tags etc will have changed automagically 
       # based on new posting assignment
-      opp.merge!(client.get_opportunity(opp['id'], {expand: client.OPP_EXPAND_VALUES}))
+      client.refresh_opp(opp)
       result['assigned_to_job'] = true
     end
     
@@ -31,7 +31,7 @@ class Controller_ProcessUpdates
       add_links(opp)
       summarise_feedbacks(opp)
       # detect_duplicate_opportunities(opp)
-      rules.do_update_tags(opp, parse_all_feedback_summary_link(opp))
+      rules.do_update_tags(opp)
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
         unless update.nil?
@@ -150,7 +150,7 @@ class Controller_ProcessUpdates
           event: 'candidateChange_EFAutomationBot',
           # signature: '',
           # token: '',
-          data: full_data ? full_webhook_data(opp) : {
+          data: full_data ? opp_view_data(opp) : {
             candidateId: opp['id'],
             contactId: opp['contact'],
             opportunityId: opp['id']
@@ -159,13 +159,6 @@ class Controller_ProcessUpdates
         headers: { 'Content-Type' => 'application/json' }
       )}
     Process.detach(p)
-  end
-
-  def full_webhook_data(opp)
-    opp.reject{|k,v| k.start_with?('_') || (k == 'applications')}.merge({
-      application: opp['applications'][0],
-      feedback_summary: parse_all_feedback_summary_link(opp)
-    })
   end
 
   def update_changed_tag(opp, update_time=nil)
@@ -303,7 +296,7 @@ class Controller_ProcessUpdates
 
     all_link = all_feedback_summary_link(opp)
     unless opp['links'].include?(all_link)
-      client.remove_links_with_prefix(opp, all_feedback_summary_link_prefix)
+      client.remove_links_with_prefix(opp, LINK_ALL_FEEDBACK_SUMMARY_PREFIX)
     end
     unless all_link.nil? || opp['links'].include?(all_link)
       client.add_links(opp, all_link)
@@ -328,10 +321,6 @@ class Controller_ProcessUpdates
     one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(rules.summarise_one_feedback(f).sort)
   end
   
-  def all_feedback_summary_link_prefix
-    AUTO_LINK_PREFIX + "feedback/all/"
-  end
-  
   def all_feedback_summary_link(opp)
     feedback_data = opp['links'].select { |l|
         l.start_with?(AUTO_LINK_PREFIX + 'feedback/') && !l.include?('/feedback/all/')
@@ -341,13 +330,7 @@ class Controller_ProcessUpdates
     return unless feedback_data.any?
     summary = rules.summarise_all_feedback(feedback_data)
     return unless summary.any?
-    all_feedback_summary_link_prefix + '?' + URI.encode_www_form(summary.sort)
-  end
-  
-  def parse_all_feedback_summary_link(opp)
-    URI.decode_www_form((opp['links'].select {|l|
-      l.start_with?(all_feedback_summary_link_prefix)
-    }.first || '').sub(/[^?]*\?/, '')).to_h
+    LINK_ALL_FEEDBACK_SUMMARY_PREFIX + '?' + URI.encode_www_form(summary.sort)
   end
   
   # determine intended cohort location from lead tags

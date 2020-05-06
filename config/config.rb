@@ -22,6 +22,10 @@ COHORT_JOB_TAG = 'EF Cohort'
 
 LEVER_BOT_USER = 'e6414a92-e785-46eb-ad30-181c18db19b5'
 
+CSV_EXPORT_HEADERS = %i[
+  id
+]
+
 # AUTO_.. prefixes are used for auto-added attributes relating to the candidate data 
 # BOT_.. prefixes are used for auto-added attributed used by our bot
 #        - ignored for the purpose of detecting data changes
@@ -39,6 +43,8 @@ TAG_DUPLICATE_OPPS_PREFIX = AUTO_TAG_PREFIX + "Duplicate: "
 TAG_LINKEDIN_OPTOUT = AUTO_TAG_PREFIX + 'LinkedIn InMail likely decline'
 TAG_LINKEDIN_OPTIN_LIKELY = AUTO_TAG_PREFIX + 'LinkedIn InMail potential accept'
 TAG_LINKEDIN_OPTIN = AUTO_TAG_PREFIX + 'LinkedIn InMail accept awaiting followup'
+
+LINK_ALL_FEEDBACK_SUMMARY_PREFIX = AUTO_LINK_PREFIX + 'feedback/all/'
 
 # deprecated: now storing under BOT_METADATA
 BOT_TAG_PREFIX = '🤖 [bot] '

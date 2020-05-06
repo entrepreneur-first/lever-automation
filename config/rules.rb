@@ -334,7 +334,6 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_ABILITY_INTERVIEW, :ability_rating, :rating, :has_ability)
     apply_feedback_tag(TAG_FROM_F2F, :f2f_ceo_cto, :ceo_cto, :has_ability)
     apply_feedback_tag(TAG_FROM_BEHAVIOUR_INTERVIEW, :behaviour_rating, :rating, :has_behaviour)
-      
   end
   
   def apply_feedback_tag(prefix, value_key, tag_set_key, required_key=nil)

@@ -2,9 +2,9 @@
 
 class BaseRules
 
-  def do_update_tags(opp, feedback_summary)
+  def do_update_tags(opp)
     opp(opp)
-    update_tags(opp, feedback_summary)
+    update_tags(opp, Util.parse_all_feedback_summary_link(opp))
   end
   
   private

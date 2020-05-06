@@ -4,8 +4,34 @@
 
 class Util
 
-  # common lever logic
+  # common opportunity logic
 
+  def self.opp_view_data(opp)
+    self.recursive_add_datetime(
+      opp.reject{|k,v| k.start_with?('_') || (k == 'applications')}.merge({
+        application: opp['applications'][0],
+        feedback_summary: self.parse_all_feedback_summary_link(opp)
+      }))
+  end
+  
+  def self.recursive_add_datetime(h)
+    h.each { |k,v|
+      if v.class == Hash
+        self.recursive_add_datetime(h)
+      elsif v.to_s.match?(/[0-9]{10}/)
+        h[k + '__datetime'] = Time.at(v.to_i).to_s
+      elsif v.to_s.match?(/[0-9]{13}/)
+        h[k + '__datetime'] = Time.at(v.to_i/1000).to_s
+      end
+    }
+  end
+
+  def self.parse_all_feedback_summary_link(opp)
+    URI.decode_www_form((opp['links'].select {|l|
+      l.start_with?(LINK_ALL_FEEDBACK_SUMMARY_PREFIX)
+    }.first || '').sub(/[^?]*\?/, '')).to_h
+  end
+  
   def self.has_posting(opp)
     opp['applications'].any?
   end
@@ -42,6 +68,17 @@ class Util
     ary.inject(Hash.new(0)) { |h,e| h[e] += 1; h }
       .select { |_k,v| v > 1 }
       .inject({}) { |r, e| r[e.first] = e.last; r }
+  end
+  
+  def self.flatten_hash(hash, to_hash={}, prefix='')
+    hash.each { |k,v|
+      if v.class == Hash
+        flatten_hash(v, to_hash, key_prefix + k.to_s + '__')
+      else
+        to_hash[key_prefix + k.to_s] = v
+      end
+    }
+    to_hash
   end
   
   def self.datetimestr_to_timestamp(d)

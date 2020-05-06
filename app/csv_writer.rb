@@ -26,6 +26,7 @@ class CSV_Writer
   end
 
   def csv
+    return @data if data.class == 'String'
     CSV.generate do |csv|
       @data.each { |row| csv << row }
     end

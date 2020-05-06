@@ -89,6 +89,10 @@ class Client
     updated
   end
   
+  def refresh_opp(opp)
+    opp.merge!(get_opportunity(opp['id'], {expand: OPP_EXPAND_VALUES}))
+  end
+  
   def add_tag(opp, tags, commit=false)
     add_annotations(opp, 'Tags', tags, commit)
   end

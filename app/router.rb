@@ -3,9 +3,88 @@
 require_relative '../controller/controller'
 
 class Router
+  
+  COMMANDS = {
+    'summarise': -> {
+      controller.summarise_opportunities
+    },
+    'process': -> {
+      controller.process_opportunities
+    },
+    'process_archived': -> {
+      controller.process_opportunities(true)
+    },
+    'process_all': -> {
+      controller.process_opportunities(nil)
+    },
+    'fix tags': -> {
+      controller.fix_auto_assigned_tags
+    },
+    'fix links': -> {
+      controller.fix_checksum_links
+    },
+    'check links': -> {
+      controller.check_links
+    },
+    'tidy bot notes': -> {
+      controller.tidy_bot_notes
+    },
+    'archive accident': -> {
+      controller.archive_accidental_postings
+    },
+    'fix archived stage': -> {
+      controller.fix_archived_stage
+    },
+    'export csv': -> {
+      puts controller.export_to_csv
+    },
+    'export csv v1': -> {
+      puts controller.export_to_csv_v1
+    },
+    'export webhook': -> {
+      controller.export_via_webhook(nil)
+    }
+    'help': -> {
+      puts "Commands:"
+      COMMANDS.keys.sort.each {|c| puts "- #{command}"}
+      puts "\nCommands for specific candidates (usage: <command> {<email> or <opportunity_id>}):"
+      OPPORTUNITY_COMMANDS.keys.sort.each {|c| puts "- #{command}"}
+      puts
+    }
+  }
+  
+  OPPORTUNITY_COMMANDS = {
+    # views
+    'view': -> (opp) {
+      puts JSON.pretty_generate(Util.opp_view_data(opp))
+    },
+    'feedback': -> (opp) {
+      puts JSON.pretty_generate(controller.client.feedback_for_opp(opp))
+    },
+    'notes': -> (opp) {
+      puts JSON.pretty_generate(controller.client.get_paged_result("#{API_URL}opportunities/#{opp['id']}/notes", {}, 'notes'))
+    },
+    'age': -> (opp) {
+      puts "#{opp['id']}: #{opp['lastInteractionAt'] - opp['createdAt']}"
+    },
+    'test rules': -> (opp) {
+      controller.test_rules(opp)
+    },
+    # actions
+    
+    'send_webhooks': -> (opp) {
+      controller.send_webhooks(opp)
+    },
+    'tidy_bot_notes': -> (opp) {
+      controller.tidy_opp_bot_notes(opp)
+    },
+    'process': -> (opp) {
+      controller.process_opportunity(opp)
+    }
+  }
 
   def self.interactive_prompt_str
-    "Enter 'summarise', 'process', 'fix tags', 'check links', 'export csv', or '[view|feedback] <email>|<opportunity_id>' to view/process one candidate:"
+    "Enter command, or 'help' for menu:\n(Common commands: 'export csv', 'summarise', or '[view|feedback] <email>|<opportunity_id>' to view/process one candidate)"
   end
 
   def self.interactive?
@@ -18,46 +97,10 @@ class Router
       
     controller = Controller.new
     controller.log.verbose
-    
     controller.log.log('Command: ' + command) unless self.interactive?
 
-    case command
-    when 'summarise'
-      controller.summarise_opportunities
-        
-    when 'process'
-      controller.process_opportunities
-
-    when 'process_archived'
-      controller.process_opportunities(true)
-        
-    when 'process_all'
-      controller.process_opportunities(nil)
-        
-    when 'fix tags'
-      controller.fix_auto_assigned_tags
-    
-    when 'fix links'
-      controller.fix_checksum_links
-    
-    when 'check links'
-      controller.check_links
-        
-    when 'tidy bot notes'
-      controller.tidy_bot_notes
-
-    when 'archive accident'
-      controller.archive_accidental_postings
-      
-    when 'fix archived stage'
-      controller.fix_archived_stage
-      
-    when 'export csv'
-      puts "CSV Export Complete: #{controller.export_to_csv}"
-      
-    when 'export webhook'
-      controller.export_via_webhook(nil)
-
+    if COMMANDS.has_key?(command)
+      COMMANDS[command].call
     else
       key = command.gsub('mailto:', '')
       command, key = key.split(' ') if key.include?(' ')
@@ -73,20 +116,13 @@ class Router
 
       puts "\n" if self.interactive?
 
-      case command
-      when 'view'
-        puts JSON.pretty_generate(os)
-      when 'feedback'
-        os.each{ |opp| puts JSON.pretty_generate controller.client.feedback_for_opp(opp) }
-      when 'notes'
-        os.each{ |opp| puts JSON.pretty_generate controller.client.get_paged_result("#{API_URL}opportunities/#{opp['id']}/notes", {}, 'notes') }
-      when 'tidy_bot_notes'
-        os.each{ |opp| controller.tidy_opp_bot_notes(opp) }
-      when 'age'
-        os.each{ |opp| puts "#{opp['id']}: #{opp['lastInteractionAt'] - opp['createdAt']}" }
-      else
-        os.each{ |opp| controller.process_opportunity(opp) }
-      end
+      os.each { |opp| 
+        if OPPORTUNITY_COMMANDS.has_key?(command)
+          OPPORTUNITY_COMMANDS[command].call(opp)
+        else
+          OPPORTUNITY_COMMANDS['process'].call(opp)
+        end
+      }
     end
     
     finished_successfully = true
