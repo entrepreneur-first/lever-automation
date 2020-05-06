@@ -19,9 +19,9 @@ class Util
       if h[k].class == Hash
         self.recursive_add_datetime(h[k])
       elsif h[k].to_s.match?(/^[0-9]{10}$/)
-        h[k + '__datetime'] = Time.at(h[k].to_i).to_s
+        h[k + '__datetime'] = Time.at(h[k].to_i).strftime('%F %T')
       elsif h[k].to_s.match?(/^[0-9]{13}$/)
-        h[k + '__datetime'] = Time.at(h[k].to_i/1000).to_s
+        h[k + '__datetime'] = Time.at(h[k].to_i/1000).strftime('%F %T')
       end
     }
     h
