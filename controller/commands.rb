@@ -106,7 +106,7 @@ module Controller_Commands
       data << Util.flatten_hash(Util.opp_view_data(opp).each { |k,v| headers[k] = true })
     }
     
-    headers = CSV_EXPORT_HEADERS + headers.keys.reject{|k| CSV_EXPORT_HEADERS.include?(k)}.sort
+    headers = CSV_EXPORT_HEADERS + headers.keys.reject{|k| CSV_EXPORT_HEADERS.include?(k.to_s)}.sort
     
     url = CSV_Writer.new(
       'full_data.csv',
