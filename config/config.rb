@@ -23,7 +23,47 @@ COHORT_JOB_TAG = 'EF Cohort'
 LEVER_BOT_USER = 'e6414a92-e785-46eb-ad30-181c18db19b5'
 
 CSV_EXPORT_HEADERS = %w[
-  id 
+  contact name application__name application__createdAt__datetime application__customQuestions application__type application__posting id stage__id stage__text stageChanges origin sources tags links archived__archivedAt__datetime archived__reason  owner__name  application__createdAt__datetime
+  feedback_summary__ability_completed_at__datetime
+  feedback_summary__ability_completed_by
+  feedback_summary__ability_rating
+  feedback_summary__app_review_ceo_cto
+  feedback_summary__app_review_completed_at__datetime
+  feedback_summary__app_review_completed_by
+  feedback_summary__app_review_edge
+  feedback_summary__app_review_industry
+  feedback_summary__app_review_rating
+  feedback_summary__app_review_software_hardware
+  feedback_summary__app_review_talker_doer
+  feedback_summary__app_review_technology
+  feedback_summary__behaviour_completed_at__datetime
+  feedback_summary__behaviour_completed_by
+  feedback_summary__behaviour_rating
+  feedback_summary__coffee_completed_at__datetime
+  feedback_summary__coffee_completed_by
+  feedback_summary__coffee_edge
+  feedback_summary__coffee_eligible
+  feedback_summary__coffee_gender
+  feedback_summary__coffee_rating
+  feedback_summary__debrief_completed_at__datetime
+  feedback_summary__debrief_edge
+  feedback_summary__debrief_healthcare
+  feedback_summary__debrief_industry
+  feedback_summary__debrief_rating
+  feedback_summary__debrief_software_hardware
+  feedback_summary__debrief_talker_doer
+  feedback_summary__debrief_technology
+  feedback_summary__debrief_visa_exposure
+  feedback_summary__f2f_ceo_cto
+  feedback_summary__has_ability
+  feedback_summary__has_app_review
+  feedback_summary__has_behaviour
+  feedback_summary__has_coffee
+  feedback_summary__has_debrief
+  feedback_summary__has_phone_screen
+  feedback_summary__phone_screen_completed_at__datetime
+  feedback_summary__phone_screen_completed_by
+  feedback_summary__phone_screen_rating
 ]
 
 # AUTO_.. prefixes are used for auto-added attributes relating to the candidate data 
