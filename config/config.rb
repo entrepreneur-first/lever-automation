@@ -22,8 +22,8 @@ COHORT_JOB_TAG = 'EF Cohort'
 
 LEVER_BOT_USER = 'e6414a92-e785-46eb-ad30-181c18db19b5'
 
-CSV_EXPORT_HEADERS = %i[
-  id
+CSV_EXPORT_HEADERS = %w[
+  id 
 ]
 
 # AUTO_.. prefixes are used for auto-added attributes relating to the candidate data 

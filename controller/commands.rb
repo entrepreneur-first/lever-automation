@@ -103,7 +103,7 @@ module Controller_Commands
       # filter to cohort job or no posting
       next if Util.has_posting(opp) && !Util.is_cohort_app(opp)
       log_index += 1
-      data << Util.flatten_hash(Util.opp_view_data(opp).each { |k,v| data_headers[k] = true })
+      data << Util.flatten_hash(Util.opp_view_data(opp)).each { |k,v| data_headers[k] = true }
       break if test && (log_index == 100)
     }
     
@@ -115,7 +115,7 @@ module Controller_Commands
       CSV.generate do |csv|
         csv << headers
         data.each do |row|
-          csv << headers.map{|k| row[k.to_sym]}
+          csv << headers.map{|k| row[k]}
         end
       end,
       prefix
