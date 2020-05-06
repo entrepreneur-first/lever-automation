@@ -23,7 +23,7 @@ COHORT_JOB_TAG = 'EF Cohort'
 LEVER_BOT_USER = 'e6414a92-e785-46eb-ad30-181c18db19b5'
 
 CSV_EXPORT_HEADERS = %w[
-  contact name application__name application__createdAt__datetime application__customQuestions application__type application__posting id stage__id stage__text stageChanges origin sources tags links archived__archivedAt__datetime archived__reason  owner__name  application__createdAt__datetime
+  contact name application__name application__createdAt__datetime __empty__ application__type application__posting id stage__id stage__text stageChanges origin sources tags links archived__archivedAt__datetime archived__reason  owner__name  application__createdAt__datetime
   feedback_summary__ability_completed_at__datetime
   feedback_summary__ability_completed_by
   feedback_summary__ability_rating
