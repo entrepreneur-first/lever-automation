@@ -6,50 +6,49 @@ class Router
   
   COMMANDS = {
     'summarise': -> {
-      controller.summarise_opportunities
+      @controller.summarise_opportunities
     },
     'process': -> {
-      controller.process_opportunities
+      @controller.process_opportunities
     },
     'process_archived': -> {
-      controller.process_opportunities(true)
+      @controller.process_opportunities(true)
     },
     'process_all': -> {
-      controller.process_opportunities(nil)
+      @controller.process_opportunities(nil)
     },
     'fix tags': -> {
-      controller.fix_auto_assigned_tags
+      @controller.fix_auto_assigned_tags
     },
     'fix links': -> {
-      controller.fix_checksum_links
+      @controller.fix_checksum_links
     },
     'check links': -> {
-      controller.check_links
+      @controller.check_links
     },
     'tidy bot notes': -> {
-      controller.tidy_bot_notes
+      @controller.tidy_bot_notes
     },
     'archive accident': -> {
-      controller.archive_accidental_postings
+      @controller.archive_accidental_postings
     },
     'fix archived stage': -> {
-      controller.fix_archived_stage
+      @controller.fix_archived_stage
     },
     'export csv': -> {
-      puts controller.export_to_csv
+      puts @controller.export_to_csv
     },
     'export csv v1': -> {
-      puts controller.export_to_csv_v1
+      puts @controller.export_to_csv_v1
     },
     'export webhook': -> {
-      controller.export_via_webhook(nil)
-    }
+      @controller.export_via_webhook(nil)
+    },
     'help': -> {
-      puts "Commands:"
-      COMMANDS.keys.sort.each {|c| puts "- #{command}"}
+      puts "\nCommands:"
+      COMMANDS.keys.sort.each {|c| puts "- #{c}"}
       puts "\nCommands for specific candidates (usage: <command> {<email> or <opportunity_id>}):"
-      OPPORTUNITY_COMMANDS.keys.sort.each {|c| puts "- #{command}"}
-      puts
+      OPPORTUNITY_COMMANDS.keys.sort.each {|c| puts "- #{c}"}
     }
   }
   
@@ -58,28 +57,31 @@ class Router
     'view': -> (opp) {
       puts JSON.pretty_generate(Util.opp_view_data(opp))
     },
+    'view_csv': -> (opp) {
+      puts JSON.pretty_generate(Util.flatten_hash(Util.opp_view_data(opp)))
+    },
     'feedback': -> (opp) {
-      puts JSON.pretty_generate(controller.client.feedback_for_opp(opp))
+      puts JSON.pretty_generate(@controller.client.feedback_for_opp(opp))
     },
     'notes': -> (opp) {
-      puts JSON.pretty_generate(controller.client.get_paged_result("#{API_URL}opportunities/#{opp['id']}/notes", {}, 'notes'))
+      puts JSON.pretty_generate(@controller.client.get_paged_result("#{API_URL}opportunities/#{opp['id']}/notes", {}, 'notes'))
     },
     'age': -> (opp) {
       puts "#{opp['id']}: #{opp['lastInteractionAt'] - opp['createdAt']}"
     },
     'test rules': -> (opp) {
-      controller.test_rules(opp)
+      @controller.test_rules(opp)
     },
     # actions
     
     'send_webhooks': -> (opp) {
-      controller.send_webhooks(opp)
+      @controller.send_webhooks(opp)
     },
     'tidy_bot_notes': -> (opp) {
-      controller.tidy_opp_bot_notes(opp)
+      @controller.tidy_opp_bot_notes(opp)
     },
     'process': -> (opp) {
-      controller.process_opportunity(opp)
+      @controller.process_opportunity(opp)
     }
   }
 
@@ -95,12 +97,12 @@ class Router
     return if command == ''
     finished_successfully = false
       
-    controller = Controller.new
-    controller.log.verbose
-    controller.log.log('Command: ' + command) unless self.interactive?
+    @controller = Controller.new
+    @controller.log.verbose
+    @controller.log.log('Command: ' + command) unless self.interactive?
 
-    if COMMANDS.has_key?(command)
-      COMMANDS[command].call
+    if COMMANDS.has_key?(command.to_sym)
+      COMMANDS[command.to_sym].call
     else
       key = command.gsub('mailto:', '')
       command, key = key.split(' ') if key.include?(' ')
@@ -108,19 +110,19 @@ class Router
 
       if key.include? '@'
         # email
-        os = controller.client.opportunities_for_contact(key)
+        os = @controller.client.opportunities_for_contact(key)
       else
         # opportunity ID
-        os = [controller.client.get_opportunity(key, {expand: controller.client.OPP_EXPAND_VALUES})].reject{|o| o.nil?}
+        os = [@controller.client.get_opportunity(key, {expand: @controller.client.OPP_EXPAND_VALUES})].reject{|o| o.nil?}
       end
 
       puts "\n" if self.interactive?
 
       os.each { |opp| 
-        if OPPORTUNITY_COMMANDS.has_key?(command)
-          OPPORTUNITY_COMMANDS[command].call(opp)
+        if OPPORTUNITY_COMMANDS.has_key?(command.to_sym)
+          OPPORTUNITY_COMMANDS[command.to_sym].call(opp)
         else
-          OPPORTUNITY_COMMANDS['process'].call(opp)
+          OPPORTUNITY_COMMANDS[:process].call(opp)
         end
       }
     end
@@ -129,7 +131,7 @@ class Router
     
     ensure
       puts "\n" if self.interactive?
-      controller.log.log("#{finished_successfully ? 'Finished' : 'Aborted'} command: " + command)
+      @controller.log.log("#{finished_successfully ? 'Finished' : 'Aborted'} command: " + command)
   end
 
 end
