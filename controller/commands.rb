@@ -106,14 +106,14 @@ module Controller_Commands
       data << Util.flatten_hash(Util.opp_view_data(opp).each { |k,v| headers[k] = true })
     }
     
-    headers = CSV_EXPORT_HEADERS + headers.keys.reject{|k| CSV_EXPORT_HEADERS.include?(k.to_s)}.sort
+    headers = CSV_EXPORT_HEADERS + headers.keys.map{|k| k.to_s}.reject{|k| CSV_EXPORT_HEADERS.include?(k)}.sort
     
     url = CSV_Writer.new(
       'full_data.csv',
       CSV.generate do |csv|
         csv << headers
         data.each do |row|
-          csv << headers.map{|k| row[k]}
+          csv << headers.map{|k| row[k.to_sym]}
         end
       end,
       prefix
