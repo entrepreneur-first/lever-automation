@@ -69,13 +69,15 @@ class Router
     'age': -> (opp) {
       puts "#{opp['id']}: #{opp['lastInteractionAt'] - opp['createdAt']}"
     },
-    'test rules': -> (opp) {
+    'test_rules': -> (opp) {
       @controller.test_rules(opp)
     },
     # actions
     
     'send_webhooks': -> (opp) {
+      @controller.log.log_prefix(opp['id'] + ': ')
       @controller.send_webhooks(opp)
+      @controller.log.pop_log_prefix
     },
     'tidy_bot_notes': -> (opp) {
       @controller.tidy_opp_bot_notes(opp)

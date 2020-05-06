@@ -160,8 +160,8 @@ module Controller_Commands
   
   def test_rules(opp)
     client.batch_updates
-    summarise_feedback(opp)
-    update_tags(opp)
+    summarise_feedbacks(opp)
+    rules.do_update_tags(opp)
     
     puts JSON.pretty_generate(Util.opp_view_data(opp))
     

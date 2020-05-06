@@ -129,7 +129,7 @@ module Controller_ProcessUpdates
     update_changed_tag(opp, last_update[:time])
   end
   
-  def send_webhooks(opp, update_time)
+  def send_webhooks(opp, update_time=nil)
     log.log("Sending full webhooks - change detected") if FULL_WEBHOOK_URLS.any?
     FULL_WEBHOOK_URLS.each {|url|
       _webhook(url, opp, update_time, true)
@@ -150,7 +150,7 @@ module Controller_ProcessUpdates
           event: 'candidateChange_EFAutomationBot',
           # signature: '',
           # token: '',
-          data: full_data ? opp_view_data(opp) : {
+          data: full_data ? Util.opp_view_data(opp) : {
             candidateId: opp['id'],
             contactId: opp['contact'],
             opportunityId: opp['id']
