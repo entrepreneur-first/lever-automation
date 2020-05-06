@@ -3,7 +3,7 @@
 require_relative '../app/export_filter'
 require_relative '../app/csv_writer'
 
-class Controller_Commands
+module Controller_Commands
 
   def summarise_opportunities
     summary = Hash.new(0)
