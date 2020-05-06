@@ -8,7 +8,7 @@ loop do
   command = gets.chomp
   break if command == ''
 
-  if command.start_with?('i ') || ((ENV['CONSOLE_ASYNC'] == '0') && !command.start_with?('a ') && !command.start_with?('async '))
+  if command.start_with?('i ') || ((ENV['CONSOLE_ASYNC'] == '0') && !command.start_with?('a ') && !command.start_with?('async ')) || command == 'help'
     # perform interactively
     Router.route(command.delete_prefix('i '))
   else
