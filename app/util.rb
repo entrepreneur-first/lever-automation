@@ -7,17 +7,17 @@ class Util
   # common opportunity logic
 
   def self.opp_view_data(opp)
-    self.recursive_add_datetime(
+    recursive_add_datetime(
       opp.reject{|k,v| k.start_with?('_') || (k == 'applications')}.merge({
         application: opp['applications'][0],
-        feedback_summary: self.parse_all_feedback_summary_link(opp)
+        feedback_summary: parse_all_feedback_summary_link(opp)
       }))
   end
   
   def self.recursive_add_datetime(h)
     h.keys.each { |k|
       if h[k].class == Hash
-        self.recursive_add_datetime(h[k])
+        recursive_add_datetime(h[k])
       elsif h[k].to_s.match?(/^[0-9]{10}$/)
         h[k + '__datetime'] = Time.at(h[k].to_i).strftime('%F %T')
       elsif h[k].to_s.match?(/^[0-9]{13}$/)
@@ -95,4 +95,18 @@ class Util
   def self.simplify_str(str)
     str.downcase.gsub(/[^a-z0-9\-\/\s]/, '').gsub(/\s+/, ' ').strip
   end
+  
+  def self.log_if_api_error(result)
+    # if not an error
+    return if is_http_success(result)
+    log.error((result.code.to_s || '') + ': ' + (result.parsed_response['code'] || '<no code>') + ': ' + (result.parsed_response['message'] || '<no message>'))
+  end
+  
+  def self.is_http_success(result)
+    result.code.between?(200, 299)
+  end
+  
+  def self.is_http_error(result)
+    !is_http_success(result)
+  end  
 end

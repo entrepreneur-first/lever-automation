@@ -142,7 +142,7 @@ module Controller_ProcessUpdates
   
   def _webhook(url, opp, update_time, full_data=false)
     p = fork {
-      HTTParty.post(
+      result = HTTParty.post(
         url,
         body: {
           # id: '',
@@ -157,7 +157,9 @@ module Controller_ProcessUpdates
           }
         }.to_json,
         headers: { 'Content-Type' => 'application/json' }
-      )}
+      )
+      Util.log_if_api_error(result)
+    }
     Process.detach(p)
   end
 
