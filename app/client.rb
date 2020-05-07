@@ -90,7 +90,7 @@ class Client
   end
   
   def refresh_opp(opp)
-    opp.merge!(get_opportunity(opp['id'], {expand: OPP_EXPAND_VALUES}))
+    opp.merge!(get_opportunity(opp['id'], {expand: self.OPP_EXPAND_VALUES}))
   end
   
   def add_tag(opp, tags, commit=false)
