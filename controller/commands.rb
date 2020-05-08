@@ -113,7 +113,6 @@ module Controller_Commands
     }
     
     log.log("Finished full export of #{log_index} #{log_opp_type}opportunities to BigQuery")
-    url
   end
 
   def export_to_csv(archived=nil, all_fields=true, test=false)
