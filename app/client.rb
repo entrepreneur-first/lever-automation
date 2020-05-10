@@ -301,7 +301,7 @@ class Client
   def api_call_log(resource, page)
     log.log("Lever API #{resource} page=#{page}") if log.verbose? && !resource.nil?
     result = yield
-    Util.log_if_api_error(result)
+    Util.log_if_api_error(log, result)
     result
   end
 
@@ -326,7 +326,7 @@ class Client
       log.warn('502 error, retrying')
       result = method.(url, body)
     end
-    Util.log_if_api_error(result)
+    Util.log_if_api_error(log, result)
     result.parsed_response
   end
   

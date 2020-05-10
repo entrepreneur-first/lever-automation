@@ -158,7 +158,7 @@ module Controller_ProcessUpdates
         }.to_json,
         headers: { 'Content-Type' => 'application/json' }
       )
-      Util.log_if_api_error(result)
+      Util.log_if_api_error(log, result)
     }
     Process.detach(p)
   end

@@ -96,7 +96,7 @@ class Util
     str.downcase.gsub(/[^a-z0-9\-\/\s]/, '').gsub(/\s+/, ' ').strip
   end
   
-  def self.log_if_api_error(result)
+  def self.log_if_api_error(log, result)
     # if not an error
     return if is_http_success(result)
     log.error((result.code.to_s || '') + ': ' + (result.parsed_response['code'] || '<no code>') + ': ' + (result.parsed_response['message'] || '<no message>'))
