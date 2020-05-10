@@ -5,7 +5,7 @@ require_relative 'router'
 
 class Worker
   include Sidekiq::Worker
-  sidekiq_options queue: ENV['APP_ENV'] || 'default'
+  sidekiq_options queue: ENV['APP_ENV'] || 'test'
 
   def perform(command)
     Router.route(command)
