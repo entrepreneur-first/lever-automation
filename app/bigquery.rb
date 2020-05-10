@@ -8,6 +8,7 @@ class BigQuery
     @log = log
     @bq = Google::Cloud::Bigquery.new(credentials: JSON.parse(ENV['GOOGLE_APPLICATION_CREDENTIALS']))
     @dataset = @bq.dataset(ENV['BIGQUERY_DATASET'])
+    raise "BigQuery Dataset not found: #{ENV['BIGQUERY_DATASET']}" if @dataset.nil?
     @table = @dataset.table(ENV['BIGQUERY_TABLE']) || create_empty_table
   end
 
