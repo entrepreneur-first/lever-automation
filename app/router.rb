@@ -35,6 +35,9 @@ class Router
     'fix archived stage': -> {
       @controller.fix_archived_stage
     },
+    'export bigquery': -> {
+      puts @controller.export_to_bigquery(nil, false)
+    },
     'export csv': -> {
       puts @controller.export_to_csv(nil, false)
     },
@@ -82,10 +85,14 @@ class Router
       @controller.test_rules(opp)
     },
     # actions
-    
     'send_webhooks': -> (opp) {
       @controller.log.log_prefix(opp['id'] + ': ')
       @controller.send_webhooks(opp)
+      @controller.log.pop_log_prefix
+    },
+    'bigquery': -> (opp) {
+      @controller.log.log_prefix(opp['id'] + ': ')
+      @controller.update_bigquery(opp)
       @controller.log.pop_log_prefix
     },
     'tidy_bot_notes': -> (opp) {

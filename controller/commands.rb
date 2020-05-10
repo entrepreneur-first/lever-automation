@@ -86,6 +86,35 @@ module Controller_Commands
     log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
   end
 
+  def export_to_bigquery(archived=nil, all_fields=true, test=false)
+    prefix = Time.now
+    log_opp_type = archived ? 'archived ' : (archived.nil? ? '' : 'active ')
+    log.log("Exporting full data for all #{log_opp_type}opportunities to BigQuery..")
+    log_index = 0
+    data = []
+    data_headers = {}
+    @bigquery ||= BigQuery.new(@log)
+    
+    client.process_paged_result(
+      OPPORTUNITIES_URL, {
+        archived: archived,
+        expand: client.OPP_EXPAND_VALUES
+      }, "#{log_opp_type}opportunities"
+    ) { |opp|
+      # filter to cohort job or no posting
+      next if Util.has_posting(opp) && !Util.is_cohort_app(opp)
+      log_index += 1
+      data << Util.flatten_hash(Util.opp_view_data(opp).merge({"#{BIGQUERY_IMPORT_TIMESTAMP_COLUMN}": Time.now.to_i*1000}))
+      if log_index % 100 == 0
+        @bigquery.insert_async_ensuring_columns(data)
+        data = []
+      end
+      break if test && (log_index == 100)
+    }
+    
+    log.log("Finished full export of #{log_index} #{log_opp_type}opportunities to BigQuery")
+  end
+
   def export_to_csv(archived=nil, all_fields=true, test=false)
     prefix = Time.now
     log_opp_type = archived ? 'archived ' : (archived.nil? ? '' : 'active ')
