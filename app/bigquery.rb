@@ -106,7 +106,7 @@ WHERE
 
   def log(msg)
     if @log
-      @log.log(msg) if @log.verbose?
+      @log.log(msg)
     else
       puts msg
     end
