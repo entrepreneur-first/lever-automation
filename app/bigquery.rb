@@ -127,8 +127,12 @@ WHERE
       else
         log "BigQuery: inserted #{result.insert_count} rows " \
           "with #{result.error_count} errors"
+        errors = Hash.new(0)
         result.insert_errors.each { |e|
-          error "BigQuery: " + e.errors.to_s
+          errors[e.errors.to_s] += 1
+        }
+        errors.each { |k, v|
+          error "BigQuery#{v>1 ? "(#{v})" : ''}: #{k}"
         }
       end
     end
