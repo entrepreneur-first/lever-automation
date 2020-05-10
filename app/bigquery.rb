@@ -58,7 +58,7 @@ WHERE
 
   def insert(rows)
     rows = format_rows(rows)
-    @table.insert rows
+    @table.insert(rows, skip_invalid: true)
   end
 
   def insert_async(rows)
@@ -85,15 +85,10 @@ WHERE
     names.map!(&:to_sym).reject!{ |name| columns.include?(name) }
     return if names.empty?
     add_columns(names)
-    # wait for bigquery to register the new columns - takes a few seconds
-    i = 0
-    while i < 30
-      columns = @dataset.table(ENV['BIGQUERY_TABLE']).headers
-      return if names.reject { |name| columns.include?(name) }.empty?
-      sleep(1)
-      i+=1
-    end
-    error('BigQuery: timed out waiting for added columns to be detected')
+    # sleep to give BigQuery time to register the new columns
+    # BQ schema is eventually-consistent: inserts may fail when new columns not yet recognised
+    # for several minutes after schema updated
+    sleep(120)
   end
 
   def add_columns(names)
@@ -125,7 +120,7 @@ WHERE
   end
   
   def inserter
-    @inserter ||= @table.insert_async do |result|
+    @inserter ||= @table.insert_async(skip_invalid: true) do |result|
       if result.error?
         log result.error
       else
