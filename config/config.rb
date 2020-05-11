@@ -15,7 +15,7 @@ OPPORTUNITY_CHANGED_WEBHOOK_URLS = [
 ]
 
 FULL_WEBHOOK_URLS = [
-  'https://hooks.zapier.com/hooks/catch/6688770/o55rf2n/'
+#  'https://hooks.zapier.com/hooks/catch/6688770/o55rf2n/'
 ]
 
 COHORT_JOB_TAG = 'EF Cohort'
