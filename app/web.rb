@@ -1,17 +1,17 @@
 require 'sinatra'
 require_relative 'slack_authorizer'
 require_relative 'bigquery'
-require_relative '../controller'
+require_relative '../controller/controller'
 
 use SlackAuthorizer
 
-HELP_RESPONSE = 'Use `/lever` to look up a candidate in Lever by name or email. Example: `/lever Dolly Parton` or `/lever dolly@parton.com`'.freeze
+HELP_RESPONSE = 'Use `/lever` to look up a candidate in Lever by name, email or link. Example: `/lever Dolly Parton`, `/lever dolly@parton.com`, `/lever linkedin.com/in/dollyparton`'.freeze
 
 VALID_LOOKUP_EXPRESSION = /^(.+)/
 
 OK_RESPONSE = "Looking up %s!".freeze
 
-INVALID_RESPONSE = 'Sorry, I didn’t quite get that. This usually works: `/lever <name|email>`.'.freeze
+INVALID_RESPONSE = 'Sorry, I didn’t quite get that. This usually works: `/lever <name, email or url>`.'.freeze
 
 @controller = Controller.new
 
