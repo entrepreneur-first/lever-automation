@@ -93,7 +93,6 @@ module Controller_Commands
     log_index = 0
     data = []
     data_headers = {}
-    @bigquery ||= BigQuery.new(@log)
     
     client.process_paged_result(
       OPPORTUNITIES_URL, {
@@ -106,7 +105,7 @@ module Controller_Commands
       log_index += 1
       data << Util.flatten_hash(Util.opp_view_data(opp).merge({"#{BIGQUERY_IMPORT_TIMESTAMP_COLUMN}": Time.now.to_i*1000}))
       if log_index % 100 == 0
-        @bigquery.insert_async_ensuring_columns(data)
+        bigquery.insert_async_ensuring_columns(data)
         data = []
       end
       break if test && (log_index == 100)
@@ -198,5 +197,21 @@ module Controller_Commands
     
     client.batch_updates(false)
   end  
+
+  def slack_lookup(search)
+    format_slack_response(find_opportunities(search))
+  end
+
+  def find_opportunities(search)
+    search_esc = search.gsub("'", "\\\\'")
+    
+    contacts = bigquery.query("SELECT DISTINCT(contact) contact FROM #{b.table.query_id} WHERE name = '#{search_esc}' OR links LIKE '#{search_esc}' OR emails LIKE '#{search_esc}'", '')
+    
+    client.get_paged_result(OPPORTUNITIES_URL, {contact_id: contacts, expand: client.OPP_EXPAND_VALUES}, 'opportunities_for_contact_ids')
+  end
+
+  def format_slack_response(matches)
+    matches.map{|o| "#{o['name']} - #{o['urls']['show']}"}.join("\n")
+  end
 
 end

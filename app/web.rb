@@ -13,8 +13,7 @@ OK_RESPONSE = "Looking up %s!".freeze
 
 INVALID_RESPONSE = 'Sorry, I didn’t quite get that. This usually works: `/lever <name|email>`.'.freeze
 
-@log = Log.new
-@client = Client.new(ENV['LKEY'], @log)
+@controller = Controller.new
 
 post '/slack/command' do
   case params['text'].to_s.strip
@@ -22,18 +21,4 @@ post '/slack/command' do
   when VALID_LOOKUP_EXPRESSION then format_slack_response(find_opportunities(params['text']))
   else INVALID_RESPONSE
   end
-end
-
-def format_slack_response(matches)
-  matches.map{|o| "#{o['name']} - #{o['urls']['show']}"}.join("\n")
-end
-
-
-def find_opportunities(search)
-  search_esc = search.gsub("'", "\\\\'")
-  
-  b = BigQuery.new
-  contacts = b.query("SELECT DISTINCT(contact) contact FROM #{b.table.query_id} WHERE name = '#{search_esc}' OR links LIKE '#{search_esc}' OR emails LIKE '#{search_esc}'", '')
-  
-  @client.get_paged_result(OPPORTUNITIES_URL, {contact_id: contacts, expand: client.OPP_EXPAND_VALUES}, 'opportunities_for_contact_ids')
 end

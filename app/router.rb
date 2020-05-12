@@ -121,6 +121,8 @@ class Router
 
     if COMMANDS.has_key?(command.to_sym)
       COMMANDS[command.to_sym].call
+    elsif command.start_with?('slack ')
+      @controller.slack_lookup(command.delete_prefix('slack ')
     else
       key = command.gsub('mailto:', '')
       command, key = key.split(' ') if key.include?(' ')
@@ -136,7 +138,7 @@ class Router
 
       puts "\n" if self.interactive?
 
-      os.each { |opp| 
+      os.each { |opp|
         if OPPORTUNITY_COMMANDS.has_key?(command.to_sym)
           OPPORTUNITY_COMMANDS[command.to_sym].call(opp)
         else
