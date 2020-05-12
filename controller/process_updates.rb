@@ -294,7 +294,7 @@ module Controller_ProcessUpdates
   def summarise_feedbacks(opp)
     if (opp['lastInteractionAt'] > last_change_detected(opp)) || feedback_outdated(opp)
       # summarise each feedback
-      client.feedback_for_opp(opp).each {|f|
+      (client.feedback_for_opp(opp) + client.profile_forms_for_opp(opp)).each {|f|
         simple_response_text(f['fields'])
         link = one_feedback_summary_link(f)
         next if opp['links'].include?(link)

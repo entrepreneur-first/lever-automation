@@ -60,6 +60,10 @@ class Client
     get_paged_result(feedback_url(opp), {}, 'feedback')
   end
   
+  def profile_forms_for_opp(opp)
+    get_paged_result(profile_forms_url(opp), {}, 'profile_forms')
+  end
+  
   def feedback(opportunities_ids = [])
     arr = []
     total = opportunities_ids.count
@@ -360,5 +364,9 @@ class Client
   
   def feedback_url(opp)
     "#{opp_url(opp)}/feedback"
+  end
+
+  def profile_forms_url(opp)
+    "#{opp_url(opp)}/forms"
   end
 end
