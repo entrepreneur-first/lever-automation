@@ -203,9 +203,13 @@ module Controller_Commands
   end
 
   def find_opportunities(search)
-    search_esc = search.gsub("'", "\\\\'")
+    search_esc = search.strip.downcase.gsub("'", "\\\\'")
     
-    contacts = bigquery.query("SELECT DISTINCT(contact) contact FROM #{b.table.query_id} WHERE name = '#{search_esc}' OR links LIKE '#{search_esc}' OR emails LIKE '#{search_esc}'", '')
+    contacts = bigquery.query("SELECT DISTINCT(contact) contact FROM #{bigquery.table.query_id} WHERE LOWER(name) LIKE '#{search_esc}' OR links LIKE '%#{search_esc}%' OR emails LIKE '%#{search_esc}%' LIMIT 5", '').map {|c| c[:contact]}
+    
+    puts contacts
+    
+    return [] if contacts.empty?
     
     client.get_paged_result(OPPORTUNITIES_URL, {contact_id: contacts, expand: client.OPP_EXPAND_VALUES}, 'opportunities_for_contact_ids')
   end
