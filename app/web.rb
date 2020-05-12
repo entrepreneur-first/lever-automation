@@ -13,12 +13,12 @@ OK_RESPONSE = "Looking up %s!".freeze
 
 INVALID_RESPONSE = 'Sorry, I didn’t quite get that. This usually works: `/lever <name, email or url>`.'.freeze
 
-@controller = Controller.new
+@@controller = Controller.new
 
 post '/slack/command' do
   case params['text'].to_s.strip
   when 'help', '' then HELP_RESPONSE
-  when VALID_LOOKUP_EXPRESSION then @controller.slack_lookup(params['text'])
+  when VALID_LOOKUP_EXPRESSION then @@controller.slack_lookup(params['text'])
   else INVALID_RESPONSE
   end
 end
