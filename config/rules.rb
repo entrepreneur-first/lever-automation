@@ -311,9 +311,6 @@ class Rules < BaseRules
     end
     
     # feedback
-    
-    add_tags('test_vit')
-
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_rating, :rating, :has_coffee)
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_edge, :edge, :has_coffee)
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_gender, :gender, :has_coffee)
