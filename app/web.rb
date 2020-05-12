@@ -1,7 +1,7 @@
 require 'sinatra'
 require_relative 'slack_authorizer'
 require_relative 'bigquery'
-require_relative 'client'
+require_relative '../controller'
 
 use SlackAuthorizer
 
