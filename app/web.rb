@@ -39,7 +39,11 @@ post '/slack/command' do
       )
     }
     Process.detach(p)
+    
     # respond empty 200 OK
+    {
+      'response_type': (params['command'].end_with?('me') ? 'ephemeral' : 'in_channel'),
+    }
     
   else
     {
