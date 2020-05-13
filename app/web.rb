@@ -41,7 +41,8 @@ post '/slack/command' do
     result = {'text': "Searching Lever for candidates matching `#{params['text']}`.."}
     result['response_type'] = 'in_channel' unless params['command'].end_with?('me') 
     
-    result    
+    result.to_json
+    
   else
     {
       'response_type': 'ephemeral',
