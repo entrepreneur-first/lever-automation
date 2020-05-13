@@ -38,12 +38,10 @@ post '/slack/command' do
     }
     Process.detach(p)
     
-    if params['command'].end_with?('me') 
-      {'text': 'Searching..'}.to_json
-    else 
-      {'response_type': 'in_channel'}.to_json
-    end
+    result = {'text': "Searching Lever for candidates matching `#{params['text']}`.."}
+    result['response_type'] = 'in_channel' unless params['command'].end_with?('me') 
     
+    result    
   else
     {
       'response_type': 'ephemeral',

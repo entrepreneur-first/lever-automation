@@ -250,30 +250,35 @@ module Controller_Commands
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*#{opp['archived'].nil? ? '👤 ' : '👻 '}<#{opp['urls']['show']}|#{opp['name']}>#{opp['archived'].nil? ? '' : ' [archived]'}*#{opp_data['applications__posting'] ? "\n" + opp_data['applications__posting'] : ''}"
+            "text": "*#{opp['archived'].nil? ? '👤 ' : '👻 '}<#{opp['urls']['show']}|#{opp['name']}>#{opp['archived'].nil? ? '' : ' [archived]'}*" \
+              "#{opp_data['applications__posting'] ? "\n" + opp_data['applications__posting'] : ''}" \
+              "\n*Email#{opp['emails'].size > 1 ? 's' : ''}:* #{opp['emails'].join(', ')}" \
+              "\n*LinkedIn:* #{opp['links'].select{|l| l.include?('linkedin.com')}.join(', ')}" \
+              "\n*Stage:* #{opp['stage']['text']}" \
+              "\n*Last updated:* #{opp_data['lastInteractionAt__datetime']}"
           }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Email:*\n#{opp['emails'].join(', ')}"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*LinkedIn:*\n#{opp['links'].select{|l| l.include?('linkedin.com')}.join(', ')}"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Stage:*\n#{opp['stage']['text']}"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Last updated:*\n#{opp_data['lastInteractionAt__datetime']}"
-            }
-          ]
         }
+#        {
+#          "type": "section",
+#          "fields": [
+#            {
+#              "type": "mrkdwn",
+#              "text": "*Email:*\n#{opp['emails'].join(', ')}"
+#            },
+#            {
+#              "type": "mrkdwn",
+#              "text": "*LinkedIn:*\n#{opp['links'].select{|l| l.include?('linkedin.com')}.join(', ')}"
+#            },
+#            {
+#              "type": "mrkdwn",
+#              "text": "*Stage:*\n#{opp['stage']['text']}"
+#            },
+#            {
+#              "type": "mrkdwn",
+#              "text": "*Last updated:*\n#{opp_data['lastInteractionAt__datetime']}"
+#            }
+#          ]
+#        }
       ]
     }
     
