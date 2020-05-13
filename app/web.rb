@@ -30,7 +30,7 @@ post '/slack/command' do
   when VALID_LOOKUP_EXPRESSION then 
     p = fork {
       result = HTTParty.post(
-        url,
+        params['response_url'],
         body: {
           'response_type': (params['command'].end_with?('me') ? 'ephemeral' : 'in_channel'),
           'text': controller.slack_lookup(params['text'])
