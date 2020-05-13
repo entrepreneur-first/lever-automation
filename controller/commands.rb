@@ -250,7 +250,7 @@ module Controller_Commands
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*#{opp['archived'].nil? ? '👤 ' : '👻 '}<#{opp['urls']['show']}|#{opp['name']}>#{opp['archived'].nil? ? '' : ' [archived]'}*" \
+            "text": "#{opp['archived'].nil? ? '👤 ' : '👻 '}<#{opp['urls']['show']}|*#{opp['name']* - view on Lever}>#{opp['archived'].nil? ? '' : ' [archived]'}" \
               "#{opp_data['application__posting__text'] ? "\n" + opp_data['application__posting__text'] : ''}" \
               "\n*Email#{opp['emails'].size > 1 ? 's' : ''}:* #{opp['emails'].join(', ')}" \
               "#{opp['links'].select{|l| l.include?('linkedin.com')}.any? ? "\n*LinkedIn:* #{opp['links'].select{|l| l.include?('linkedin.com')}.join(', ')}" : ''}" \
@@ -261,7 +261,18 @@ module Controller_Commands
       ]
     }
     
-    blocks += [{ "type": "divider" }]
+    blocks += [
+      { "type": "divider" },
+      {
+        "type": "context",
+        "elements": [
+          {
+            "type": "mrkdwn",
+            "text": "To search, type `/lever <name, email, or url e.g. LinkedIn>` - or `/leverme` to show only to yourself."
+          }
+        ]
+      }
+    ]
     
     blocks
   end
