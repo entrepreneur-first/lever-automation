@@ -202,38 +202,55 @@ module Controller_Commands
     format_slack_response(find_opportunities(slack_params['text']), slack_params)
   end
 
-  def find_opportunities(search)
+  def find_opportunities(search, limit=nil)
+    limit ||= 4
+    
     search_esc = search.strip.downcase.gsub("'", "\\\\'")
     
-    contacts = bigquery.query("SELECT DISTINCT(contact) contact FROM #{bigquery.table.query_id} WHERE LOWER(name) LIKE '#{search_esc}' OR links LIKE '%#{search_esc}%' OR emails LIKE '%#{search_esc}%' LIMIT 5", '').map {|c| c[:contact]}
+    from = "FROM #{bigquery.table.query_id} WHERE LOWER(name) LIKE '#{search_esc}' OR links LIKE '%#{search_esc}%' OR emails LIKE '%#{search_esc}%'"
+    counts = bigquery.query("SELECT COUNT(*) total, COUNT(DISTINCT contact) contacts #{from}", '')[0]
+    contacts = bigquery.query("SELECT DISTINCT(contact) contact #{from} LIMIT #{limit}", '').map {|c| c[:contact]}
     
-    puts contacts
+    return {count: 0, opportunities: []} if contacts.empty?
     
-    return [] if contacts.empty?
-    
-    client.get_paged_result(OPPORTUNITIES_URL, {contact_id: contacts, expand: client.OPP_EXPAND_VALUES}, 'opportunities_for_contact_ids')
+    {
+      count: counts[:total],
+      contacts: counts[:contacts],
+      has_more: (counts[:contacts] > limit),
+      opportunities: client.get_paged_result(OPPORTUNITIES_URL, {contact_id: contacts, expand: client.OPP_EXPAND_VALUES}, 'opportunities_for_contact_ids')
+    }
   end
 
-  def format_slack_response(matches, slack_params)
-    blocks = [{
-		"type": "section",
-		"text": {
-			"type": "mrkdwn",
-			"text": "Lever search results for `#{slack_params['text']}`"
-		}
-	},
-	{
-		"type": "divider"
-	}
-	]
+  def format_slack_response(results, slack_params)
+    return [{
+    		"type": "section",
+    		"text": {
+    			"type": "mrkdwn",
+    			"text": "No Lever search results found for `#{slack_params['text']}`:"
+    		}
+      }] if results[:opportunities].empty?
+    
+    blocks = [
+      {
+    		"type": "section",
+    		"text": {
+    			"type": "mrkdwn",
+    			"text": "Lever search results for `#{slack_params['text']}`#{results[:has_more] ? " (displaying #{results[:opportunities].size} of #{results[:count]} opportunities for #{results[:contacts]} contacts)" : ''}:"
+    		}
+    	},
+    	{
+    		"type": "divider"
+    	}
+  	]
 	
-    matches.each{ |opp|
+    results[:opportunities].each{ |opp|
+      opp_data = Util.opp_view_data(opp)
       blocks += [
         {
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*#{opp['archived'].nil? ? '👤 ' : '👻 [archived] '}<#{opp['urls']['show']}|opp['name']>*#{opp['applications'].any? ? "\n" + opp['applications'][0]['posting']: ''}"
+            "text": "*#{opp['archived'].nil? ? '👤 ' : '👻 [archived] '}<#{opp['urls']['show']}|#{opp['name']}>*#{opp_data['applications__posting'] ? "\n" + opp_data['applications__posting'] : ''}"
           }
         },
         {
@@ -253,11 +270,13 @@ module Controller_Commands
             },
             {
               "type": "mrkdwn",
-              "text": "*Last updated:*\n#{opp['lastInteractionAt__datetime']}"
+              "text": "*Last updated:*\n#{opp_data['lastInteractionAt__datetime']}"
             }
           ]
         }
       ]
+    }
+    
     blocks
   end
 

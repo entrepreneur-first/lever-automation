@@ -122,7 +122,7 @@ class Router
     if COMMANDS.has_key?(command.to_sym)
       COMMANDS[command.to_sym].call
     elsif command.start_with?('slack ')
-      puts JSON.pretty_generate(@controller.slack_lookup(command.delete_prefix('slack ')))
+      puts JSON.pretty_generate(@controller.slack_lookup({'text' => command.delete_prefix('slack '), 'command' => 'lever'}))
     else
       key = command.gsub('mailto:', '')
       command, key = key.split(' ') if key.include?(' ')
