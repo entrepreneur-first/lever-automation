@@ -14,7 +14,7 @@ OK_RESPONSE = "Looking up %s!".freeze
 
 INVALID_RESPONSE = 'Sorry, I didn’t quite get that. This usually works: `/lever <name, email or url>`.'.freeze
 
-@@controller = Controller.new
+controller = Controller.new
 
 post '/slack/command' do
   content_type :json
@@ -26,7 +26,7 @@ post '/slack/command' do
     }
   when VALID_LOOKUP_EXPRESSION then {
     'response_type': (params['command'].end_with?('me') ? 'ephemeral' : 'in_channel'),
-    'text': @@controller.slack_lookup(params['text'])
+    'text': controller.slack_lookup(params['text'])
   else {
       'response_type': 'ephemeral',
       'text': INVALID_RESPONSE
