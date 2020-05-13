@@ -198,8 +198,8 @@ module Controller_Commands
     client.batch_updates(false)
   end  
 
-  def slack_lookup(search)
-    format_slack_response(find_opportunities(search))
+  def slack_lookup(slack_params)
+    format_slack_response(find_opportunities(slack_params['text']), slack_params)
   end
 
   def find_opportunities(search)
@@ -214,8 +214,51 @@ module Controller_Commands
     client.get_paged_result(OPPORTUNITIES_URL, {contact_id: contacts, expand: client.OPP_EXPAND_VALUES}, 'opportunities_for_contact_ids')
   end
 
-  def format_slack_response(matches)
-    matches.map{|o| "#{o['name']} - #{o['urls']['show']}"}.join("\n")
+  def format_slack_response(matches, slack_params)
+    blocks = [{
+		"type": "section",
+		"text": {
+			"type": "mrkdwn",
+			"text": "Lever search results for `#{slack_params['text']}`"
+		}
+	},
+	{
+		"type": "divider"
+	}
+	]
+	
+    matches.each{ |opp|
+      blocks += [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*#{opp['archived'].nil? ? '👤 ' : '👻 [archived] '}<#{opp['urls']['show']}|opp['name']>*#{opp['applications'].any? ? "\n" + opp['applications'][0]['posting']: ''}"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Email:*\n#{opp['emails'].join(', ')}"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*LinkedIn:*\n#{opp['links'].select{|l| l.include?('linkedin.com')}.join(', ')}"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Stage:*\n#{opp['stage']['text']}"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Last updated:*\n#{opp['lastInteractionAt__datetime']}"
+            }
+          ]
+        }
+      ]
+    blocks
   end
 
 end

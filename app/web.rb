@@ -33,7 +33,7 @@ post '/slack/command' do
         params['response_url'],
         body: {
           'response_type': (params['command'].end_with?('me') ? 'ephemeral' : 'in_channel'),
-          'text': controller.slack_lookup(params['text'])
+          'blocks': controller.slack_lookup(params)
         }.to_json,
         headers: { 'Content-Type' => 'application/json' }
       )
