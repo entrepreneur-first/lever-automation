@@ -11,14 +11,12 @@ HELP_RESPONSE = 'Use `/lever` to look up a candidate in Lever by name, email or 
 
 VALID_LOOKUP_EXPRESSION = /^(.+)/
 
-OK_RESPONSE = "Looking up %s!".freeze
-
 INVALID_RESPONSE = 'Sorry, I didn’t quite get that. This usually works: `/lever <name, email or url>`.'.freeze
 
 controller = Controller.new
 
 post '/slack/command' do
-  content_type :json
+  # content_type :json
 
   case params['text'].to_s.strip
   when 'help', '' then
