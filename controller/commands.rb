@@ -226,7 +226,7 @@ module Controller_Commands
     		"type": "section",
     		"text": {
     			"type": "mrkdwn",
-    			"text": "No Lever search results found for `#{slack_params['text']}`:"
+    			"text": "No Lever search results found for `#{slack_params['text']}`"
     		}
       }] if results[:opportunities].empty?
     
