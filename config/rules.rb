@@ -148,9 +148,7 @@ class Rules < BaseRules
     end
     
     if ['app_review', 'debrief'].include?(result['type'])
-      # software/hardware
-      # TODO: question?
-      result['software_hardware'] = (f['fields'].select{|f| f[:_text].include?('software')}.first || {})[:_value]
+ 
      
       # talker/doer
       # TODO: question?
@@ -168,7 +166,13 @@ class Rules < BaseRules
     if ['coffee', 'app_review', 'debrief'].include?(result['type'])
       # edge
       # TODO: question title varies
+      
       result['edge'] = (f['fields'].select{|f| f[:_text].include?('edge')}.first || {})[:_value]
+
+      # software/hardware
+      # TODO: question?
+
+      result['software_hardware'] = (f['fields'].select{|f| f[:_text].include?('software')}.first || {})[:_value]
     end
     
     if result['type'] == 'debrief'
@@ -200,7 +204,8 @@ class Rules < BaseRules
       coffee_eligible: nil,
       coffee_completed_at: nil,
       coffee_completed_by: nil,
-      
+      coffee_software_hardware: nil,
+
       has_phone_screen: false,
       phone_screen_rating: nil,
       phone_screen_completed_at: nil,
@@ -250,6 +255,8 @@ class Rules < BaseRules
         result[:coffee_eligible] = f['eligible']
         result[:coffee_completed_at] = f['submitted_at']
         result[:coffee_completed_by] = f['submitted_by']
+        result[:coffee_software_hardware] = f['software_hardware']
+        
         
       when 'app_review'
         result[:has_app_review] = true
