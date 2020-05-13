@@ -16,7 +16,7 @@ INVALID_RESPONSE = 'Sorry, I didn’t quite get that. This usually works: `/leve
 controller = Controller.new
 
 post '/slack/command' do
-  # content_type :json
+  content_type :json
 
   case params['text'].to_s.strip
   when 'help', '' then
