@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'json'
+require 'httparty'
 require_relative 'slack_authorizer'
 require_relative 'bigquery'
 require_relative '../controller/controller'
@@ -20,14 +21,28 @@ post '/slack/command' do
   content_type :json
 
   case params['text'].to_s.strip
-  when 'help', '' then {
+  when 'help', '' then
+    {
       'response_type': 'ephemeral',
       'text': HELP_RESPONSE
     }
-  when VALID_LOOKUP_EXPRESSION then {
-    'response_type': (params['command'].end_with?('me') ? 'ephemeral' : 'in_channel'),
-    'text': controller.slack_lookup(params['text'])
-  else {
+    
+  when VALID_LOOKUP_EXPRESSION then 
+    p = fork {
+      result = HTTParty.post(
+        url,
+        body: {
+          'response_type': (params['command'].end_with?('me') ? 'ephemeral' : 'in_channel'),
+          'text': controller.slack_lookup(params['text'])
+        }.to_json,
+        headers: { 'Content-Type' => 'application/json' }
+      )
+    }
+    Process.detach(p)
+    # respond empty 200 OK
+    
+  else
+    {
       'response_type': 'ephemeral',
       'text': INVALID_RESPONSE
     }
