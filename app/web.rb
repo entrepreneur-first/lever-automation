@@ -42,8 +42,8 @@ post '/slack/command' do
     
     # respond empty 200 OK
     {
-      'response_type': (params['command'].end_with?('me') ? 'ephemeral' : 'in_channel'),
-    }.to_json
+      'response_type': (params['command'].end_with?('me') ? 'ephemeral' : 'in_channel')
+    }
     
   else
     {
