@@ -253,7 +253,7 @@ module Controller_Commands
             "text": "*#{opp['archived'].nil? ? '👤 ' : '👻 '}<#{opp['urls']['show']}|#{opp['name']}>#{opp['archived'].nil? ? '' : ' [archived]'}*" \
               "#{opp_data['application__posting__text'] ? "\n" + opp_data['application__posting__text'] : ''}" \
               "\n*Email#{opp['emails'].size > 1 ? 's' : ''}:* #{opp['emails'].join(', ')}" \
-              "#{opp['links'].select{|l| l.include?('linkedin.com')}.any? "\n*LinkedIn:* #{opp['links'].select{|l| l.include?('linkedin.com')}.join(', ')}" : ''}" \
+              "#{opp['links'].select{|l| l.include?('linkedin.com')}.any? ? "\n*LinkedIn:* #{opp['links'].select{|l| l.include?('linkedin.com')}.join(', ')}" : ''}" \
               "\n*Stage:* #{opp['stage']['text']}" \
               "\n*Last updated:* #{opp_data['lastInteractionAt__datetime']}"
           }
