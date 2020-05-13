@@ -237,10 +237,10 @@ module Controller_Commands
     			"type": "mrkdwn",
     			"text": "Lever search results for `#{slack_params['text']}`#{results[:has_more] ? " (displaying #{results[:opportunities].size} of #{results[:count]} opportunities for #{results[:contacts]} contacts)" : ''}:"
     		}
-    	},
-    	{
-    		"type": "divider"
-    	}
+  	  },
+  	  {
+  		"type": "divider"
+  	  }
   	]
 	
     results[:opportunities].each{ |opp|
@@ -251,36 +251,17 @@ module Controller_Commands
           "text": {
             "type": "mrkdwn",
             "text": "*#{opp['archived'].nil? ? '👤 ' : '👻 '}<#{opp['urls']['show']}|#{opp['name']}>#{opp['archived'].nil? ? '' : ' [archived]'}*" \
-              "#{opp_data['applications__posting'] ? "\n" + opp_data['applications__posting'] : ''}" \
+              "#{opp_data['application__posting__text'] ? "\n" + opp_data['application__posting__text'] : ''}" \
               "\n*Email#{opp['emails'].size > 1 ? 's' : ''}:* #{opp['emails'].join(', ')}" \
-              "\n*LinkedIn:* #{opp['links'].select{|l| l.include?('linkedin.com')}.join(', ')}" \
+              "#{opp['links'].select{|l| l.include?('linkedin.com')}.any? "\n*LinkedIn:* #{opp['links'].select{|l| l.include?('linkedin.com')}.join(', ')}" : ''}" \
               "\n*Stage:* #{opp['stage']['text']}" \
               "\n*Last updated:* #{opp_data['lastInteractionAt__datetime']}"
           }
         }
-#        {
-#          "type": "section",
-#          "fields": [
-#            {
-#              "type": "mrkdwn",
-#              "text": "*Email:*\n#{opp['emails'].join(', ')}"
-#            },
-#            {
-#              "type": "mrkdwn",
-#              "text": "*LinkedIn:*\n#{opp['links'].select{|l| l.include?('linkedin.com')}.join(', ')}"
-#            },
-#            {
-#              "type": "mrkdwn",
-#              "text": "*Stage:*\n#{opp['stage']['text']}"
-#            },
-#            {
-#              "type": "mrkdwn",
-#              "text": "*Last updated:*\n#{opp_data['lastInteractionAt__datetime']}"
-#            }
-#          ]
-#        }
       ]
     }
+    
+    blocks += [{ "type": "divider" }]
     
     blocks
   end
