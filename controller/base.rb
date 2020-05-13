@@ -4,6 +4,7 @@ require 'method_source'
 require_relative '../config/config'
 require_relative '../app/util'
 require_relative '../app/log'
+require_relative '../app/bigquery'
 require_relative '../app/client'
 require_relative '../config/rules'
 
@@ -28,6 +29,10 @@ class BaseController
     @log
   end
   
+  def bigquery
+    @bigquery ||= BigQuery.new(@log)
+  end
+
   def rules
     @rules
   end

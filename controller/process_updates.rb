@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require_relative '../app/bigquery'
 
 module Controller_ProcessUpdates
 
@@ -166,8 +165,7 @@ module Controller_ProcessUpdates
   end
 
   def update_bigquery(opp, update_time=nil)
-    @bigquery ||= BigQuery.new(@log)
-    @bigquery.insert_async_ensuring_columns(Util.flatten_hash(Util.opp_view_data(opp).merge({"#{BIGQUERY_IMPORT_TIMESTAMP_COLUMN}": update_time || opp['lastInteractionAt']})))
+    bigquery.insert_async_ensuring_columns(Util.flatten_hash(Util.opp_view_data(opp).merge({"#{BIGQUERY_IMPORT_TIMESTAMP_COLUMN}": update_time || opp['lastInteractionAt']})))
   end
 
   def update_changed_tag(opp, update_time=nil)
