@@ -250,7 +250,7 @@ module Controller_Commands
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*#{opp['archived'].nil? ? '👤 ' : '👻 [archived] '}<#{opp['urls']['show']}|#{opp['name']}>*#{opp_data['applications__posting'] ? "\n" + opp_data['applications__posting'] : ''}"
+            "text": "*#{opp['archived'].nil? ? '👤 ' : '👻 '}<#{opp['urls']['show']}|#{opp['name']}>#{opp['archived'].nil? ? '' : ' [archived]'}*#{opp_data['applications__posting'] ? "\n" + opp_data['applications__posting'] : ''}"
           }
         },
         {
