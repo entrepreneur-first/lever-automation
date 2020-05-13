@@ -268,7 +268,7 @@ module Controller_Commands
         "elements": [
           {
             "type": "mrkdwn",
-            "text": "To search, type `/lever <name, email, or url e.g. LinkedIn>` - or `/leverme` to show only to yourself."
+            "text": "To search, type `/lever <name, email or url>` - or `/leverme` to show only to yourself."
           }
         ]
       }
