@@ -23,7 +23,7 @@ post '/slack/command' do
     {
       'response_type': 'ephemeral',
       'text': HELP_RESPONSE
-    }
+    }.to_json
     
   when VALID_LOOKUP_EXPRESSION then 
     p = fork {
@@ -41,12 +41,12 @@ post '/slack/command' do
     # respond empty 200 OK
     {
       'response_type': (params['command'].end_with?('me') ? 'ephemeral' : 'in_channel')
-    }
+    }.to_json
     
   else
     {
       'response_type': 'ephemeral',
       'text': INVALID_RESPONSE
-    }
+    }.to_json
   end
 end
