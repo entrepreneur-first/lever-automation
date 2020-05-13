@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'json'
 require_relative 'slack_authorizer'
 require_relative 'bigquery'
 require_relative 'client'
@@ -16,9 +17,19 @@ INVALID_RESPONSE = 'Sorry, I didn’t quite get that. This usually works: `/leve
 @controller = Controller.new
 
 post '/slack/command' do
+  content_type :json
+
   case params['text'].to_s.strip
-  when 'help', '' then HELP_RESPONSE
-  when VALID_LOOKUP_EXPRESSION then format_slack_response(find_opportunities(params['text']))
-  else INVALID_RESPONSE
+  when 'help', '' then {
+      'response_type': 'ephemeral',
+      'text': HELP_RESPONSE
+    }
+  when VALID_LOOKUP_EXPRESSION then {
+    'response_type': (params['command'].end_with?('me') ? 'ephemeral' : 'in_channel'),
+    'text': format_slack_response(find_opportunities(params['text']))
+  else {
+      'response_type': 'ephemeral',
+      'text': INVALID_RESPONSE
+    }
   end
 end
