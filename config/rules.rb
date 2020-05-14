@@ -125,7 +125,7 @@ class Rules < BaseRules
       end
     
     # rating  
-    result['rating'] = (f['fields'].select{|f| f[:_text] == 'rating' || f[:_text].include?('could pass ic')}.first || {})[:_value]
+    result['rating'] = (f['fields'].select{|f| f[:_text] == 'rating' || f[:_text].include?('could pass ic')|| f[:_text].include?('overall score')}.first || {})[:_value]
     
     if result['type'] == 'coffee'
       # gender
