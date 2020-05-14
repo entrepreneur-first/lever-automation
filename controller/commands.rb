@@ -207,7 +207,7 @@ module Controller_Commands
     
     search_esc = search.strip.downcase.gsub("'", "\\\\'")
     
-    from = "FROM #{bigquery.table.query_id} WHERE LOWER(name) LIKE '#{search_esc}' OR links LIKE '%#{search_esc}%' OR emails LIKE '%#{search_esc}%'"
+    from = "FROM #{bigquery.table.query_id}_view WHERE LOWER(name) LIKE '#{search_esc}' OR links LIKE '%#{search_esc}%' OR emails LIKE '%#{search_esc}%'"
     counts = bigquery.query("SELECT COUNT(*) total, COUNT(DISTINCT contact) contacts #{from}", '')[0]
     contacts = bigquery.query("SELECT DISTINCT(contact) contact #{from} LIMIT #{limit}", '').map {|c| c[:contact]}
     
