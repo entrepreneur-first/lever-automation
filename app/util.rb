@@ -14,6 +14,10 @@ class Util
       }))
   end
   
+  def self.view_flat(opp)
+    flatten_hash(opp_view_data(opp))
+  end
+  
   def self.recursive_add_datetime(h)
     h.keys.each { |k|
       if h[k].class == Hash
@@ -61,6 +65,10 @@ class Util
 
   # generic util functions
 
+  def self.escape_sql(str)
+    str.gsub("'", "\\\\'")
+  end
+
   def self.to_query(hash)
     URI.encode_www_form(BASE_PARAMS.merge(hash))
   end
@@ -82,6 +90,27 @@ class Util
       end
     }
     to_hash
+  end
+  
+  def self.get_hash_key_flexi(hash, key)
+    get_hash_element_flexi(hash, key)[0]
+  end
+  
+  def self.get_hash_value_flexi(hash, key)
+    get_hash_element_flexi(hash, key)[1]
+  end
+  
+  def self.get_hash_element_flexi(hash, key)
+    key = flexi_string(key)
+    hash.each { |k, v|
+      v = v.strip if v.class == String
+      return [k, v] if flexi_string(k) == key
+    }
+    [nil, nil]
+  end
+  
+  def self.flexi_string(str)
+    str.to_s.downcase.gsub(/[^a-z0-9]/, '')
   end
   
   def self.datetimestr_to_timestamp(d)

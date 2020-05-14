@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'date'
+require 'time'
 require 'digest/md5'
 require 'httparty'
 require 'uri'
@@ -74,6 +75,11 @@ class Client
       arr += result.fetch('data').map { |x| x.merge('opportunity_id' => opportunity_id) }
     end
     arr
+  end
+  
+  def profile_form_template(id)
+    get_single_result("#{API_URL}form_templates/#{id.class == Hash ?
+      id['id'] : id}", {}, "get profile form: #{id}")
   end
 
   #
@@ -248,6 +254,45 @@ class Client
   def update_stage(opp, stage_id)
     api_action_log('Moving opportunity to stage: ' + stage_id) do
       put("#{opp_url(opp)}/stage?", {stage: stage_id})
+    end
+  end
+
+  def prepare_feedback(template_id, fields)
+    form = profile_form_template(template_id)
+    fields_data = form['fields']
+    fields = fields.transform_keys(&:to_s)
+    
+    keys_found = []
+    fields_data.map!{ |field|
+      key, val = Util.get_hash_element_flexi(fields, field['text'])
+      keys_found << key unless key.nil?
+      val = val.to_s
+      if ['createdAt', 'completedAt'].include?(field['text']) && !val.match?(/^[0-9]*$/)
+        val = (Time.parse(val).to_i*1000).to_s
+      end
+      field.merge({'value' => key.nil? ? '' : val})
+    }
+    
+    {
+      fields: fields_data,
+      keys: keys_found
+    }
+  end
+
+  def add_profile_form(opp, template_id, fields)
+    api_action_log("Adding profile form for template: " + template_id) do
+      result = post("#{opp_url(opp)}/forms?", {
+        baseTemplateId: template_id,
+        fields: fields
+      })
+      result
+    end
+  end
+
+  def create_opportunity(params)
+    api_action_log("Creating opportunity: {emails: #{(params[:emails] || []).join(',')}; links: #{(params[:links] || []).join(',')}}") do
+      result = post("#{API_URL}/opportunities?perform_as_posting_owner=true&", params)
+      result
     end
   end
 
