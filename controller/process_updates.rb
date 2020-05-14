@@ -297,7 +297,7 @@ module Controller_ProcessUpdates
         client.profile_forms_for_opp(opp)
       ).each { |f|
         if (f['deletedAt'] || 0) > 0
-          client.remove_links_with_refix(opp, one_feedback_summary_link_prefix(f))
+          client.remove_links_with_prefix(opp, one_feedback_summary_link_prefix(f))
           next
         end
         simple_response_text(f['fields'])
