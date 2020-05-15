@@ -367,9 +367,7 @@ class Client
 
   def api_call_log(resource, page)
     log.log("Lever API #{resource} page=#{page}") if log.verbose? && !resource.nil?
-    result = yield
-    Util.log_if_api_error(log, result)
-    result
+    yield
   end
 
   def api_action_log(msg)
@@ -414,10 +412,10 @@ class Client
       log.warn("EOFError - ignoring")
     end
     Util.log_if_api_error(log, result)
-    result.parsed_response unless result.nil?
+    result.parsed_response if result && result.respond_to?(:parsed_response)
   end
   
-  def _get(url)
+  def _get(url, _ignore_body)
     HTTParty.get(url, basic_auth: auth)
   end
   
