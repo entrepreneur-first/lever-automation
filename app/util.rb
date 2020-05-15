@@ -140,6 +140,9 @@ class Util
   def self.log_if_api_error(log, result)
     # if not an error
     return if is_http_success(result)
+    # 404s are a valid API GET response
+    return if result.request && result.request.http_method.is_a?(Net::HTTP::Get) && result.code == 404
+    
     log.error((result.code.to_s || '') + ': ' + (result.parsed_response['code'] || '<no code>') + ': ' + (result.parsed_response['message'] || '<no message>'))
   end
   
