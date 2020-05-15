@@ -300,21 +300,21 @@ module Controller_Commands
       counts[:rows] += 1
       
       opp_params = {
-        'email': (Util.get_hash_value_flexi(row, 'email') || '').downcase,
-        'linkedin': (Util.get_hash_value_flexi(row, 'linkedin') || '').downcase.sub(/\?.+/, ''),
-        'posting': Util.get_hash_value_flexi(row, 'posting'),
-        'name': Util.get_hash_value_flexi(row, 'name'),
-        'origin': Util.get_hash_value_flexi(row, 'origin'),
-        'sources': (Util.get_hash_value_flexi(row, 'sources') || '').split(',').map(&:strip),
-        'tags': (Util.get_hash_value_flexi(row, 'tags') || '').split(',').map(&:strip),
-        'phones': (Util.get_hash_value_flexi(row, 'phone') || '').split(',').map(&:strip),
-        'location': Util.get_hash_value_flexi(row, 'location'),
-        'headline': Util.get_hash_value_flexi(row, 'headline')
+        'email': (Util.get_hash_value_fuzzy(row, 'email') || '').downcase,
+        'linkedin': (Util.get_hash_value_fuzzy(row, 'linkedin') || '').downcase.sub(/\?.+/, ''),
+        'posting': Util.get_hash_value_fuzzy(row, 'posting'),
+        'name': Util.get_hash_value_fuzzy(row, 'name'),
+        'origin': Util.get_hash_value_fuzzy(row, 'origin'),
+        'sources': (Util.get_hash_value_fuzzy(row, 'sources') || '').split(',').map(&:strip),
+        'tags': (Util.get_hash_value_fuzzy(row, 'tags') || '').split(',').map(&:strip),
+        'phones': (Util.get_hash_value_fuzzy(row, 'phone') || '').split(',').map(&:strip),
+        'location': Util.get_hash_value_fuzzy(row, 'location'),
+        'headline': Util.get_hash_value_fuzzy(row, 'headline')
       }
-      opp_params[:createdAt] = Util.get_hash_value_flexi(row, 'createdat')
-      opp_params[:stage] = Util.get_hash_value_flexi(row, 'stageid')
+      opp_params[:createdAt] = Util.get_hash_value_fuzzy(row, 'createdat')
+      opp_params[:stage] = Util.get_hash_value_fuzzy(row, 'stageid')
       
-      log.log("Looking for existing opportunity via parameters:\n" + opp_params.map{|k,v| "- #{k}: #{v}"}.join("\n")) if test
+      log.log("Looking for existing opportunity via parameters:\n" + opp_params.select{|k,v| [:email, :linkedin, :posting].include?(k)}.map{|k,v| "- #{k}: #{v}"}.join("\n")) if test
       
       if opp_params[:posting].empty?
         log.log('No job posting ID ("posting") found - unable to process row')
@@ -332,11 +332,10 @@ module Controller_Commands
 
       fields = row.reject {|k,v|
         [
-          Util.get_hash_key_flexi(row, 'posting'),
-          Util.get_hash_key_flexi(row, 'name'),
-          Util.get_hash_key_flexi(row, 'origin'),
-          Util.get_hash_key_flexi(row, 'email'),
-          Util.get_hash_key_flexi(row, 'linkedin')
+          Util.get_hash_key_fuzzy(row, 'posting'),
+          Util.get_hash_key_fuzzy(row, 'name'),
+          Util.get_hash_key_fuzzy(row, 'email'),
+          Util.get_hash_key_fuzzy(row, 'linkedin')
         ].include?(k)
       }.transform_keys {|k|
         k.to_s.sub(/^coffee_/i, '')

@@ -81,6 +81,16 @@ class Client
     get_single_result("#{API_URL}form_templates/#{id.class == Hash ?
       id['id'] : id}", {}, "get profile form: #{id}")
   end
+  
+  def users
+    @users ||= get_paged_result("#{API_URL}users", {}, 'users')
+    @users
+  end
+
+  def postings
+    @postings ||= get_paged_result("#{API_URL}postings", {}, 'job postings')
+    @postings
+  end
 
   #
   # Updating data
@@ -264,11 +274,19 @@ class Client
     
     keys_found = []
     fields_data.map!{ |field|
-      key, val = Util.get_hash_element_flexi(fields, field['text'])
+      key, val = Util.get_hash_element_fuzzy(fields, field['text'])
       keys_found << key unless key.nil?
       val = val.to_s
       if ['createdAt', 'completedAt'].include?(field['text']) && !val.match?(/^[0-9]*$/)
         val = (Time.parse(val).to_i*1000).to_s
+      end
+      if field['text'] == 'user' && !val.match(/^[0-9a-z\-]{30,}$/)
+        lookup_val = Util.lookup_row_fuzzy(users, val, 'id', 'name')
+        if lookup_val.nil?
+          log.warn("User not found: #{val}")
+        else
+          val = lookup_val
+        end
       end
       field.merge({'value' => key.nil? ? '' : val})
     }

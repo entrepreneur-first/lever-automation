@@ -92,24 +92,36 @@ class Util
     to_hash
   end
   
-  def self.get_hash_key_flexi(hash, key)
-    get_hash_element_flexi(hash, key)[0]
+  def self.lookup_row_fuzzy(array, search_val, result_key='id', search_key=nil)
+    lookup_row(array, search_val, result_key, search_key, true)
   end
   
-  def self.get_hash_value_flexi(hash, key)
-    get_hash_element_flexi(hash, key)[1]
+  def self.lookup_row(array, search_val, result_key='id', search_key=nil, fuzzy=false)
+    search_val = fuzzy_string(search_val) if fuzzy
+    array.each { |row|
+      return result_key ? row[result_key] : row if (fuzzy ? fuzzy_string(row[search_key]) : row[search_key]) == search_val
+    }
+    nil
   end
   
-  def self.get_hash_element_flexi(hash, key)
-    key = flexi_string(key)
+  def self.get_hash_key_fuzzy(hash, key)
+    get_hash_element_fuzzy(hash, key)[0]
+  end
+  
+  def self.get_hash_value_fuzzy(hash, key)
+    get_hash_element_fuzzy(hash, key)[1]
+  end
+  
+  def self.get_hash_element_fuzzy(hash, key)
+    key = fuzzy_string(key)
     hash.each { |k, v|
       v = v.strip if v.class == String
-      return [k, v] if flexi_string(k) == key
+      return [k, v] if fuzzy_string(k) == key
     }
     [nil, nil]
   end
   
-  def self.flexi_string(str)
+  def self.fuzzy_string(str)
     str.to_s.downcase.gsub(/[^a-z0-9]/, '')
   end
   
