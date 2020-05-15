@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'date'
+require 'time'
 require 'digest/md5'
 require 'httparty'
 require 'uri'
@@ -15,6 +16,9 @@ BASE_PARAMS = {
 OPPORTUNITIES_PARAMS = {
   expand: %w[applications stage owner followers]
 }.freeze
+
+class BadGatewayError < StandardError
+end
 
 class Client
 
@@ -60,16 +64,35 @@ class Client
     get_paged_result(feedback_url(opp), {}, 'feedback')
   end
   
+  def profile_forms_for_opp(opp)
+    get_paged_result(profile_forms_url(opp), {}, 'profile_forms')
+  end
+  
   def feedback(opportunities_ids = [])
     arr = []
     total = opportunities_ids.count
     opportunities_ids.each_with_index.each do |opportunity_id, index|
       result = api_call_log('feedback', "#{index + 1}/#{total}") do
-        HTTParty.get(feedback_url(opportunity_id), basic_auth: auth)
+        get(feedback_url(opportunity_id))
       end
-      arr += result.fetch('data').map { |x| x.merge('opportunity_id' => opportunity_id) }
+      arr += result.fetch('data', []).map { |x| x.merge('opportunity_id' => opportunity_id) }
     end
     arr
+  end
+  
+  def profile_form_template(id)
+    get_single_result("#{API_URL}form_templates/#{id.class == Hash ?
+      id['id'] : id}", {}, "get profile form: #{id}")
+  end
+  
+  def users
+    @users ||= get_paged_result("#{API_URL}users", {}, 'users')
+    @users
+  end
+
+  def postings
+    @postings ||= get_paged_result("#{API_URL}postings", {}, 'job postings')
+    @postings
   end
 
   #
@@ -221,16 +244,10 @@ class Client
 
   def add_candidate_to_posting(candidate_id, posting_id)
     api_action_log("Adding to posting " + posting_id) do
-      result = HTTParty.post(API_URL + 'candidates/' + candidate_id + '/addPostings?' + Util.to_query({
-          perform_as: LEVER_BOT_USER
-        }),
-        body: {
-          postings: [posting_id]
-        }.to_json,
-        headers: { 'Content-Type' => 'application/json' },
-        basic_auth: auth
+      post(
+        API_URL + 'candidates/' + candidate_id + '/addPostings?',
+        {postings: [posting_id]}
       )
-      result
     end
   end
 
@@ -247,17 +264,61 @@ class Client
     end
   end
 
+  def prepare_feedback(template_id, fields)
+    form = profile_form_template(template_id)
+    fields_data = form['fields']
+    fields = fields.transform_keys(&:to_s)
+    
+    keys_found = []
+    fields_data.map!{ |field|
+      key, val = Util.get_hash_element_fuzzy(fields, field['text'])
+      keys_found << key unless key.nil?
+      val = val.to_s
+      if ['createdAt', 'completedAt'].include?(field['text']) && !val.match?(/^[0-9]*$/)
+        val = (Time.parse(val).to_i*1000).to_s
+      end
+      if field['text'] == 'user' && !val.match(/^[0-9a-z\-]{30,}$/)
+        lookup_val = Util.lookup_row_fuzzy(users, val, 'id', 'name')
+        if lookup_val.nil?
+          log.warn("User not found: #{val}")
+        else
+          val = lookup_val
+        end
+      end
+      field.merge({'value' => key.nil? ? '' : val})
+    }
+    
+    {
+      fields: fields_data,
+      keys: keys_found
+    }
+  end
+
+  def add_profile_form(opp, template_id, fields)
+    api_action_log("Adding profile form for template: " + template_id) do
+      result = post("#{opp_url(opp)}/forms?", {
+        baseTemplateId: template_id,
+        fields: fields
+      })
+      result
+    end
+  end
+
+  def create_opportunity(params)
+    api_action_log("Creating opportunity: {emails: #{(params[:emails] || []).join(',')}; links: #{(params[:links] || []).join(',')}}") do
+      result = post("#{API_URL}/opportunities?perform_as_posting_owner=true&", params)
+      result
+    end
+  end
+
   #
   # Helpers
   #
   
   def get_single_result(url, params={}, log_string='')
-    u = url + '?' + Util.to_query(params)
-    result = api_call_log(log_string, '<single>') do
-      result = HTTParty.get(u, basic_auth: auth)
-    end
-    return nil if Util.is_http_error(result)
-    result.fetch('data')
+    api_call_log(log_string, '<single>') do
+      get(url + '?' + Util.to_query(params))
+    end.fetch('data', {})
   end
    
   def process_paged_result(url, params, log_string=nil)
@@ -265,9 +326,11 @@ class Client
     next_batch = nil
     loop do
       result = api_call_log(log_string, page) do
-        HTTParty.get(url + '?' + Util.to_query(params.merge(offset: next_batch).reject{|k,v| v.nil?}), basic_auth: auth)
+        get(url + '?' + Util.to_query(params.merge(offset: next_batch).reject{|k,v| v.nil?}))
       end
-      result.fetch('data').each { |row| yield(row) }
+      result.fetch('data', []).each { |row|
+        yield(row)
+      }
       break unless result.fetch('hasNext')
       next_batch = result.fetch('next')
       page += 1
@@ -278,6 +341,10 @@ class Client
     arr = []
     process_paged_result(url, params, log_string) { |row| arr << row }
     arr
+  end
+  
+  def get(url)
+    http_method(self.method(:_get).curry, url)
   end
   
   def post(url, body)
@@ -300,9 +367,7 @@ class Client
 
   def api_call_log(resource, page)
     log.log("Lever API #{resource} page=#{page}") if log.verbose? && !resource.nil?
-    result = yield
-    Util.log_if_api_error(log, result)
-    result
+    yield
   end
 
   def api_action_log(msg)
@@ -320,14 +385,38 @@ class Client
   #
 
   def http_method(method, url, body={})
-    result = method.(url, body)
-    # retry on occasional bad gateway error
-    if result.code == 502
-      log.warn('502 error, retrying')
+    begin
       result = method.(url, body)
+      # retry on occasional bad gateway error
+      raise BadGatewayError if result.code == 502
+    rescue BadGatewayError, Net::OpenTimeout => e
+      if e.is_a?(BadGatewayError)
+        log.warn("502 error, retrying")
+      elsif e.is_a?(Net::OpenTimeout)
+        log.warn("Net::OpenTimeout error, retrying")
+      else
+        log.error("http_method: unknown error occurred: #{e}")
+      end
+      begin
+        result = method.(url, body)
+      rescue BadGatewayError, Net::OpenTimeout => e
+        if e.is_a?(BadGatewayError)
+          log.warn("502 error on 2nd attempt; aborting")
+        elsif e.is_a?(Net::OpenTimeout)
+          log.warn("Net::OpenTimeout on 2nd attempt; aborting")
+        else
+          log.error("http_method: unknown error occurred on 2nd attempt: #{e}")
+        end
+      end
+    rescue EOFError
+      log.warn("EOFError - ignoring")
     end
     Util.log_if_api_error(log, result)
-    result.parsed_response
+    result.parsed_response if result && result.respond_to?(:parsed_response)
+  end
+  
+  def _get(url, _ignore_body)
+    HTTParty.get(url, basic_auth: auth)
   end
   
   def _post(url, body)
@@ -360,5 +449,9 @@ class Client
   
   def feedback_url(opp)
     "#{opp_url(opp)}/feedback"
+  end
+
+  def profile_forms_url(opp)
+    "#{opp_url(opp)}/forms"
   end
 end

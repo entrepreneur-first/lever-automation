@@ -14,6 +14,10 @@ class Util
       }))
   end
   
+  def self.view_flat(opp)
+    flatten_hash(opp_view_data(opp))
+  end
+  
   def self.recursive_add_datetime(h)
     h.keys.each { |k|
       if h[k].class == Hash
@@ -61,6 +65,10 @@ class Util
 
   # generic util functions
 
+  def self.escape_sql(str)
+    str.gsub("'", "\\\\'")
+  end
+
   def self.to_query(hash)
     URI.encode_www_form(BASE_PARAMS.merge(hash))
   end
@@ -84,6 +92,39 @@ class Util
     to_hash
   end
   
+  def self.lookup_row_fuzzy(array, search_val, result_key='id', search_key=nil)
+    lookup_row(array, search_val, result_key, search_key, true)
+  end
+  
+  def self.lookup_row(array, search_val, result_key='id', search_key=nil, fuzzy=false)
+    search_val = fuzzy_string(search_val) if fuzzy
+    array.each { |row|
+      return result_key ? row[result_key] : row if (fuzzy ? fuzzy_string(row[search_key]) : row[search_key]) == search_val
+    }
+    nil
+  end
+  
+  def self.get_hash_key_fuzzy(hash, key)
+    get_hash_element_fuzzy(hash, key)[0]
+  end
+  
+  def self.get_hash_value_fuzzy(hash, key)
+    get_hash_element_fuzzy(hash, key)[1]
+  end
+  
+  def self.get_hash_element_fuzzy(hash, key)
+    key = fuzzy_string(key)
+    hash.each { |k, v|
+      v = v.strip if v.class == String
+      return [k, v] if fuzzy_string(k) == key
+    }
+    [nil, nil]
+  end
+  
+  def self.fuzzy_string(str)
+    str.to_s.downcase.gsub(/[^a-z0-9]/, '')
+  end
+  
   def self.datetimestr_to_timestamp(d)
     DateTime.parse(d).strftime('%s').to_i*1000
   end
@@ -99,6 +140,9 @@ class Util
   def self.log_if_api_error(log, result)
     # if not an error
     return if is_http_success(result)
+    # 404s are a valid API GET response
+    return if result.request && (result.request.http_method == Net::HTTP::Get) && (result.code == 404)
+    
     log.error((result.code.to_s || '') + ': ' + (result.parsed_response['code'] || '<no code>') + ': ' + (result.parsed_response['message'] || '<no message>'))
   end
   

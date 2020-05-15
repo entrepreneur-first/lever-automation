@@ -46,4 +46,8 @@ class BaseController
     raise "SIGTERM: Gracefully aborting job" if terminating?
   end
 
+  def test_opportunity
+    client.opportunities_for_contact(TEST_OPPORTUNITY_EMAIL)[0]
+  end
+ 
 end

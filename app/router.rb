@@ -58,6 +58,15 @@ class Router
       COMMANDS.keys.sort.each {|c| puts "- #{c}"}
       puts "\nCommands for specific candidates (usage: <command> {<email> or <opportunity_id>}):"
       OPPORTUNITY_COMMANDS.keys.sort.each {|c| puts "- #{c}"}
+    },
+    'slack': -> (param_str) {
+      puts JSON.pretty_generate(@controller.slack_lookup({'text' => param_str, 'command' => 'lever'}))
+    },
+    'import bigquery': -> (param_str) {
+      @controller.import_from_bigquery(param_str)
+    },
+    'test import bigquery': -> (param_str) {
+      @controller.import_from_bigquery(param_str, true)
     }
   }
   
@@ -67,10 +76,10 @@ class Router
       puts JSON.pretty_generate(Util.opp_view_data(opp))
     },
     'view_csv': -> (opp) {
-      puts JSON.pretty_generate(Util.flatten_hash(Util.opp_view_data(opp)))
+      puts JSON.pretty_generate(Util.view_flat(opp))
     },
     'csv_headers': -> (opp) {
-      puts JSON.pretty_generate(Util.flatten_hash(Util.opp_view_data(opp)).keys)
+      puts JSON.pretty_generate(Util.view_flat(opp).keys)
     },
     'feedback': -> (opp) {
       puts JSON.pretty_generate(@controller.client.feedback_for_opp(opp))
@@ -98,6 +107,9 @@ class Router
     'tidy_bot_notes': -> (opp) {
       @controller.tidy_opp_bot_notes(opp)
     },
+    'add_coffee_feedback_test': -> (opp) {
+      @controller.add_coffee_feedback(opp, {})
+    },
     'process': -> (opp) {
       @controller.process_opportunity(opp)
     }
@@ -119,10 +131,19 @@ class Router
     @controller.log.verbose
     @controller.log.log('Command: ' + command) unless self.interactive?
 
-    if COMMANDS.has_key?(command.to_sym)
-      COMMANDS[command.to_sym].call
-    elsif command.start_with?('slack ')
-      puts JSON.pretty_generate(@controller.slack_lookup({'text' => command.delete_prefix('slack '), 'command' => 'lever'}))
+    command_func = nil
+    COMMANDS.each {|text, func|
+      if command.start_with?(text.to_s)
+        command_func = {text: text.to_s, func: func}
+        break
+      end
+    }
+    if command_func
+      if command_func[:func].arity == 0
+        command_func[:func].call()
+      else
+        command_func[:func].call(command.delete_prefix(command_func[:text]).strip)
+      end
     else
       key = command.gsub('mailto:', '')
       command, key = key.split(' ') if key.include?(' ')

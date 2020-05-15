@@ -292,7 +292,14 @@ module Controller_ProcessUpdates
   def summarise_feedbacks(opp)
     if (opp['lastInteractionAt'] > last_change_detected(opp)) || feedback_outdated(opp)
       # summarise each feedback
-      client.feedback_for_opp(opp).each {|f|
+      (
+        client.feedback_for_opp(opp) + 
+        client.profile_forms_for_opp(opp)
+      ).each { |f|
+        if (f['deletedAt'] || 0) > 0
+          client.remove_links_with_prefix(opp, one_feedback_summary_link_prefix(f))
+          next
+        end
         simple_response_text(f['fields'])
         link = one_feedback_summary_link(f)
         next if opp['links'].include?(link)
@@ -325,6 +332,11 @@ module Controller_ProcessUpdates
   end
   
   def one_feedback_summary_link(f)
+    if f['type'] == 'form'
+      f['fields'].each { |field|
+        f[field['text']] = field['value'] if ['createdAt', 'completedAt', 'user'].include?(field['text'])
+      }
+    end
     one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(rules.summarise_one_feedback(f).sort)
   end
   

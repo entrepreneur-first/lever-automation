@@ -9,6 +9,8 @@ COHORT_JOBS = [
   {name: 'toronto', posting_id: '0b785d4c-3a6e-4597-829e-fcafb06cae2b'}
 ]
 
+TEST_JOB = '51e8be45-30e9-4465-97c0-64cd2a9963db'
+
 OPPORTUNITY_CHANGED_WEBHOOK_URLS = [
   # Zap: New app + debrief info - https://zapier.com/app/history?root_id=80954860
   'https://hooks.zapier.com/hooks/catch/3678640/o1tu42p/'
@@ -21,6 +23,10 @@ FULL_WEBHOOK_URLS = [
 COHORT_JOB_TAG = 'EF Cohort'
 
 LEVER_BOT_USER = 'e6414a92-e785-46eb-ad30-181c18db19b5'
+
+COFFEE_FEEDBACK_FORM = '14598edb-390d-41e7-999c-fd56c3c4fe65'
+
+TEST_OPPORTUNITY_EMAIL = 'test@example.com'
 
 CSV_EXPORT_HEADERS = %w[
   contact name application__name application__createdAt__datetime __empty__ application__type application__posting id stageChanges stage__text stage__id origin sources tags links archived__archivedAt__datetime archived__reason  owner__name  application__createdAt__datetime
