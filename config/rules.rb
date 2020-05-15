@@ -124,9 +124,11 @@ class Rules < BaseRules
         'unknown'
       end
     
-    # rating  
-    result['rating'] = (f['fields'].select{|f| f['type'] == 'score-system'}.first || {})[:_value]
+    # rating
     # always one field of type 'score-system' for overall feedback rating
+    result['rating'] = (f['fields'].select{|f| f['type'] == 'score-system'}.first || {})[:_value]
+    # for imported feedback forms where all fields are strings, fall back to field name
+    result['rating'] ||= (f['fields'].select{|f| f[:_text] == 'rating'}.first || {})[:_value]
     
     if result['type'] == 'coffee'
       # gender
