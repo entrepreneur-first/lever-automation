@@ -12,8 +12,8 @@ COHORT_JOBS = [
 TEST_JOB = '51e8be45-30e9-4465-97c0-64cd2a9963db'
 
 OPPORTUNITY_CHANGED_WEBHOOK_URLS = [
-  # Zap: New app + debrief info - https://zapier.com/app/history?root_id=80954860
-  'https://hooks.zapier.com/hooks/catch/3678640/o1tu42p/'
+  ## Zap: New app + debrief info - https://zapier.com/app/history?root_id=80954860
+  #'https://hooks.zapier.com/hooks/catch/3678640/o1tu42p/'
 ]
 
 FULL_WEBHOOK_URLS = [
