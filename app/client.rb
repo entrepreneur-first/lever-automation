@@ -16,6 +16,9 @@ OPPORTUNITIES_PARAMS = {
   expand: %w[applications stage owner followers]
 }.freeze
 
+class BadGatewayError < StandardError
+end
+
 class Client
 
   def initialize(username, log)
@@ -65,9 +68,9 @@ class Client
     total = opportunities_ids.count
     opportunities_ids.each_with_index.each do |opportunity_id, index|
       result = api_call_log('feedback', "#{index + 1}/#{total}") do
-        HTTParty.get(feedback_url(opportunity_id), basic_auth: auth)
+        get(feedback_url(opportunity_id))
       end
-      arr += result.fetch('data').map { |x| x.merge('opportunity_id' => opportunity_id) }
+      arr += result.fetch('data', []).map { |x| x.merge('opportunity_id' => opportunity_id) }
     end
     arr
   end
@@ -221,16 +224,10 @@ class Client
 
   def add_candidate_to_posting(candidate_id, posting_id)
     api_action_log("Adding to posting " + posting_id) do
-      result = HTTParty.post(API_URL + 'candidates/' + candidate_id + '/addPostings?' + Util.to_query({
-          perform_as: LEVER_BOT_USER
-        }),
-        body: {
-          postings: [posting_id]
-        }.to_json,
-        headers: { 'Content-Type' => 'application/json' },
-        basic_auth: auth
+      post(
+        API_URL + 'candidates/' + candidate_id + '/addPostings?',
+        {postings: [posting_id]}
       )
-      result
     end
   end
 
@@ -252,12 +249,9 @@ class Client
   #
   
   def get_single_result(url, params={}, log_string='')
-    u = url + '?' + Util.to_query(params)
-    result = api_call_log(log_string, '<single>') do
-      result = HTTParty.get(u, basic_auth: auth)
-    end
-    return nil if Util.is_http_error(result)
-    result.fetch('data')
+    api_call_log(log_string, '<single>') do
+      get(url + '?' + Util.to_query(params))
+    end.fetch('data', [])
   end
    
   def process_paged_result(url, params, log_string=nil)
@@ -265,9 +259,11 @@ class Client
     next_batch = nil
     loop do
       result = api_call_log(log_string, page) do
-        HTTParty.get(url + '?' + Util.to_query(params.merge(offset: next_batch).reject{|k,v| v.nil?}), basic_auth: auth)
+        get(url + '?' + Util.to_query(params.merge(offset: next_batch).reject{|k,v| v.nil?}))
       end
-      result.fetch('data').each { |row| yield(row) }
+      result.fetch('data', []).each { |row|
+        yield(row)
+      }
       break unless result.fetch('hasNext')
       next_batch = result.fetch('next')
       page += 1
@@ -278,6 +274,10 @@ class Client
     arr = []
     process_paged_result(url, params, log_string) { |row| arr << row }
     arr
+  end
+  
+  def get(url)
+    http_method(self.method(:_get).curry, url)
   end
   
   def post(url, body)
@@ -320,14 +320,38 @@ class Client
   #
 
   def http_method(method, url, body={})
-    result = method.(url, body)
-    # retry on occasional bad gateway error
-    if result.code == 502
-      log.warn('502 error, retrying')
+    begin
       result = method.(url, body)
+      # retry on occasional bad gateway error
+      raise BadGatewayError if result.code == 502
+    rescue BadGatewayError, Net::OpenTimeout => e
+      if e.is_a?(BadGatewayError)
+        log.warn("502 error, retrying")
+      elsif e.is_a?(Net::OpenTimeout)
+        log.warn("Net::OpenTimeout error, retrying")
+      else
+        log.error("http_method: unknown error occurred: #{e}")
+      end
+      begin
+        result = method.(url, body)
+      rescue BadGatewayError, Net::OpenTimeout => e
+        if e.is_a?(BadGatewayError)
+          log.warn("502 error on 2nd attempt; aborting")
+        elsif e.is_a?(Net::OpenTimeout)
+          log.warn("Net::OpenTimeout on 2nd attempt; aborting")
+        else
+          log.error("http_method: unknown error occurred on 2nd attempt: #{e}")
+        end
+      end
+    rescue EOFError
+      log.warn("EOFError - ignoring")
     end
     Util.log_if_api_error(log, result)
-    result.parsed_response
+    result.parsed_response unless result.nil?
+  end
+  
+  def _get(url)
+    HTTParty.get(url, basic_auth: auth)
   end
   
   def _post(url, body)
