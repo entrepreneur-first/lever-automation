@@ -73,7 +73,7 @@ module Controller_Import
       
       unless test
         add_coffee_feedback(opp, feedback[:fields])
-        client.add_note(opp, "Imported coffee feedback; " + msg)
+        client.add_note(opp, "Imported coffee feedback; " + msg) if remaining.any?
       else
         log.log("Ready to add coffee feedback:\n" + feedback[:fields].map{|v| "- #{v['text']}: #{v['value']}"}.sort.join("\n"))
         log.log(msg)
@@ -97,7 +97,7 @@ module Controller_Import
         sources: Array(params[:source]),
         tags: [AUTO_TAG_PREFIX + tag + "-new"] + (Array(params[:tags]) || [])
       }
-      create_params[:emails] = [params[:email]] if !(params[:email] || '').empty?
+      create_params[:emails] = [params[:email]] if (params[:email] || '').match?(/^[^ ]+@[^ ]+\.[^ ]+$/)
       create_params[:links] = [params[:linkedin]] if !(params[:linkedin] || '').empty?
       create_params[:createdAt] = params[:createdAt] if params[:createdAt]
       create_params[:stage] = params[:stage_id] if params[:stage_id]
@@ -116,7 +116,7 @@ module Controller_Import
 
   def find_opportunity(params)
     opp = nil
-    if params[:email].match?(/.+@.+\..+/)
+    if params[:email].match?(/^[^ ]+@[^ ]+\.[^ ]+$/)
       opp = client.opportunities_for_contact(params[:email]).select {|opp|
         ['', params[:posting]].include?(Util.view_flat(opp)['application__posting'] || '')
       }.sort_by {|opp|
