@@ -125,9 +125,8 @@ class Rules < BaseRules
       end
     
     # rating  
-    result['rating'] = (f['fields'].select{|f| f[:_text] == 'rating'}.first || {})[:_value]
-    # 'rating' field applied by lever for overall feedback score
-    # || f[:_text].include?('could pass ic')|| f[:_text].include?('overall score')
+    result['rating'] = (f['fields'].select{|f| f['type'] == 'score-system'}.first || {})[:_value]
+    # always one field of type 'score-system' for overall feedback rating
     
     if result['type'] == 'coffee'
       # gender
