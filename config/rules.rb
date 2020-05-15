@@ -125,7 +125,9 @@ class Rules < BaseRules
       end
     
     # rating  
-    result['rating'] = (f['fields'].select{|f| f[:_text] == 'rating' || f[:_text].include?('could pass ic')|| f[:_text].include?('overall score')}.first || {})[:_value]
+    result['rating'] = (f['fields'].select{|f| f[:_text] == 'rating'}.first || {})[:_value]
+    # 'rating' field applied by lever for overall feedback score
+    # || f[:_text].include?('could pass ic')|| f[:_text].include?('overall score')
     
     if result['type'] == 'coffee'
       # gender
@@ -245,7 +247,7 @@ class Rules < BaseRules
       debrief_visa_exposure: nil
     }
     
-    summaries.each {|f|
+    summaries.sort_by{|f| f['submitted_at']}.each {|f|
       case f['type']
       when 'coffee'
         result[:has_coffee] = true
@@ -256,7 +258,6 @@ class Rules < BaseRules
         result[:coffee_completed_at] = f['submitted_at']
         result[:coffee_completed_by] = f['submitted_by']
         result[:coffee_software_hardware] = f['software_hardware']
-        
         
       when 'app_review'
         result[:has_app_review] = true
@@ -431,7 +432,7 @@ class Rules < BaseRules
           ['directly contacted by ef', tags[:sourced]],
           ['cohort member', tags[:referral]],
           ['someone else', tags[:organic]], # if not already covered above by latter questions
-          ['came across ef', tags[:offline_organic]],
+          ['came across ef', tags[:organic]],
           ['event', tags[:offline]]
         ]
         source = nil
