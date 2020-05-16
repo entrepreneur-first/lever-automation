@@ -248,7 +248,7 @@ class Rules < BaseRules
       debrief_visa_exposure: nil
     }
     
-    summaries.sort_by{|f| f['submitted_at']}.each {|f|
+    summaries.sort_by{|f| f['submitted_at'] || ''}.each {|f|
       case f['type']
       when 'coffee'
         result[:has_coffee] = true
