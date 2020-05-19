@@ -18,6 +18,7 @@ module Controller_Import
       rows: 0,
       errors: 0,
       existing: 0,
+      existing_skipped: 0,
       new: 0
     }
     
@@ -53,13 +54,15 @@ module Controller_Import
         counts[:new] += 1
       else
         counts[:existing] += 1
+
+        feedback_summary = Util.parse_all_feedback_summary_link(opp)
+        if feedback_summary['has_coffee']
+          log.log("#{opp['id']}: has coffee feedback form already - skipping")
+          counts[:existing_skipped] += 1
+          next
+        end
       end
 
-      opp_data = Util.opp_view_data(opp)
-      if opp_data[:has_coffee]
-        log.log("already has coffee feedback form - skipping")
-        next
-      end
 
       fields = row.reject {|k,v|
         [
