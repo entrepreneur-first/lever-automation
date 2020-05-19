@@ -147,7 +147,7 @@ class Util
   end
   
   def self.is_http_success(result)
-    result.code.between?(200, 299)
+    result && result.code && result.code.between?(200, 299)
   end
   
   def self.is_http_error(result)
