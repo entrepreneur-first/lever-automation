@@ -55,6 +55,12 @@ module Controller_Import
         counts[:existing] += 1
       end
 
+      opp_data = Util.opp_view_data(opp)
+      if opp_data[:has_coffee]
+        log.log("already has coffee feedback form - skipping")
+        next
+      end
+
       fields = row.reject {|k,v|
         [
           Util.get_hash_key_fuzzy(row, 'posting'),
