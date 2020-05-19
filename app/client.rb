@@ -318,7 +318,7 @@ class Client
   def get_single_result(url, params={}, log_string='')
     api_call_log(log_string, '<single>') do
       get(url + '?' + Util.to_query(params))
-    end.fetch('data', {})
+    end.fetch('data', nil)
   end
    
   def process_paged_result(url, params, log_string=nil)
