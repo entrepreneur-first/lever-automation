@@ -5,7 +5,10 @@ require_relative '../app/base_rules.rb'
 # Logic for rules we wish to apply
 #
 
+TAG_OVERALL = AUTO_TAG_PREFIX + 'Overall: '
+
 TAG_FROM_APPLICATION = AUTO_TAG_PREFIX + 'App: '
+
 TAG_FROM_COFFEE = AUTO_TAG_PREFIX + 'Coffee: '
 TAG_FROM_APP_REVIEW = AUTO_TAG_PREFIX + 'App Review: '
 TAG_FROM_PHONE_SCREEN = AUTO_TAG_PREFIX + 'Phone Screen: '
@@ -24,6 +27,7 @@ class Rules < BaseRules
         referral: 'Referral',
         organic: 'Organic',
         offline: 'Offline',
+        digital_marketing: 'DM',
         offline_organic: 'Offline-or-Organic',
         error: '<source unknown>'
       },
@@ -319,6 +323,9 @@ class Rules < BaseRules
       apply_single_tag(TAG_FROM_APPLICATION, gender_from_app(opp), tags(:gender))
     end
     
+    # "master" source
+    apply_single_tag(TAG_OVERALL, overall_source(opp), tags(:source))
+    
     # feedback
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_rating, :rating, :has_coffee)
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_edge, :edge, :has_coffee)
@@ -397,6 +404,41 @@ class Rules < BaseRules
       end
     
     end
+  end
+
+  def overall_source(opp)
+    tags = tags(:source)
+
+    # 1) TODO: any merged-in source tags
+    
+
+    # 2) first, look at the source tags
+    
+    source_tags_map = {
+      # source tag => overall source to apply
+      'sourced' => :sourced,
+      'referral' => :referral,
+      'offline' => :offline,
+      'linkedin limited listing' => :digital_marketing,
+      'dm' => :digital_marketing,
+      'linkedin ad' => :digital_marketing,
+      'angellist' => :digital_marketing,
+      'researchgate' => :digital_marketing
+    }
+    
+    sources = opp["sources"].map { |s| s.downcase.strip }
+    
+    source_tags_map.each { |key, value|
+      return tags[value] if sources.include?(key)
+    }
+    
+    # 3) if no source tag detected, look at the self-reported source from the application
+    
+    from_app = source_from_app(opp)
+    return from_app[:tag] if from_app
+    
+    # 4) .. otherwise ¯\_(ツ)_/¯ 
+    nil
   end
 
   def source_from_app(opp)
