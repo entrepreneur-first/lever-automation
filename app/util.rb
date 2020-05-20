@@ -34,9 +34,14 @@ class Util
   end
   
   def self.overall_source_from_opp(opp)
-    source_tags = Rules.tags(:source).map{|t| TAG_OVERALL + t}
+    rules = Rules.new(nil)
+    find_tag_value(opp, rules.tags(:source), TAG_OVERALL)
+  end
+  
+  def find_tag_value(opp, tag_set, prefix)
+    set_tags = tag_set.map{|k, v| prefix + v}
     opp['tags'].each { |tag|
-      return tag if source_tags.include?(tag)
+      return tag if set_tags.include?(tag)
     }
   end
 
