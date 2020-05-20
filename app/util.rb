@@ -10,7 +10,9 @@ class Util
     recursive_add_datetime(
       opp.reject{|k,v| k.start_with?('_') || (k == 'applications')}.merge({
         application: opp['applications'][0],
-        feedback_summary: parse_all_feedback_summary_link(opp)
+        feedback_summary: parse_all_feedback_summary_link(opp),
+        overall_source: overall_source_from_opp(opp),
+        original_links: actual_links(opp)
       }))
   end
   
@@ -29,6 +31,13 @@ class Util
       end
     }
     h
+  end
+  
+  def self.overall_source_from_opp(opp)
+    source_tags = Rules.tags(:source).map{|t| TAG_OVERALL + t}
+    opp['tags'].each { |tag|
+      return tag if source_tags.include?(tag)
+    }
   end
 
   def self.parse_all_feedback_summary_link(opp)

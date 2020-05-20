@@ -7,6 +7,16 @@ class BaseRules
     update_tags(opp, Util.parse_all_feedback_summary_link(opp))
   end
   
+  def tags(category=nil, name=nil)
+    if category.nil?
+      all_tags
+    elsif name.nil?
+      all_tags[category]
+    else
+      all_tags[category][name]
+    end
+  end
+  
   private
 
   def initialize(client)
@@ -26,16 +36,6 @@ class BaseRules
     @opp
   end
 
-  def tags(category=nil, name=nil)
-    if category.nil?
-      all_tags
-    elsif name.nil?
-      all_tags[category]
-    else
-      all_tags[category][name]
-    end
-  end
-  
   def add_tags(tags)
     @client.add_tags_if_unset(@opp, tags)
   end
