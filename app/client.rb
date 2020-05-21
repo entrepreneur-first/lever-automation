@@ -331,7 +331,7 @@ class Client
       result.fetch('data', []).each { |row|
         yield(row)
       }
-      break unless result.fetch('hasNext')
+      break unless result.fetch('hasNext', nil)
       next_batch = result.fetch('next')
       page += 1
     end
