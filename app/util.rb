@@ -38,7 +38,7 @@ class Util
     find_tag_value(opp, rules.tags(:source), TAG_OVERALL)
   end
   
-  def find_tag_value(opp, tag_set, prefix)
+  def self.find_tag_value(opp, tag_set, prefix)
     set_tags = tag_set.map{|k, v| prefix + v}
     opp['tags'].each { |tag|
       return tag if set_tags.include?(tag)
