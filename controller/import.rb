@@ -139,7 +139,8 @@ module Controller_Import
       }.last
     end
     
-    if opp.nil? && params[:linkedin].match?(/linkedin\.com\/.+/)
+    # match linkedin or other urls (sometimes used for personal websites instead of linkedin)
+    if opp.nil? && params[:linkedin].match?(/(linkedin\.com\/.+)|(www\.[^\.\s]+\.[^\.\s]+)/)
       ids = bigquery.query("SELECT id FROM #{bigquery.table.query_id}_view WHERE LOWER(links) LIKE '%#{Util.escape_sql(params[:linkedin].sub(/^[a-z]+:\/\/(www\.)/, '').sub(/\/+$/, ''))}%' AND application__posting IN ('#{Util.escape_sql(params[:posting])}', '', null) ORDER BY lastInteractionAt DESC LIMIT 1", '')
       opp = client.get_opportunity(ids[0][:id]) if ids[0]
     end
