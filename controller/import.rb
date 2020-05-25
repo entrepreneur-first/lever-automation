@@ -57,7 +57,7 @@ module Controller_Import
         counts[:existing] += 1
 
         feedback_summary = Util.parse_all_feedback_summary_link(opp)
-        if feedback_summary['has_coffee']
+        if feedback_summary['has_coffee'] == 'true'
           log.log("#{opp['id']}: has coffee feedback form already - skipping")
           counts[:existing_skipped] += 1
           next
