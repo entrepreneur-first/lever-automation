@@ -26,6 +26,7 @@ module Controller_Import
       counts[:rows] += 1
       
       opp_params = {
+        'id': (Util.get_hash_value_fuzzy(row, 'id') || '').downcase,
         'email': (Util.get_hash_value_fuzzy(row, 'email') || '').downcase,
         'linkedin': (Util.get_hash_value_fuzzy(row, 'linkedin') || '').downcase.sub(/\?.+/, ''),
         'posting': Util.get_hash_value_fuzzy(row, 'posting'),
@@ -35,14 +36,14 @@ module Controller_Import
         'tags': (Util.get_hash_value_fuzzy(row, 'tags') || '').split(',').map(&:strip),
         'phones': (Util.get_hash_value_fuzzy(row, 'phone') || '').split(',').map(&:strip),
         'location': Util.get_hash_value_fuzzy(row, 'location'),
-        'headline': Util.get_hash_value_fuzzy(row, 'headline')
+        'headline': Util.get_hash_value_fuzzy(row, 'headline'),
+        'createdAt': Util.get_hash_value_fuzzy(row, 'createdat'),
+        'stage': Util.get_hash_value_fuzzy(row, 'stageid')
       }
-      opp_params[:createdAt] = Util.get_hash_value_fuzzy(row, 'createdat')
-      opp_params[:stage] = Util.get_hash_value_fuzzy(row, 'stageid')
       
-      log.log("Looking for existing opportunity via parameters:\n" + opp_params.select{|k,v| [:email, :linkedin, :posting].include?(k)}.map{|k,v| "- #{k}: #{v}"}.join("\n")) if test
+      log.log("Looking for existing opportunity via parameters:\n" + opp_params.select{|k,v| [:id, :email, :linkedin, :posting].include?(k)}.map{|k,v| "- #{k}: #{v}"}.join("\n")) if test
       
-      if opp_params[:posting].empty?
+      if opp_params[:posting].nil? || opp_params[:posting].empty?
         log.log('No job posting ID ("posting") found - unable to process row')
         counts[:errors] += 1
         next
@@ -65,6 +66,7 @@ module Controller_Import
 
       fields = row.reject {|k,v|
         [
+          Util.get_hash_key_fuzzy(row, 'id'),
           Util.get_hash_key_fuzzy(row, 'posting'),
           Util.get_hash_key_fuzzy(row, 'name'),
           Util.get_hash_key_fuzzy(row, 'email'),
@@ -124,7 +126,12 @@ module Controller_Import
 
   def find_opportunity(params)
     opp = nil
-    if params[:email].match?(/^[^ ]+@[^ ]+\.[^ ]+$/)
+    
+    unless params[:id].nil? || params[:id].empty?
+      opp = client.get_opportunity(params[:id])
+    end
+    
+    if opp.nil? && params[:email].match?(/^[^ ]+@[^ ]+\.[^ ]+$/)
       opp = client.opportunities_for_contact(params[:email]).select {|opp|
         ['', params[:posting]].include?(Util.view_flat(opp)['application__posting'] || '')
       }.sort_by {|opp|
