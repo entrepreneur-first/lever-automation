@@ -5,43 +5,52 @@ require_relative '../controller/controller'
 class Router
   
   COMMANDS = {
-    'summarise': -> {
-      @controller.summarise_opportunities
+    # help
+    'help': -> {
+      puts "\nCommands:"
+      COMMANDS.keys.sort.each {|c| puts "- #{c}"}
+      puts "\nCommands for specific candidates (usage: <command> {<email> or <opportunity_id>}):"
+      OPPORTUNITY_COMMANDS.keys.sort.each {|c| puts "- #{c}"}
     },
-    'process': -> {
-      @controller.process_opportunities
-    },
-    'process_archived': -> {
-      @controller.process_opportunities(true)
-    },
-    'process_all': -> {
-      @controller.process_opportunities(nil)
-    },
-    'fix tags': -> {
-      @controller.fix_auto_assigned_tags
-    },
-    'fix links': -> {
-      @controller.fix_checksum_links
-    },
-    'check links': -> {
-      @controller.check_links
-    },
-    'tidy bot notes': -> {
-      @controller.tidy_bot_notes
-    },
+    
+    # fixes
     'archive accident': -> {
       @controller.archive_accidental_postings
     },
     'fix archived stage': -> {
       @controller.fix_archived_stage
     },
+    'fix links': -> {
+      @controller.fix_checksum_links
+    },
+    'fix tags': -> {
+      @controller.fix_auto_assigned_tags
+    },
+    'tidy bot notes': -> {
+      @controller.tidy_bot_notes
+    },
+    'tidy_bot_notes': -> (opp) {
+      @controller.tidy_opp_bot_notes(opp)
+    },
+    
+    # checks
+    'check links': -> {
+      @controller.check_links
+    },
+    
+    # export
     'export bigquery': -> {
       puts @controller.export_to_bigquery(nil, false)
+    },
+    'bigquery': -> (opp) {
+      @controller.log.log_prefix(opp['id'] + ': ')
+      @controller.update_bigquery(opp)
+      @controller.log.pop_log_prefix
     },
     'export csv': -> {
       puts @controller.export_to_csv(nil, false)
     },
-    'export csv test': -> {
+    'test export csv': -> {
       puts @controller.export_to_csv(nil, true, true)
     },
     'export csv all fields': -> {
@@ -53,25 +62,30 @@ class Router
     'export webhook': -> {
       @controller.export_via_webhook(nil)
     },
-    'help': -> {
-      puts "\nCommands:"
-      COMMANDS.keys.sort.each {|c| puts "- #{c}"}
-      puts "\nCommands for specific candidates (usage: <command> {<email> or <opportunity_id>}):"
-      OPPORTUNITY_COMMANDS.keys.sort.each {|c| puts "- #{c}"}
-    },
-    'slack': -> (param_str) {
-      puts JSON.pretty_generate(@controller.slack_lookup({'text' => param_str, 'command' => 'lever'}))
-    },
+
+    # import    
     'import bigquery': -> (param_str) {
       @controller.import_from_bigquery(param_str)
     },
     'test import bigquery': -> (param_str) {
       @controller.import_from_bigquery(param_str, true)
+    },
+    
+    # process
+    'process': -> (opp) {
+      @controller.process_opportunity(opp)
     }
-  }
-  
-  OPPORTUNITY_COMMANDS = {
+    'process_all': -> {
+      @controller.process_opportunities(nil)
+    },
+    'process_archived': -> {
+      @controller.process_opportunities(true)
+    },
+    
     # views
+    'summarise': -> {
+      @controller.summarise_opportunities
+    },
     'view': -> (opp) {
       puts JSON.pretty_generate(Util.opp_view_data(opp))
     },
@@ -90,33 +104,28 @@ class Router
     'age': -> (opp) {
       puts "#{opp['id']}: #{opp['lastInteractionAt'] - opp['createdAt']}"
     },
-    'test_rules': -> (opp) {
-      @controller.test_rules(opp)
-    },
+    
     # actions
     'send_webhooks': -> (opp) {
       @controller.log.log_prefix(opp['id'] + ': ')
       @controller.send_webhooks(opp)
       @controller.log.pop_log_prefix
     },
-    'bigquery': -> (opp) {
-      @controller.log.log_prefix(opp['id'] + ': ')
-      @controller.update_bigquery(opp)
-      @controller.log.pop_log_prefix
-    },
-    'tidy_bot_notes': -> (opp) {
-      @controller.tidy_opp_bot_notes(opp)
+
+    # functionality tests
+    'slack': -> (param_str) {
+      puts JSON.pretty_generate(@controller.slack_lookup({'text' => param_str, 'command' => 'lever'}))
+    },    
+    'test_rules': -> (opp) {
+      @controller.test_rules(opp)
     },
     'add_coffee_feedback_test': -> (opp) {
       @controller.add_coffee_feedback(opp, {})
     },
-    'process': -> (opp) {
-      @controller.process_opportunity(opp)
-    }
   }
-
+  
   def self.interactive_prompt_str
-    "Enter command, or 'help' for menu:\n(Common commands: 'export csv', 'summarise', or '[view|feedback] <email>|<opportunity_id>' to view/process one candidate)"
+    "Enter command, or 'help' for menu:\n(Common commands: 'export bigquery', 'summarise', or '[view|feedback] <email>|<opportunity_id>' to view/process one candidate)"
   end
 
   def self.interactive?
@@ -138,36 +147,40 @@ class Router
         break
       end
     }
-    if command_func
-      if command_func[:func].arity == 0
-        command_func[:func].call()
-      else
-        command_func[:func].call(command.delete_prefix(command_func[:text]).strip)
-      end
-    else
-      key = command.gsub('mailto:', '')
-      command, key = key.split(' ') if key.include?(' ')
-      key = (key.match(/https:\/\/hire.lever.co\/candidates\/([^\/?]+)/) || [])[1] || key
 
-      if key.include? '@'
+    param_str = command.delete_prefix(command_func[:text]).strip
+    
+    if command_func.nil? || command_func[:func].parameters.fetch(0, []).fetch(1, nil) == :opp
+      param_str.gsub!('mailto:', '')
+      param_str = (param_str.match(/https:\/\/hire.lever.co\/candidates\/([^\/?]+)/) || [])[1] || param_str
+
+      if param_str.include? '@'
         # email
-        os = @controller.client.opportunities_for_contact(key)
+        os = @controller.client.opportunities_for_contact(param_str)
       else
         # opportunity ID
-        os = [@controller.client.get_opportunity(key, {expand: @controller.client.OPP_EXPAND_VALUES})].reject{|o| o.nil?}
+        os = [@controller.client.get_opportunity(param_str, {
+            expand: @controller.client.OPP_EXPAND_VALUES
+          })].reject{|o| o.nil?}
       end
 
       puts "\n" if self.interactive?
 
       os.each { |opp|
-        if OPPORTUNITY_COMMANDS.has_key?(command.to_sym)
-          OPPORTUNITY_COMMANDS[command.to_sym].call(opp)
+        unless command_func.nil?
+          command_func[:func].call(opp)
         else
-          OPPORTUNITY_COMMANDS[:process].call(opp)
+          COMMANDS[:process].call(opp)
         end
       }
+      
+    elsif command_func[:func].arity == 0
+      command_func[:func].call()
+      
+    else
+      command_func[:func].call(param_str)
     end
-    
+
     finished_successfully = true
     
     ensure
