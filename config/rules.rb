@@ -114,7 +114,7 @@ class Rules < BaseRules
     result['type'] =
       if type.include?('coffee') || type.include?('initial call') || type.include?('london call') || type.include?('berlin call') || type.include?('paris call') || type.include?('toronto call') || type.include?('sy stream stage 4')
         'coffee'
-      elseif type.include?('sy stream phone screen') || type.include('sy stream pi')
+      elsif type.include?('sy stream phone screen') || type.include?('sy stream pi')
         'pre_coffee_screen'
       elsif type.include?('phone screen') # excludes 'sy stream phone screen' above
         'phone_screen'
