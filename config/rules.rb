@@ -324,7 +324,7 @@ class Rules < BaseRules
     end
     
     # "master" source
-    apply_single_tag(TAG_OVERALL, overall_source(opp), tags(:source))
+    apply_single_tag(TAG_OVERALL, {tag: overall_source(opp)}, tags(:source))
     
     # feedback
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_rating, :rating, :has_coffee)
@@ -393,7 +393,7 @@ class Rules < BaseRules
         'healthcare'
       when 'no'
         'not healthcare'
-      end      
+      end
 
     when :visa_exposure
       case value

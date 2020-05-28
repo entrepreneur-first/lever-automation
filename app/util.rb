@@ -43,6 +43,7 @@ class Util
     opp['tags'].each { |tag|
       return tag if set_tags.include?(tag)
     }
+    nil
   end
 
   def self.parse_all_feedback_summary_link(opp)
