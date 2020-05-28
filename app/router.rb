@@ -104,6 +104,26 @@ class Router
     'age': -> (opp) {
       puts "#{opp['id']}: #{opp['lastInteractionAt'] - opp['createdAt']}"
     },
+    'view user': -> (search) {
+      users = @controller.client.users
+      if search.include?('@')
+        result = Util.lookup_row_fuzzy(users, search, 'email')
+      elsif search.include(' ')
+        result = Util.lookup_row_fuzzy(users, search, 'name')
+      else
+        result = Util.lookup_row(users, search)
+      end
+      puts JSON.pretty_generate(result)
+    },
+    'view posting': -> (search) {
+      postings = @controller.client.postings
+      if search.include(' ')
+        result = Util.lookup_row_fuzzy(postings, search, 'name')
+      else
+        result = Util.lookup_row(postings, search)
+      end
+      puts JSON.pretty_generate(result)
+    },
     
     # actions
     'send_webhooks': -> (opp) {
