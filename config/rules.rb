@@ -435,7 +435,6 @@ class Rules < BaseRules
     # 3) if no source tag detected, look at the self-reported source from the application
     
     from_app = Util.find_tag_value(opp, tags(:source), TAG_FROM_APPLICATION)
-    puts from_app
     return from_app if from_app
     
     # 4) .. otherwise ¯\_(ツ)_/¯ 
