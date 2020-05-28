@@ -497,7 +497,7 @@ class Rules < BaseRules
         map = [
           ['been on the ef programme', tags[:referral]],
           ['worked at ef', tags[:referral]],
-          ['professional network', tags[:organicl]],
+          ['professional network', tags[:organic]],
           ['friends or family', tags[:organic]]
         ]
         source = nil
