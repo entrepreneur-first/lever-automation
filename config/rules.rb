@@ -416,26 +416,38 @@ class Rules < BaseRules
     
     source_tags_map = {
       # source tag => overall source to apply
-      'sourced' => :sourced,
+      /sourced/ => :sourced,
       'referral' => :referral,
       'offline' => :offline,
-      'linkedin limited listing' => :digital_marketing,
+      'organic' => :organic,
+      /linkedin/ => :digital_marketing,
+      'fb' => :digital_marketing,
+      'facebook' => :digital_marketing,
+      'twitter' => :digital_marketing,
+      'quora' => :digital_marketing,
       'dm' => :digital_marketing,
-      'linkedin ad' => :digital_marketing,
+      'digital marketing' => :digital_marketing,
       'angellist' => :digital_marketing,
+      'ai-jobs' => :digital_marketing,
       'researchgate' => :digital_marketing
     }
     
     sources = opp["sources"].map { |s| s.downcase.strip }
     
     source_tags_map.each { |key, value|
-      return tags[value] if sources.include?(key)
+      if key.respond_to?(:match)
+        sources.each { |s|
+          return tags[value] if key.match?(s)
+        }
+      else
+        return tags[value] if sources.include?(key)
+      end
     }
     
     # 3) if no source tag detected, look at the self-reported source from the application
     
     from_app = Util.find_tag_value(opp, tags(:source), TAG_FROM_APPLICATION)
-    return from_app if from_app
+    return from_app.delete_prefix(TAG_FROM_APPLICATION) if from_app
     
     # 4) .. otherwise ¯\_(ツ)_/¯ 
     nil
