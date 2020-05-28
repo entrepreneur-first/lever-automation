@@ -112,9 +112,9 @@ class Rules < BaseRules
     type = Util.simplify_str(f['text'])
     result['title'] = type
     result['type'] =
-      if type.include?('coffee') || type.include?('initial call') || type.include?('london call') || type.include?('berlin call') || type.include?('paris call') || type.include?('toronto call')
+      if type.include?('coffee') || type.include?('initial call') || type.include?('london call') || type.include?('berlin call') || type.include?('paris call') || type.include?('toronto call') || type.include?('sy stream stage 4')
         'coffee'
-      elsif type.include?('phone screen')
+      elsif type.include?('phone screen') || type.include?('sy stream pi')
         'phone_screen'
       elsif type.include?('app review')
         'app_review'
