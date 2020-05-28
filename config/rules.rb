@@ -114,7 +114,9 @@ class Rules < BaseRules
     result['type'] =
       if type.include?('coffee') || type.include?('initial call') || type.include?('london call') || type.include?('berlin call') || type.include?('paris call') || type.include?('toronto call') || type.include?('sy stream stage 4')
         'coffee'
-      elsif type.include?('phone screen') || type.include?('sy stream pi')
+      elseif type.include?('sy stream phone screen') || type.include('sy stream pi')
+        'pre_coffee_screen'
+      elsif type.include?('phone screen') # excludes 'sy stream phone screen' above
         'phone_screen'
       elsif type.include?('app review')
         'app_review'
@@ -214,6 +216,11 @@ class Rules < BaseRules
     return {} unless summaries.any?
   
     result = {
+      has_pre_coffee_screen: false,
+      pre_coffee_screen_rating: nil,
+      pre_coffee_screen_completed_at: nil,
+      pre_coffee_screen_completed_by: nil,
+
       has_coffee: false,
       coffee_rating: nil,
       coffee_edge: nil,
@@ -223,11 +230,6 @@ class Rules < BaseRules
       coffee_completed_by: nil,
       coffee_software_hardware: nil,
 
-      has_phone_screen: false,
-      phone_screen_rating: nil,
-      phone_screen_completed_at: nil,
-      phone_screen_completed_by: nil,
-      
       has_app_review: false,
       app_review_rating: nil,
       app_review_edge: nil,
@@ -238,6 +240,11 @@ class Rules < BaseRules
       app_review_ceo_cto: nil,
       app_review_completed_at: nil,
       app_review_completed_by: nil,
+      
+      has_phone_screen: false,
+      phone_screen_rating: nil,
+      phone_screen_completed_at: nil,
+      phone_screen_completed_by: nil,
       
       has_ability: false,
       ability_rating: nil,
@@ -264,6 +271,12 @@ class Rules < BaseRules
     
     summaries.sort_by{|f| f['submitted_at'] || ''}.each {|f|
       case f['type']
+      when 'pre_coffee_screen'
+        result[:has_pre_coffee_screen] = true
+        result[:pre_coffee_screen_rating] = f['rating']
+        result[:pre_coffee_screen_completed_at] = f['submitted_at']
+        result[:pre_coffee_screen_completed_by] = f['submitted_by']
+        
       when 'coffee'
         result[:has_coffee] = true
         result[:coffee_rating] = f['rating']
