@@ -181,7 +181,8 @@ module Controller_ProcessUpdates
     [
       {time: opp["lastInteractionAt"], source: 'a new interaction'},
       tags_have_changed?(opp),
-      links_have_changed?(opp)
+      links_have_changed?(opp),
+      sources_have_changed?(opp)
     ].reject {|x| x.nil?}.max_by {|x| x[:time]}
   end
 
@@ -223,6 +224,25 @@ module Controller_ProcessUpdates
     end
   end
   
+  # detect if source(s) have changed since we last checked, based on special checksum
+  def sources_have_changed?(opp)
+    checksum = attribute_checksum(opp, 'sources')
+    existing = existing_sources_checksum(opp)
+
+    if existing != checksum
+      set_bot_metadata(opp, 'sources_checksum', checksum)
+    end
+
+    if existing != checksum && !existing.nil?
+      {
+        time: Time.now.to_i*1000,
+        source: "sources updated\n#" + opp['sources'].sort.join(" #")
+      }
+    else
+      nil
+    end
+  end
+  
   # calculate checksum for tags/links
   # - excludes bot-applied
   def attribute_checksum(opp, type)
@@ -254,6 +274,11 @@ module Controller_ProcessUpdates
         return checksum
       end
     }
+    nil
+  end
+
+  def existing_sources_checksum(opp)
+    return bot_metadata(opp)['sources_checksum'] if bot_metadata(opp)['sources_checksum']
     nil
   end
 
