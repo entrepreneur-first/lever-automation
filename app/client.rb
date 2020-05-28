@@ -103,11 +103,11 @@ class Client
     @batch_updates = batch
   end
 
-  def commit_opp(opp)
+  def commit_opp(opp, test_mode=false)
     updated = false
     ['Tags','Links'].each{|type|
-      (updated = true; add_annotations(opp, type, opp['_add'+type], true)) if Array(opp['_add'+type]).any?
-      (updated = true; remove_annotations(opp, type, opp['_remove'+type], true)) if Array(opp['_remove'+type]).any?
+      (updated = true; add_annotations(opp, type, opp['_add'+type], !test_mode)) if Array(opp['_add'+type]).any?
+      (updated = true; remove_annotations(opp, type, opp['_remove'+type], !test_mode)) if Array(opp['_remove'+type]).any?
     }
     updated
   end
@@ -278,7 +278,7 @@ class Client
         val = (Time.parse(val).to_i*1000).to_s
       end
       if field['text'] == 'user' && !val.match(/^[0-9a-z\-]{30,}$/)
-        lookup_val = Util.lookup_row_fuzzy(users, val, 'id', 'name')
+        lookup_val = Util.lookup_row_fuzzy(users, val, 'name', 'id')
         if lookup_val.nil?
           log.warn("User not found: #{val}")
         else
@@ -331,7 +331,7 @@ class Client
       result.fetch('data', []).each { |row|
         yield(row)
       }
-      break unless result.fetch('hasNext')
+      break unless result.fetch('hasNext', nil)
       next_batch = result.fetch('next')
       page += 1
     end
