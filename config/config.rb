@@ -2,11 +2,11 @@
 
 COHORT_JOBS = [
   {name: 'bangalore', posting_id: '23bf8c07-b32e-483f-9007-1b9c2a004eb6'},
-  {name: 'london', posting_id: 'c404cfc6-0621-4fce-9e76-5d908e36fd9c'},
+  {name: 'london',    posting_id: 'c404cfc6-0621-4fce-9e76-5d908e36fd9c'},
   {name: 'singapore', posting_id: '3b2c714a-edee-4fd0-974d-413bae32c818'},
-  {name: 'paris', posting_id: 'e23deb1a-c0ab-43b8-9a3a-e47e3cca0970'},
-  {name: 'berlin', posting_id: 'b9c2b6b8-3d82-4c45-9b06-b549d223b017'},
-  {name: 'toronto', posting_id: '0b785d4c-3a6e-4597-829e-fcafb06cae2b'}
+  {name: 'paris',     posting_id: 'e23deb1a-c0ab-43b8-9a3a-e47e3cca0970'},
+  {name: 'berlin',    posting_id: 'b9c2b6b8-3d82-4c45-9b06-b549d223b017'},
+  {name: 'toronto',   posting_id: '0b785d4c-3a6e-4597-829e-fcafb06cae2b'}
 ]
 
 TEST_JOB = '51e8be45-30e9-4465-97c0-64cd2a9963db'
