@@ -29,6 +29,7 @@ class Rules < BaseRules
         organic: 'Organic',
         offline: 'Offline',
         digital_marketing: 'DM',
+        rollover: 'Rollover',
         offline_organic: 'Offline-or-Organic',
         error: '<source unknown>'
       },
@@ -433,7 +434,13 @@ class Rules < BaseRules
   end
 
   def overall_source(opp)
-    tags = tags(:source)
+    potential_source_tags = tags(:source)    
+    tags = opp["tags"].map { |t| t.downcase.strip }
+    
+    # 0) If manually tagged "rollover", go with that above everything else
+    tags.each { |tag|
+      return potential_source_tags[:rollover] if tag.include?('rollover')
+    }
 
     # 1) TODO: any merged-in source tags
     
@@ -442,11 +449,12 @@ class Rules < BaseRules
     
     source_tags_map = {
       # source tag => overall source to apply
+      'rollover' => :rollover,
       /sourced/ => :sourced,
       'referral' => :referral,
       'offline' => :offline,
       'organic' => :organic,
-      /linkedin/ => :digital_marketing,
+      /linkedin [a-z]+/ => :digital_marketing,
       'fb' => :digital_marketing,
       'facebook' => :digital_marketing,
       'twitter' => :digital_marketing,
@@ -457,25 +465,39 @@ class Rules < BaseRules
       'ai-jobs' => :digital_marketing,
       'researchgate' => :digital_marketing
     }
-    
     sources = opp["sources"].map { |s| s.downcase.strip }
-    
     source_tags_map.each { |key, value|
       if key.respond_to?(:match)
         sources.each { |s|
-          return tags[value] if key.match?(s)
+          return potential_source_tags[value] if key.match?(s)
         }
       else
-        return tags[value] if sources.include?(key)
+        return potential_source_tags[value] if sources.include?(key)
+      end
+    }
+
+    # 3) if unclear from source tags, look for clues in generic tags
+    
+    tags_map = {
+      'dm' => :digital_marketing,
+      'sourced' => :sourced
+    }
+    tags_map.each { |key, value|
+      if key.respond_to?(:match)
+        tags.each { |s|
+          return potential_source_tags[value] if key.match?(s)
+        }
+      else
+        return potential_source_tags[value] if tags.include?(key)
       end
     }
     
-    # 3) if no source tag detected, look at the self-reported source from the application
+    # 4) if no source tag detected, look at the self-reported source from the application
     
     from_app = Util.find_tag_value(opp, tags(:source), TAG_FROM_APPLICATION)
     return from_app.delete_prefix(TAG_FROM_APPLICATION) if from_app
     
-    # 4) .. otherwise ¯\_(ツ)_/¯ 
+    # 5) .. otherwise ¯\_(ツ)_/¯ 
     nil
   end
 
