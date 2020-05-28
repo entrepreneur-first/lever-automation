@@ -132,7 +132,19 @@ class Rules < BaseRules
     # always one field of type 'score-system' for overall feedback rating
     result['rating'] = (f['fields'].select{|f| f['type'] == 'score-system'}.first || {})[:_value]
     # for imported feedback forms where all fields are strings, fall back to field name
-    result['rating'] ||= (f['fields'].select{|f| f[:_text] == 'rating'}.first || {})[:_value]
+    result['rating'] ||= (f['fields'].select{|f| f[:_text] == 'rating'}.first || {})[:_value].to_s
+    result['rating'] = case result['rating']
+      when '1'
+        '1 - Strong No Hire'
+      when '2'
+        '2 - No Hire'
+      when '3'
+        '3 - Hire'
+      when '4'
+        '4 - Strong Hire'
+      else
+        result['rating']
+      end
     
     if result['type'] == 'coffee'
       # gender
@@ -155,8 +167,6 @@ class Rules < BaseRules
     end
     
     if ['app_review', 'debrief'].include?(result['type'])
- 
-     
       # talker/doer
       # TODO: question?
       result['talker_doer'] = (f['fields'].select{|f| f[:_text].include?('talker')}.first || {})[:_value]
