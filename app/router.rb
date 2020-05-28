@@ -145,8 +145,8 @@ class Router
     # functionality tests
     'slack': -> (param_str) {
       puts JSON.pretty_generate(@controller.slack_lookup({'text' => param_str, 'command' => 'lever'}))
-    },    
-    'test_rules': -> (opp) {
+    },
+    'test rules': -> (*opp) {
       @controller.test_rules(opp)
     },
     'add_coffee_feedback_test': -> (opp) {
@@ -187,11 +187,15 @@ class Router
       if param_str.include? '@'
         # email
         os = @controller.client.opportunities_for_contact(param_str)
-      else
+      elsif param_str > ''
         # opportunity ID
         os = [@controller.client.get_opportunity(param_str, {
             expand: @controller.client.OPP_EXPAND_VALUES
           })].reject{|o| o.nil?}
+      elsif command_func[:func].parameters.fetch(0, []).fetch(0, nil) == :rest
+        os = ['']
+      else
+        os = []
       end
 
       puts "\n" if self.interactive?

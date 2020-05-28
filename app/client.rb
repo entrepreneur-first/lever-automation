@@ -103,11 +103,11 @@ class Client
     @batch_updates = batch
   end
 
-  def commit_opp(opp)
+  def commit_opp(opp, test_mode=false)
     updated = false
     ['Tags','Links'].each{|type|
-      (updated = true; add_annotations(opp, type, opp['_add'+type], true)) if Array(opp['_add'+type]).any?
-      (updated = true; remove_annotations(opp, type, opp['_remove'+type], true)) if Array(opp['_remove'+type]).any?
+      (updated = true; add_annotations(opp, type, opp['_add'+type], !test_mode)) if Array(opp['_add'+type]).any?
+      (updated = true; remove_annotations(opp, type, opp['_remove'+type], !test_mode)) if Array(opp['_remove'+type]).any?
     }
     updated
   end

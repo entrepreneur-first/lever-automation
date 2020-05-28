@@ -4,7 +4,7 @@ module Controller_ProcessUpdates
 
   # process a single opportunity
   # apply changes & trigger webhook as necessary
-  def process_opportunity(opp)
+  def process_opportunity(opp, test_mode=false)
     return {'anonymized': true} if opp['isAnonymized']
   
     result = {}
@@ -16,7 +16,7 @@ module Controller_ProcessUpdates
     # should notify of change based on state before we executed?
     notify = last_update[:time] > last_change_detected(opp) + 100
 
-    if check_no_posting(opp)
+    if check_no_posting(opp, test_mode)
       # if we added to a job then reload as tags etc will have changed automagically 
       # based on new posting assignment
       client.refresh_opp(opp)
@@ -40,7 +40,7 @@ module Controller_ProcessUpdates
         end
       }
 
-      if notify
+      if notify && !test_mode
         # send webhook of change
         notify_of_change(opp, last_update)
         result['sent_webhook'] = result['updated'] = true
@@ -56,7 +56,7 @@ module Controller_ProcessUpdates
       end
     end
 
-    if client.commit_opp(opp)
+    if client.commit_opp(opp, test_mode)
       result['updated'] = true
     end
 
@@ -103,7 +103,7 @@ module Controller_ProcessUpdates
   # Note slight confusion between Lever interface vs API:
   # - Leads not assigned to a job posting show up in Lever as candidates with "no opportunity", but are returned in the API as opportunities without an application
   # - Leads assigned to a job posting show up in Lever as opportunities - potentially multiple per candidate. These show up in the API as applications against the opportunity - even when no actual application submitted
-  def check_no_posting(opp)
+  def check_no_posting(opp, test_mode)
     return if Util.has_posting(opp) || Util.is_archived(opp)
     
     location = location_from_tags(opp)
@@ -116,7 +116,7 @@ module Controller_ProcessUpdates
       client.add_tag(opp, TAG_ASSIGN_TO_LOCATION_PREFIX + location[:name])
       client.add_tag(opp, TAG_ASSIGNED_TO_LOCATION)
       # add_note(opp, 'Assigned to cohort job: ' + location[:name] + ' based on tags')
-      client.add_candidate_to_posting(opp["id"], location[:posting_id])
+      client.add_candidate_to_posting(opp["id"], location[:posting_id]) unless test_mode
       true
     end
   end

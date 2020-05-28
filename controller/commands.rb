@@ -50,13 +50,13 @@ module Controller_Commands
     log.log(JSON.pretty_generate(untagable))
   end
 
-  def process_opportunities(archived=false)
+  def process_opportunities(archived=false, test_mode=false)
     summary = Hash.new(0)
     contacts = Hash.new(0)
     
     log_opp_type = archived ? 'archived ' : (archived.nil? ? '' : 'active ')
 
-    log.log("Processing all #{log_opp_type}opportunities..")
+    log.log("#{test_mode ? '[Test mode - no changes applied] ' : ''}Processing all #{log_opp_type}opportunities..")
     log_index = 0
 
     client.process_paged_result(OPPORTUNITIES_URL, {archived: archived, expand: client.OPP_EXPAND_VALUES}, "#{log_opp_type}opportunities") { |opp|
@@ -67,23 +67,29 @@ module Controller_Commands
       summary[:contacts_with_duplicates] += 1 if contacts[opp['contact']] == 2
       summary[:contacts_with_3_plus] += 1 if contacts[opp['contact']] == 3
 
-      result = process_opportunity(opp)
+      result = process_opportunity(opp, test_mode)
       
       summary[:updated] += 1 if result['updated']
       summary[:sent_webhook] += 1 if result['sent_webhook']
       summary[:assigned_to_job] += 1 if result['assigned_to_job']
       summary[:anonymized] += 1 if result['anonymized']
 
-      if summary[:updated] > 0 && summary[:updated] % 50 == 0 && summary[:updated] > log_index
+      if !test_mode && summary[:updated] > 0 && summary[:updated] % 50 == 0 && summary[:updated] > log_index
         log_index = summary[:updated]
         log.log("Processed #{summary[:opportunities]} #{log_opp_type}opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
+      elsif test_mode && summary[:opportunities] % 50 == 0
+        log.log("Processed #{summary[:opportunities]} #{log_opp_type}opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} to be changed (#{summary[:assigned_to_job]} to be assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
       end
 
       # exit normally in case of termination      
       break if terminating?
     }
 
-    log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
+    if !test_mode
+      log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
+    else
+      log.log("Finished: #{summary[:opportunities]} #{log_opp_type}opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} to be changed (#{summary[:assigned_to_job]} to be assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
+    end
   end
 
   def export_to_bigquery(archived=nil, all_fields=true, test=false)
@@ -188,14 +194,19 @@ module Controller_Commands
     }  
   end
   
-  def test_rules(opp)
-    client.batch_updates
-    summarise_feedbacks(opp)
-    rules.do_update_tags(opp)
-    
-    puts JSON.pretty_generate(Util.opp_view_data(opp))
-    
-    client.batch_updates(false)
-  end 
+  def test_rules(opp = nil)
+    opp = opp.first if opp.is_a?(Array)
+    unless (opp || '') == ''
+      client.batch_updates
+      summarise_feedbacks(opp)
+      rules.do_update_tags(opp)
+      
+      puts JSON.pretty_generate(Util.opp_view_data(opp))
+      
+      client.batch_updates(false)
+    else
+      process_opportunities(nil, true)
+    end
+  end
 
 end
