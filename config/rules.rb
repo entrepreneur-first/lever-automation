@@ -9,6 +9,7 @@ TAG_OVERALL = AUTO_TAG_PREFIX + 'Overall: '
 
 TAG_FROM_APPLICATION = AUTO_TAG_PREFIX + 'App: '
 
+TAG_FROM_PRE_SCREEN = AUTO_TAG_PREFIX + 'Pre-Screen: '
 TAG_FROM_COFFEE = AUTO_TAG_PREFIX + 'Coffee: '
 TAG_FROM_APP_REVIEW = AUTO_TAG_PREFIX + 'App Review: '
 TAG_FROM_PHONE_SCREEN = AUTO_TAG_PREFIX + 'Phone Screen: '
@@ -350,6 +351,8 @@ class Rules < BaseRules
     apply_single_tag(TAG_OVERALL, {tag: overall_source(opp)}, tags(:source))
     
     # feedback
+    apply_feedback_tag(TAG_FROM_PRE_SCREEN, :pre_coffee_screen_rating, :rating, :has_pre_coffee_screen)
+    
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_rating, :rating, :has_coffee)
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_edge, :edge, :has_coffee)
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_gender, :gender, :has_coffee)
