@@ -53,6 +53,10 @@ module Controller_Commands
   def process_opportunities(archived=false, test_mode=false)
     summary = Hash.new(0)
     contacts = Hash.new(0)
+    if test_mode
+      added_tags = Hash.new(0)
+      removed_tags = Hash.new(0)
+    end
     
     log_opp_type = archived ? 'archived ' : (archived.nil? ? '' : 'active ')
 
@@ -73,12 +77,23 @@ module Controller_Commands
       summary[:sent_webhook] += 1 if result['sent_webhook']
       summary[:assigned_to_job] += 1 if result['assigned_to_job']
       summary[:anonymized] += 1 if result['anonymized']
+      
+      if test_mode
+        Array(opp['_addTags']).each{|tag|
+          added_tags[tag] += 1
+        }
+        Array(opp['_removeTags']).each{|tag|
+          removed_tags[tag] += 1
+        }
+      end
 
       if !test_mode && summary[:updated] > 0 && summary[:updated] % 50 == 0 && summary[:updated] > log_index
         log_index = summary[:updated]
         log.log("Processed #{summary[:opportunities]} #{log_opp_type}opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
       elsif test_mode && summary[:opportunities] % 50 == 0
         log.log("Processed #{summary[:opportunities]} #{log_opp_type}opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} to be changed (#{summary[:assigned_to_job]} to be assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
+        log.log("added tags: " + JSON.pretty_generate(added_tags)) if added_tags.any?
+        log.log("removed tags: " + JSON.pretty_generate(removed_tags)) if removed_tags.any?
       end
 
       # exit normally in case of termination      
@@ -89,6 +104,8 @@ module Controller_Commands
       log.log("Finished: #{summary[:opportunities]} opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
     else
       log.log("Finished: #{summary[:opportunities]} #{log_opp_type}opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} to be changed (#{summary[:assigned_to_job]} to be assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")
+        log.log("added tags: " + JSON.pretty_generate(added_tags)) if added_tags.any?
+        log.log("removed tags: " + JSON.pretty_generate(removed_tags)) if removed_tags.any?
     end
   end
 
