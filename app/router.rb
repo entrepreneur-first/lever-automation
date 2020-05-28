@@ -7,10 +7,19 @@ class Router
   COMMANDS = {
     # help
     'help': -> {
+      commands = []
+      opportunity_commands = []
+      COMMANDS.keys.sort.each {|c|
+        if COMMANDS[c].parameters.fetch(0, []).fetch(1, nil) == :opp
+          opportunity_commands.push(c)
+        else
+          commands.push(c)
+        end
+      }
       puts "\nCommands:"
-      COMMANDS.keys.sort.each {|c| puts "- #{c}"}
+      commands.each {|c| puts "- #{c}"}
       puts "\nCommands for specific candidates (usage: <command> {<email> or <opportunity_id>}):"
-      OPPORTUNITY_COMMANDS.keys.sort.each {|c| puts "- #{c}"}
+      opportunity_commands.each {|c| puts "- #{c}"}
     },
     
     # fixes
@@ -67,6 +76,7 @@ class Router
     'import bigquery': -> (param_str) {
       @controller.import_from_bigquery(param_str)
     },
+    
     'test import bigquery': -> (param_str) {
       @controller.import_from_bigquery(param_str, true)
     },
@@ -74,7 +84,7 @@ class Router
     # process
     'process': -> (opp) {
       @controller.process_opportunity(opp)
-    }
+    },
     'process_all': -> {
       @controller.process_opportunities(nil)
     },
@@ -108,7 +118,7 @@ class Router
       users = @controller.client.users
       if search.include?('@')
         result = Util.lookup_row_fuzzy(users, search, 'email')
-      elsif search.include(' ')
+      elsif search.include?(' ')
         result = Util.lookup_row_fuzzy(users, search, 'name')
       else
         result = Util.lookup_row(users, search)
@@ -117,8 +127,8 @@ class Router
     },
     'view posting': -> (search) {
       postings = @controller.client.postings
-      if search.include(' ')
-        result = Util.lookup_row_fuzzy(postings, search, 'name')
+      if search.include?(' ')
+        result = Util.lookup_row_fuzzy(postings, search, 'text')
       else
         result = Util.lookup_row(postings, search)
       end
@@ -161,7 +171,7 @@ class Router
     @controller.log.log('Command: ' + command) unless self.interactive?
 
     command_func = nil
-    COMMANDS.each {|text, func|
+    COMMANDS.sort_by{|text, func| -text.length}.each {|text, func|
       if command.start_with?(text.to_s)
         command_func = {text: text.to_s, func: func}
         break

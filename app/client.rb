@@ -278,7 +278,7 @@ class Client
         val = (Time.parse(val).to_i*1000).to_s
       end
       if field['text'] == 'user' && !val.match(/^[0-9a-z\-]{30,}$/)
-        lookup_val = Util.lookup_row_fuzzy(users, val, 'id', 'name')
+        lookup_val = Util.lookup_row_fuzzy(users, val, 'name', 'id')
         if lookup_val.nil?
           log.warn("User not found: #{val}")
         else

@@ -92,11 +92,11 @@ class Util
     to_hash
   end
   
-  def self.lookup_row_fuzzy(array, search_val, result_key='id', search_key=nil)
-    lookup_row(array, search_val, result_key, search_key, true)
+  def self.lookup_row_fuzzy(array, search_val, search_key='id', result_key=nil)
+    lookup_row(array, search_val, search_key, result_key, true)
   end
   
-  def self.lookup_row(array, search_val, result_key='id', search_key=nil, fuzzy=false)
+  def self.lookup_row(array, search_val, search_key='id', result_key=nil, fuzzy=false)
     search_val = fuzzy_string(search_val) if fuzzy
     array.each { |row|
       return result_key ? row[result_key] : row if (fuzzy ? fuzzy_string(row[search_key]) : row[search_key]) == search_val
