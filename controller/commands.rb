@@ -51,6 +51,9 @@ module Controller_Commands
   end
 
   def process_opportunities(archived=false, test_mode=false)
+    @opps_processed = Hash.new(0)
+    @contacts_processed = Hash.new(0)
+    
     summary = Hash.new(0)
     contacts = Hash.new(0)
     if test_mode
@@ -71,22 +74,26 @@ module Controller_Commands
       summary[:contacts_with_duplicates] += 1 if contacts[opp['contact']] == 2
       summary[:contacts_with_3_plus] += 1 if contacts[opp['contact']] == 3
 
-      result = process_opportunity(opp, test_mode)
-      
-      summary[:updated] += 1 if result['updated']
-      summary[:sent_webhook] += 1 if result['sent_webhook']
-      summary[:assigned_to_job] += 1 if result['assigned_to_job']
-      summary[:anonymized] += 1 if result['anonymized']
-      
-      if test_mode
-        Array(opp['_addTags']).each{|tag|
-          added_tags[tag] += 1
-        }
-        Array(opp['_removeTags']).each{|tag|
-          removed_tags[tag] += 1
+      unless @opps_processed.has_key?(opp['id']) # if not already processed
+        results = process_opportunity(opp, test_mode)
+        
+        results.each { |result|        
+          summary[:updated] += 1 if result['updated']
+          summary[:sent_webhook] += 1 if result['sent_webhook']
+          summary[:assigned_to_job] += 1 if result['assigned_to_job']
+          summary[:anonymized] += 1 if result['anonymized']
+          
+          if test_mode
+            Array(result['_addTags']).each { |tag|
+              added_tags[tag] += 1
+            }
+            Array(result['_removeTags']).each { |tag|
+              removed_tags[tag] += 1
+            }
+          end
         }
       end
-
+      
       if !test_mode && summary[:updated] > 0 && summary[:updated] % 50 == 0 && summary[:updated] > log_index
         log_index = summary[:updated]
         log.log("Processed #{summary[:opportunities]} #{log_opp_type}opportunities (#{summary[:unique_contacts]} contacts); #{summary[:updated]} changed (#{summary[:sent_webhook]} webhooks sent, #{summary[:assigned_to_job]} assigned to job); #{summary[:contacts_with_duplicates]} contacts with multiple opportunities (#{summary[:contacts_with_3_plus]} with 3+)")

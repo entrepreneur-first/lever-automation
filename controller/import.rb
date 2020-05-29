@@ -132,7 +132,7 @@ module Controller_Import
     end
     
     if opp.nil? && params[:email].match?(/^[^ ]+@[^ ]+\.[^ ]+$/)
-      opp = client.opportunities_for_contact(params[:email]).select {|opp|
+      opp = client.opportunities_for_email(params[:email]).select {|opp|
         ['', params[:posting]].include?(Util.view_flat(opp)['application__posting'] || '')
       }.sort_by {|opp|
         opp['lastInteractionAt']

@@ -5,11 +5,15 @@ module Controller_ProcessUpdates
   # process a single opportunity
   # apply changes & trigger webhook as necessary
   def process_opportunity(opp, test_mode=false)
+    @opps_processed ||= Hash.new(0)
+    @opps_processed[opp['id']] += 1
+    
     return {'anonymized': true} if opp['isAnonymized']
   
     result = {}
+    results = []
     log.log_prefix(opp['id'] + ': ')
-    client.batch_updates
+    prev_client_batch_updates = client.batch_updates
 
     # checks lastInteractionAt and tag checksum, creating checksum tag if necessary
     last_update = latest_change(opp)
@@ -30,7 +34,7 @@ module Controller_ProcessUpdates
       prepare_app_responses(opp)
       add_links(opp)
       summarise_feedbacks(opp)
-      # detect_duplicate_opportunities(opp)
+      results = detect_duplicates(opp, test_mode)
       rules.do_update_tags(opp)
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
@@ -56,13 +60,19 @@ module Controller_ProcessUpdates
       end
     end
 
+    if test_mode
+      result['_addTags'] = opp['_addTags']
+      result['_removeTags'] = opp['_removeTags']
+    end
+
     if client.commit_opp(opp, test_mode)
       result['updated'] = true
     end
 
     log.pop_log_prefix
-    client.batch_updates(false)
-    result
+    client.batch_updates(prev_client_batch_updates)
+
+    results + [result]
   end
 
   def check_linkedin_optout(opp)
@@ -385,6 +395,90 @@ module Controller_ProcessUpdates
       }
     }
     nil
+  end
+
+  def detect_duplicates(opp, test_mode)
+    results = []
+    
+    @contacts_processed ||= Hash.new(0)
+    @contacts_processed[opp['contact']] += 1
+    
+    # we process duplicates on detection of the 2nd opportunity for a specific contact
+    # nb. we (currently) only process opportunities assigned to a cohort job posting or no posting ("general opportunity") - not EF team jobs
+    return unless @contacts_processed[opp['contact']] == 2
+    
+    # ok, we have a duplicate
+    # get all (cohort/unassigned) opportunities for this contact
+    opps = client.opportunities_for_contact(opp['contact']).select { |o| 
+      !Util.has_posting(o) || Util.is_cohort_app(o)
+    }.sort_by { |o|
+      o['createdAt']
+    }
+    
+    original_source = Util.overall_source_from_opp(opps.first)
+    latest_opp_id = opps.last['id']
+    
+    # see what type(s) of duplicates we have - multiple postings? etc.
+    latest_opp_by_posting = {}
+    opps.each { |o|
+      posting = (o.fetch('applications', []).first || {}).fetch('posting', 'none')
+      latest_opp_by_posting[posting] = opp['id']
+    }
+    
+    duplicate_type =
+      if latest_opp_by_posting.length == 1 && latest_opp_by_posting.has_key?('none')
+        :general
+      elsif latest_opp_by_posting.length == 1
+        :single
+      elsif latest_opp_by_posting.length == 2 && latest_opp_by_posting.has_key?('none')
+        :single_plus_general
+      else
+        :multiple
+      end
+    latest_opps_per_posting = latest_opp_by_posting.values
+    
+    # ensure we've processed all opportunities for this candidate in order of creation
+    opps.each { |o|
+      unless @opps_processed.has_key?(o['id'])
+        result = process_opportunity(o, test_mode)
+      else
+        result = {}
+      end
+
+      process_again = false
+
+      # don't apply original source tag to original opp
+      unless o['id'] == opps.first['id'] || o['tags'].include?(TAG_ORIGINAL_SOURCE_PREFIX + original_source)
+        client.add_tags(opp, TAG_ORIGINAL_SOURCE_PREFIX + original_source)
+        process_again = true
+      end
+      
+      unless latest_opps_per_posting.include?(opp['id']) || o['tags'].include?(TAG_DUPLICATE_ARCHIVED)
+        client.add_tags(opp, TAG_DUPLICATE_ARCHIVED)
+        unless test_mode
+          # client.archive(opp)
+        end
+        process_again = true
+      end
+
+      # apply tag indicating specific type of dupes to all affected opps
+      rules.apply_single_tag(TAG_DUPLICATE_OPP_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opp)
+      
+      if process_again
+        result_again = process_opportunity(o, test_mode)
+
+        result[:updated] ||= result_again[:updated]
+        result[:sent_webhook] ||= result_again[:sent_webhook]
+        if test_mode
+          result['_addTags'] = Array(result['_addTags']) + Array(result_again['_addTags'])
+          result['_removeTags'] = Array(result['_removeTags']) + Array(result_again['_removeTags'])
+        end
+      end
+      
+      results << result
+    }
+
+    results
   end
 
   def bot_metadata(opp)

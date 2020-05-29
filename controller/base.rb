@@ -47,7 +47,7 @@ class BaseController
   end
 
   def test_opportunity
-    client.opportunities_for_contact(TEST_OPPORTUNITY_EMAIL)[0]
+    client.opportunities_for_email(TEST_OPPORTUNITY_EMAIL)[0]
   end
  
 end

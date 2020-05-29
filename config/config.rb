@@ -85,13 +85,15 @@ TAG_ASSIGN_TO_LOCATION_NONE_FOUND = AUTO_TAG_PREFIX + 'No location tag'
 TAG_ASSIGN_TO_LOCATION_PREFIX = AUTO_TAG_PREFIX + 'Auto-assigned to cohort: '
 TAG_ASSIGNED_TO_LOCATION = AUTO_TAG_PREFIX + 'Auto-assigned to cohort'
 
-TAG_DUPLICATE_OPPS_PREFIX = AUTO_TAG_PREFIX + "Duplicate: "
-
 TAG_LINKEDIN_OPTOUT = AUTO_TAG_PREFIX + 'LinkedIn InMail likely decline'
 TAG_LINKEDIN_OPTIN_LIKELY = AUTO_TAG_PREFIX + 'LinkedIn InMail potential accept'
 TAG_LINKEDIN_OPTIN = AUTO_TAG_PREFIX + 'LinkedIn InMail accept awaiting followup'
 
 LINK_ALL_FEEDBACK_SUMMARY_PREFIX = AUTO_LINK_PREFIX + 'feedback/all/'
+
+TAG_DUPLICATE_ARCHIVED = AUTO_TAG_PREFIX + 'Archived duplicate'
+TAG_DUPLICATE_PREFIX = AUTO_TAG_PREFIX + "Duplicate: "
+TAG_ORIGINAL_SOURCE_PREFIX = AUTO_TAG_PREFIX + 'Original: '
 
 # deprecated: now storing under BOT_METADATA
 BOT_TAG_PREFIX = '🤖 [bot] '

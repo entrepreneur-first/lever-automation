@@ -87,8 +87,15 @@ class Rules < BaseRules
         yes: 'Healthcare',
         no: 'Not Healthcare',
         error: '<healthcare unknown>'
+      },
+      
+      duplicate_opps: {
+        general: 'General opportunity',
+        single: 'Single posting',
+        single_plus_general: 'Single posting + general opp',
+        multiple: 'Multiple postings'
       }
-    }  
+    }
   end
 
   def update_links(opp)

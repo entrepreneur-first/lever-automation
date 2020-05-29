@@ -186,7 +186,7 @@ class Router
 
       if param_str.include? '@'
         # email
-        os = @controller.client.opportunities_for_contact(param_str)
+        os = @controller.client.opportunities_for_email(param_str)
       elsif param_str > ''
         # opportunity ID
         os = [@controller.client.get_opportunity(param_str, {

@@ -21,7 +21,7 @@ module Controller_SlackBot
       count: counts[:total],
       contacts: counts[:contacts],
       has_more: (counts[:contacts] > limit),
-      opportunities: client.get_paged_result(OPPORTUNITIES_URL, {contact_id: contacts, expand: client.OPP_EXPAND_VALUES}, 'opportunities_for_contact_ids')
+      opportunities: client.opportunities_for_contact(contacts)
     }
   end
 

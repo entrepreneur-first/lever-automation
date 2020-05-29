@@ -44,8 +44,12 @@ class Client
     get_single_result(opp_url(id), params, 'retrieve single opportunity')
   end
 
-  def opportunities_for_contact(email)
-    get_paged_result(OPPORTUNITIES_URL, {email: email, expand: self.OPP_EXPAND_VALUES}, 'opportunities_for_contact')
+  def opportunities_for_email(email)
+    get_paged_result(OPPORTUNITIES_URL, {email: email, expand: self.OPP_EXPAND_VALUES}, 'opportunities_for_email')
+  end
+
+  def opportunities_for_contact(contact_ids)
+    get_paged_result(OPPORTUNITIES_URL, {contact_id: contact_ids, expand: self.OPP_EXPAND_VALUES}, 'opportunities_for_contact')
   end
 
   def opportunities(posting_ids = [], params = {})
@@ -100,7 +104,9 @@ class Client
   #
 
   def batch_updates(batch=true)
+    prev = @batch_updates
     @batch_updates = batch
+    prev
   end
 
   def commit_opp(opp, test_mode=false)
@@ -232,7 +238,7 @@ class Client
     # )
     
     ## So we use the legacy endpoint to assign a posting to a candidate instead
-    opps = opportunities_for_contact(email)
+    opps = opportunities_for_email(email)
     opps_without_posting = opps.select { |o| o["applications"].count == 0 }
     
     result = []
