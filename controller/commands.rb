@@ -77,7 +77,7 @@ module Controller_Commands
       unless @opps_processed.has_key?(opp['id']) # if not already processed
         results = process_opportunity(opp, test_mode)
         
-        results.each { |result|        
+        results.each { |opp_id, result|        
           summary[:updated] += 1 if result['updated']
           summary[:sent_webhook] += 1 if result['sent_webhook']
           summary[:assigned_to_job] += 1 if result['assigned_to_job']

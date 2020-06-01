@@ -8,10 +8,9 @@ module Controller_ProcessUpdates
     @opps_processed ||= Hash.new(0)
     @opps_processed[opp['id']] += 1
     
-    return {'anonymized': true} if opp['isAnonymized']
+    return {opp['id'] => {'anonymized': true}} if opp['isAnonymized']
   
-    result = {}
-    results = []
+    result = Hash.new { |hash, key| hash[key] = {} }
     log.log_prefix(opp['id'] + ': ')
     prev_client_batch_updates = client.batch_updates
 
@@ -24,7 +23,7 @@ module Controller_ProcessUpdates
       # if we added to a job then reload as tags etc will have changed automagically 
       # based on new posting assignment
       client.refresh_opp(opp)
-      result['assigned_to_job'] = true
+      result[opp['id']]['assigned_to_job'] = true
     end
     
     check_linkedin_optout(opp)
@@ -34,7 +33,7 @@ module Controller_ProcessUpdates
       prepare_app_responses(opp)
       add_links(opp)
       summarise_feedbacks(opp)
-      results = detect_duplicates(opp, test_mode)
+      result.merge(detect_duplicates(opp, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       rules.do_update_tags(opp)
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
@@ -47,7 +46,7 @@ module Controller_ProcessUpdates
       if notify && !test_mode
         # send webhook of change
         notify_of_change(opp, last_update)
-        result['sent_webhook'] = result['updated'] = true
+        result[opp['id']]['sent_webhook'] = result[opp['id']]['updated'] = true
       else 
         # we didn't have a change to notify, but we added one or more notes
         # which will update lastInteractionAt
@@ -56,23 +55,23 @@ module Controller_ProcessUpdates
       end
 
       if commit_bot_metadata(opp)
-        result['updated'] = true
+        result[opp['id']]['updated'] = true
       end
     end
 
     if test_mode
-      result['_addTags'] = opp['_addTags']
-      result['_removeTags'] = opp['_removeTags']
+      result[opp['id']]['_addTags'] = opp['_addTags']
+      result[opp['id']]['_removeTags'] = opp['_removeTags']
     end
 
     if client.commit_opp(opp, test_mode)
-      result['updated'] = true
+      result[opp['id']]['updated'] = true
     end
 
     log.pop_log_prefix
     client.batch_updates(prev_client_batch_updates)
 
-    results + [result]
+    result
   end
 
   def check_linkedin_optout(opp)
@@ -398,14 +397,14 @@ module Controller_ProcessUpdates
   end
 
   def detect_duplicates(opp, test_mode)
-    results = []
+    result = Hash.new { |hash, key| hash[key] = {} }
     
     @contacts_processed ||= Hash.new(0)
     @contacts_processed[opp['contact']] += 1
     
     # we process duplicates on detection of the 2nd opportunity for a specific contact
     # nb. we (currently) only process opportunities assigned to a cohort job posting or no posting ("general opportunity") - not EF team jobs
-    return unless @contacts_processed[opp['contact']] == 2
+    return result unless @contacts_processed[opp['contact']] == 2
     
     # ok, we have a duplicate
     # get all (cohort/unassigned) opportunities for this contact
@@ -415,7 +414,7 @@ module Controller_ProcessUpdates
       o['createdAt']
     }
     
-    original_source = Util.overall_source_from_opp(opps.first)
+    original_source = Util.overall_source_from_opp(opps.first).delete_prefix(AUTO_TAG_PREFIX)
     latest_opp_id = opps.last['id']
     
     # see what type(s) of duplicates we have - multiple postings? etc.
@@ -440,21 +439,19 @@ module Controller_ProcessUpdates
     # ensure we've processed all opportunities for this candidate in order of creation
     opps.each { |o|
       unless @opps_processed.has_key?(o['id'])
-        result = process_opportunity(o, test_mode)
-      else
-        result = {}
+        result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
 
       process_again = false
 
       # don't apply original source tag to original opp
-      unless o['id'] == opps.first['id'] || o['tags'].include?(TAG_ORIGINAL_SOURCE_PREFIX + original_source)
-        client.add_tags(opp, TAG_ORIGINAL_SOURCE_PREFIX + original_source)
+      unless o['id'] == opps.first['id'] || o['tags'].include?(TAG_ORIGINAL_PREFIX + original_source)
+        client.add_tag(opp, TAG_ORIGINAL_PREFIX + original_source)
         process_again = true
       end
       
       unless latest_opps_per_posting.include?(opp['id']) || o['tags'].include?(TAG_DUPLICATE_ARCHIVED)
-        client.add_tags(opp, TAG_DUPLICATE_ARCHIVED)
+        client.add_tag(opp, TAG_DUPLICATE_ARCHIVED)
         unless test_mode
           # client.archive(opp)
         end
@@ -462,23 +459,14 @@ module Controller_ProcessUpdates
       end
 
       # apply tag indicating specific type of dupes to all affected opps
-      rules.apply_single_tag(TAG_DUPLICATE_OPP_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opp)
+      rules.apply_single_tag(TAG_DUPLICATE_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opps))
       
       if process_again
-        result_again = process_opportunity(o, test_mode)
-
-        result[:updated] ||= result_again[:updated]
-        result[:sent_webhook] ||= result_again[:sent_webhook]
-        if test_mode
-          result['_addTags'] = Array(result['_addTags']) + Array(result_again['_addTags'])
-          result['_removeTags'] = Array(result['_removeTags']) + Array(result_again['_removeTags'])
-        end
+        result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
-      
-      results << result
     }
 
-    results
+    result
   end
 
   def bot_metadata(opp)
