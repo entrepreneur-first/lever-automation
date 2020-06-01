@@ -395,25 +395,29 @@ class Client
       result = method.(url, body)
       # retry on occasional bad gateway error
       raise BadGatewayError if result.code == 502
-    rescue BadGatewayError, Net::OpenTimeout, EOFError => e
+    rescue BadGatewayError, Net::OpenTimeout, EOFError, Errno::ECONNRESET => e
       if e.is_a?(BadGatewayError)
         log.warn("502 error, retrying")
       elsif e.is_a?(Net::OpenTimeout)
         log.warn("Net::OpenTimeout error, retrying")
       elsif e.is_a?(EOFError)
         log.warn("EOFError, retrying")
+      elsif e.is_a?(Errno::ECONNRESET)
+        log.warn("Errno::ECONNRESET, retrying")
       else
         log.error("http_method: unknown error occurred: #{e}")
       end
       begin
         result = method.(url, body)
-      rescue BadGatewayError, Net::OpenTimeout, EOFError => e
+      rescue BadGatewayError, Net::OpenTimeout, EOFError, Errno::ECONNRESET => e
         if e.is_a?(BadGatewayError)
           log.warn("502 error on 2nd attempt; aborting")
         elsif e.is_a?(Net::OpenTimeout)
           log.warn("Net::OpenTimeout on 2nd attempt; aborting")
         elsif e.is_a?(EOFError)
           log.warn("EOFError on 2nd attempt; aborting")
+        elsif e.is_a?(Errno::ECONNRESET)
+          log.warn("Errno::ECONNRESET on 2nd attempt; aborting")
         else
           log.error("http_method: unknown error occurred on 2nd attempt: #{e}")
         end
