@@ -456,7 +456,7 @@ class Rules < BaseRules
     
     source_tags_map = {
       # source tag => overall source to apply
-      'rollover' => :rollover,
+      /rollover/ => :rollover,
       /sourced/ => :sourced,
       'referral' => :referral,
       'offline' => :offline,
