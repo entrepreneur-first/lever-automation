@@ -393,7 +393,7 @@ module Controller_ProcessUpdates
   def location_from_tags(opp)
     opp["tags"].each { |tag|
       COHORT_JOBS.each { |cohort|
-        return cohort if tag.downcase.include?(cohort[:name])
+        return cohort if tag.downcase.include?(cohort[:tag])
       }
     }
     nil

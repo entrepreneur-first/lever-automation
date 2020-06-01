@@ -159,13 +159,18 @@ class Rules < BaseRules
         result['rating']
       end
     
-    if result['type'] == 'coffee'
+    if ['pre_coffee_screen', 'coffee'].include?(result['type'])
       # gender
       result['gender'] = (f['fields'].select{|f| f[:_text] == 'gender'}.first || {})[:_value]
       
       # eligibile
-      # TODO: question title/format varies
-      result['eligibile'] = (f['fields'].select{|f| f[:_text].include?('eligible for the upcoming cohort')}.first || {})[:_value]
+      opp_posting_code = (COHORT_JOBS.select { |j| j[:posting_id] == Util.posting(opp) }.first || {}).dig(:code)
+      eligibility_value = (f['fields'].select { |f|
+        f[:_text].include?('eligible') ||
+        f[:_text].include?('elligible') ||
+        f[:_text].include?('cohort they can join')
+      }.first || {})[:_value]
+      result['eligibile'] = eligibility_value == 'yes' || (eligibility_value + ' ').include?(opp_posting_code.downcase + ' ')
     end
     
     if ['app_review', 'ability_interview'].include? result['type']
@@ -193,15 +198,13 @@ class Rules < BaseRules
       result['technology'] = (f['fields'].select{|f| f[:_text] == 'technology'}.first || {})[:_value]
     end    
     
-    if ['coffee', 'app_review', 'debrief'].include?(result['type'])
+    if ['pre_coffee_screen', 'coffee', 'app_review', 'debrief'].include?(result['type'])
       # edge
       # TODO: question title varies
-      
       result['edge'] = (f['fields'].select{|f| f[:_text].include?('edge')}.first || {})[:_value]
 
       # software/hardware
       # TODO: question?
-
       result['software_hardware'] = (f['fields'].select{|f| f[:_text].include?('software')}.first || {})[:_value]
     end
     
