@@ -116,7 +116,7 @@ class Rules < BaseRules
   
   def summarise_one_feedback(f, opp)
     result = {
-      posting: Util.posting(opp)
+      'posting' => Util.posting(opp)
     }
 
     # feedback type

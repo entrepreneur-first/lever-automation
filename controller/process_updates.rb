@@ -334,7 +334,7 @@ module Controller_ProcessUpdates
           next
         end
         simple_response_text(f['fields'])
-        link = one_feedback_summary_link(f)
+        link = one_feedback_summary_link(f, opp)
         next if opp['links'].include?(link)
         client.remove_links_with_prefix(opp, one_feedback_summary_link_prefix(f))
         client.add_links(opp, link)
@@ -368,7 +368,7 @@ module Controller_ProcessUpdates
     AUTO_LINK_PREFIX + "feedback/#{f['id']}/"
   end
   
-  def one_feedback_summary_link(f)
+  def one_feedback_summary_link(f, opp)
     if f['type'] == 'form'
       f['fields'].each { |field|
         f[field['text']] = field['value'] if ['createdAt', 'completedAt', 'user'].include?(field['text'])
