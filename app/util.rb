@@ -62,6 +62,10 @@ class Util
       opp['applications'][0]['customQuestions'].any?
   end
   
+  def self.posting(opp, none='none')
+    opp.dig('applications', 0, 'posting') || none
+  end
+  
   def self.is_cohort_app(opp)
     opp['tags'].include?(COHORT_JOB_TAG)
   end

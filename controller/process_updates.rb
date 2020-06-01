@@ -297,8 +297,7 @@ module Controller_ProcessUpdates
   
   def prepare_app_responses(opp)
     # responses to questions are subdivided by custom question set - need to combine them together
-    opp['_app_responses'] = []
-    opp['_app_responses'] = opp['applications'][0]['customQuestions'].reduce([]) {|a, b| a+b['fields']} if opp.dig('applications', 0, 'customQuestions')
+    opp['_app_responses'] = (opp.dig('applications', 0, 'customQuestions') || []).reduce([]) {|a, b| a+b['fields']}
     simple_response_text(opp['_app_responses'])    
   end
   
@@ -342,9 +341,13 @@ module Controller_ProcessUpdates
       }
     end
 
+    # tidy legacy summary format; TODO(remove)
+    client.remove_links_with_prefix(opp, LINK_ALL_FEEDBACK_SUMMARY_PREFIX + '?')
+    #
+    
     all_link = all_feedback_summary_link(opp)
     unless opp['links'].include?(all_link)
-      client.remove_links_with_prefix(opp, LINK_ALL_FEEDBACK_SUMMARY_PREFIX)
+      client.remove_links_with_prefix(opp, LINK_ALL_FEEDBACK_SUMMARY_PREFIX + Util.posting(opp) + '?')
     end
     unless all_link.nil? || opp['links'].include?(all_link)
       client.add_links(opp, all_link)
@@ -371,7 +374,7 @@ module Controller_ProcessUpdates
         f[field['text']] = field['value'] if ['createdAt', 'completedAt', 'user'].include?(field['text'])
       }
     end
-    one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(rules.summarise_one_feedback(f).sort)
+    one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(rules.summarise_one_feedback(f, opp).sort)
   end
   
   def all_feedback_summary_link(opp)
@@ -381,9 +384,9 @@ module Controller_ProcessUpdates
         URI.decode_www_form(l.sub(/[^?]*\?/, '')).to_h
       }
     return unless feedback_data.any?
-    summary = rules.summarise_all_feedback(feedback_data)
+    summary = rules.summarise_all_feedback(feedback_data, opp)
     return unless summary.any?
-    LINK_ALL_FEEDBACK_SUMMARY_PREFIX + '?' + URI.encode_www_form(summary.sort)
+    LINK_ALL_FEEDBACK_SUMMARY_PREFIX + Util.posting(opp) + '?' + URI.encode_www_form(summary.sort)
   end
   
   # determine intended cohort location from lead tags

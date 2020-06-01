@@ -114,8 +114,10 @@ class Rules < BaseRules
     add_links(links.uniq)
   end
   
-  def summarise_one_feedback(f)
-    result = {}
+  def summarise_one_feedback(f, opp)
+    result = {
+      posting: Util.posting(opp)
+    }
 
     # feedback type
     type = Util.simplify_str(f['text'])
@@ -221,7 +223,12 @@ class Rules < BaseRules
     result
   end
 
-  def summarise_all_feedback(summaries)
+  def summarise_all_feedback(summaries, opp)
+    # We store feedback summaries within Lever as links on the candidate contact
+    # Links are shared across all opportunities for that candidate contact
+    # so here we filter down to just feedback for the same posting as the current opportunity
+    summaries.select! { |f| f['posting'] == Util.posting(opp) }
+  
     return {} unless summaries.any?
   
     result = {
