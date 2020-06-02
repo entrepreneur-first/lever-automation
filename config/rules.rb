@@ -176,7 +176,7 @@ class Rules < BaseRules
           'ineligible'
         elsif opp_posting_code.nil? || eligibility_value.nil?
           nil # unknown
-        elsif (eligibility_value + ' ').include?(opp_posting_code.downcase + ' '))
+        elsif (eligibility_value + ' ').include?(opp_posting_code.downcase + ' ')
           'eligible'
         else
           'ineligible'
