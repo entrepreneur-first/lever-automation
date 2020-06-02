@@ -13,8 +13,8 @@ class Util
         feedback_summary: parse_all_feedback_summary_link(opp),
         overall_source: overall_source_from_opp(opp),
         original_links: actual_links(opp),
-        offered_at: find_stage_change(opp, OFFER_STAGES).first || {})['updatedAt'],
-        offer_accepted_at: find_stage_change(opp, OFFER_ACCEPTED_STAGES).first || {})['updatedAt']
+        offered_at: (find_stage_changes(opp, OFFER_STAGES).first || {})['updatedAt'],
+        offer_accepted_at: (find_stage_changes(opp, OFFER_ACCEPTED_STAGES).first || {})['updatedAt']
       }))
   end
   
@@ -27,9 +27,9 @@ class Util
       if h[k].class == Hash
         recursive_add_datetime(h[k])
       elsif h[k].to_s.match?(/^[0-9]{10}$/)
-        h[k + '__datetime'] = Time.at(h[k].to_i).strftime('%F %T')
+        h[k.to_s + '__datetime'] = Time.at(h[k].to_i).strftime('%F %T')
       elsif h[k].to_s.match?(/^[0-9]{13}$/)
-        h[k + '__datetime'] = Time.at(h[k].to_i/1000).strftime('%F %T')
+        h[k.to_s + '__datetime'] = Time.at(h[k].to_i/1000).strftime('%F %T')
       end
     }
     h
