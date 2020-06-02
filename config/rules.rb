@@ -480,7 +480,8 @@ class Rules < BaseRules
       'digital marketing' => :digital_marketing,
       'angellist' => :digital_marketing,
       'ai-jobs' => :digital_marketing,
-      'researchgate' => :digital_marketing
+      'researchgate' => :digital_marketing,
+      'linkedin' => :sourced
     }
     sources = opp["sources"].map { |s| s.downcase.strip }
     source_tags_map.each { |key, value|
