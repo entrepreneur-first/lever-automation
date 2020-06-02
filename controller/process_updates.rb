@@ -449,12 +449,12 @@ module Controller_ProcessUpdates
 
       # don't apply original source tag to original opp
       unless (o['id'] == opps.first['id']) || o['tags'].include?(TAG_ORIGINAL_PREFIX + original_source)
-        client.add_tag(opp, TAG_ORIGINAL_PREFIX + original_source)
+        client.add_tag(o, TAG_ORIGINAL_PREFIX + original_source)
         process_again = true
       end
       
-      unless latest_opps_per_posting.include?(opp['id']) || o['tags'].include?(TAG_DUPLICATE_ARCHIVED)
-        client.add_tag(opp, TAG_DUPLICATE_ARCHIVED)
+      unless latest_opps_per_posting.include?(o['id']) || o['tags'].include?(TAG_DUPLICATE_ARCHIVED)
+        client.add_tag(o, TAG_DUPLICATE_ARCHIVED)
         unless test_mode
           # client.archive(opp)
         end
@@ -462,7 +462,7 @@ module Controller_ProcessUpdates
       end
 
       # apply tag indicating specific type of dupes to all affected opps
-      rules.apply_single_tag(TAG_DUPLICATE_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opps))
+      rules.apply_single_tag(TAG_DUPLICATE_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opps), o)
       
       if process_again
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }

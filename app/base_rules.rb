@@ -17,7 +17,8 @@ class BaseRules
     end
   end
   
-  def apply_single_tag(prefix, tag_context, tag_set)
+  def apply_single_tag(prefix, tag_context, tag_set, opp=nil)
+    opp(opp)
     tag_context = Hash(tag_context)
     if tag_context[:remove]
       tag = update = nil
