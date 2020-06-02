@@ -392,7 +392,7 @@ module Controller_ProcessUpdates
   # determine intended cohort location from lead tags
   def location_from_tags(opp)
     opp["tags"].each { |tag|
-      COHORT_JOBS.each { |cohort|
+      COHORT_JOBS.select { |cohort| cohort.has_key?(:tag) }.each { |cohort|
         return cohort if tag.downcase.include?(cohort[:tag])
       }
     }

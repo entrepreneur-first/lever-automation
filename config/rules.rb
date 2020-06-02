@@ -170,7 +170,7 @@ class Rules < BaseRules
         f[:_text].include?('elligible') ||
         f[:_text].include?('cohort they can join')
       }.first || {})[:_value]
-      result['eligibile'] = eligibility_value == 'yes' || (eligibility_value + ' ').include?(opp_posting_code.downcase + ' ')
+      result['eligibile'] = eligibility_value == 'yes' || (!opp_posting_code.nil? && ((eligibility_value || '') + ' ').include?(opp_posting_code.downcase + ' ')) ? 'eligible' : 'ineligible'
     end
     
     if ['app_review', 'ability_interview'].include? result['type']
@@ -237,6 +237,10 @@ class Rules < BaseRules
     result = {
       has_pre_coffee_screen: false,
       pre_coffee_screen_rating: nil,
+      pre_coffee_screen_edge: nil,
+      pre_coffee_screen_gender: nil,
+      pre_coffee_screen_eligible: nil,
+      pre_coffee_screen_software_hardware: nil,
       pre_coffee_screen_completed_at: nil,
       pre_coffee_screen_completed_by: nil,
 
@@ -293,6 +297,10 @@ class Rules < BaseRules
       when 'pre_coffee_screen'
         result[:has_pre_coffee_screen] = true
         result[:pre_coffee_screen_rating] = f['rating']
+        result[:pre_coffee_screen_edge] = f['edge']
+        result[:pre_coffee_screen_gender] = f['gender']
+        result[:pre_coffee_screen_eligible] = f['eligible']
+        result[:pre_coffee_screen_software_hardware] = f['software_hardware']
         result[:pre_coffee_screen_completed_at] = f['submitted_at']
         result[:pre_coffee_screen_completed_by] = f['submitted_by']
         
@@ -370,6 +378,7 @@ class Rules < BaseRules
     
     # feedback
     apply_feedback_tag(TAG_FROM_PRE_SCREEN, :pre_coffee_screen_rating, :rating, :has_pre_coffee_screen)
+    apply_feedback_tag(TAG_FROM_PRE_SCREEN, :pre_coffee_screen_eligible, :eligibility, :has_pre_coffee_screen)
     
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_rating, :rating, :has_coffee)
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_edge, :edge, :has_coffee)
