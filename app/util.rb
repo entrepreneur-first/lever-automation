@@ -43,7 +43,7 @@ class Util
   def self.find_tag_value(opp, tag_set, prefix)
     set_tags = tag_set.map{|k, v| prefix + v}
     opp['tags'].each { |tag|
-      return tag if set_tags.include?(tag)
+      return tag.delete_prefix(prefix) if set_tags.include?(tag)
     }
     nil
   end

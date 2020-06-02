@@ -453,7 +453,7 @@ module Controller_ProcessUpdates
 
       # don't apply original source tag to original opp
       unless (o['id'] == opps.first['id']) || (original_source == '') || o['tags'].include?(TAG_ORIGINAL_PREFIX + original_source)
-        client.add_tag(o, TAG_ORIGINAL_PREFIX + original_source)
+        rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {tag: original_source}, rules.tags(:source), o)
         process_again = true
       end
       
@@ -463,6 +463,8 @@ module Controller_ProcessUpdates
           # client.archive(opp)
         end
         process_again = true
+      else
+        client.remove_tags_if_set(o, TAG_DUPLICATE_ARCHIVED)
       end
 
       # apply tag indicating specific type of dupes to all affected opps

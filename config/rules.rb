@@ -548,7 +548,7 @@ class Rules < BaseRules
     # 4) if no source tag detected, look at the self-reported source from the application
     
     from_app = Util.find_tag_value(opp, tags(:source), TAG_FROM_APPLICATION)
-    return from_app.delete_prefix(TAG_FROM_APPLICATION) if from_app
+    return from_app if from_app
     
     # 5) .. otherwise ¯\_(ツ)_/¯ 
     nil
