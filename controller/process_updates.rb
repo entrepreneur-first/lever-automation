@@ -451,15 +451,11 @@ module Controller_ProcessUpdates
 
       process_again = false
 
-puts o['id']
-
       # don't apply original source tag to original opp
       unless (o['id'] == opps.first['id']) || (original_source == '')
-      puts 'AAA'
         rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {tag: original_source}, rules.tags(:source), o)
         process_again = true
       else
-        puts 'BBB'
         rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {remove: true}, rules.tags(:source), o)
       end
       
