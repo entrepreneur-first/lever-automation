@@ -21,6 +21,11 @@ class BaseController
     end
   end
   
+  def reset
+    @opps_processed = Hash.new(0)
+    @contacts_processed = Hash.new(0)
+  end
+  
   def client
     @client
   end

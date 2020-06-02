@@ -413,7 +413,7 @@ module Controller_ProcessUpdates
     # we process duplicates on detection of the 2nd opportunity for a specific contact
     # nb. we (currently) only process opportunities assigned to a cohort job posting or no posting ("general opportunity") - not EF team jobs
     return result unless @contacts_processed[opp['contact']] == 2
-    
+
     # ok, we have a duplicate
     # get all (cohort/unassigned) opportunities for this contact
     opps = client.opportunities_for_contact(opp['contact']).select { |o| 
@@ -451,11 +451,15 @@ module Controller_ProcessUpdates
 
       process_again = false
 
+puts o['id']
+
       # don't apply original source tag to original opp
       unless (o['id'] == opps.first['id']) || (original_source == '')
+      puts 'AAA'
         rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {tag: original_source}, rules.tags(:source), o)
         process_again = true
       else
+        puts 'BBB'
         rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {remove: true}, rules.tags(:source), o)
       end
       

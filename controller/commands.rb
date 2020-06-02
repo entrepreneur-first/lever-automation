@@ -51,8 +51,7 @@ module Controller_Commands
   end
 
   def process_opportunities(archived=false, test_mode=false)
-    @opps_processed = Hash.new(0)
-    @contacts_processed = Hash.new(0)
+    reset
     
     summary = Hash.new(0)
     contacts = Hash.new(0)
@@ -114,12 +113,6 @@ module Controller_Commands
         log.log("added tags: " + JSON.pretty_generate(added_tags)) if added_tags.any?
         log.log("removed tags: " + JSON.pretty_generate(removed_tags)) if removed_tags.any?
     end
-  end
-
-  def process_one_opportunity(opp, test_mode=false)
-    @opps_processed = Hash.new(0)
-    @contacts_processed = Hash.new(0)
-    process_opportunity(opp, test_mode)
   end
 
   def export_to_bigquery(archived=nil, all_fields=true, test=false)
