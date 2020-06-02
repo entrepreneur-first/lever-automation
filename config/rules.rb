@@ -368,7 +368,20 @@ class Rules < BaseRules
         result[:debrief_completed_at] = f['submitted_at']
       end
     }
-  
+    
+    # legacy fix for hardware/software tags
+    if (opp['tags'] & ['Software', 'Hardware']).any?
+      value = opp['tags'].include?('Software') ? 'software' : 'hardware'
+      # set value for most feedback form if not already present
+      if result[:has_app_review]
+        result[:app_review_software_hardware] ||= value
+      elsif result[:has_coffee]
+        result[:coffee_software_hardware] ||= value
+      elsif result[:has_pre_coffee_screen]
+        result[:pre_coffee_screen_software_hardware] ||= value
+      end
+    end
+    
     result
   end
 
