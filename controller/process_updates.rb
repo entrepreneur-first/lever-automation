@@ -452,17 +452,19 @@ module Controller_ProcessUpdates
       process_again = false
 
       # don't apply original source tag to original opp
-      unless (o['id'] == opps.first['id']) || (original_source == '') || o['tags'].include?(TAG_ORIGINAL_PREFIX + original_source)
+      unless (o['id'] == opps.first['id']) || (original_source == '')
         rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {tag: original_source}, rules.tags(:source), o)
         process_again = true
+      else
+        rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {remove: true}, rules.tags(:source), o)
       end
       
-      unless latest_opps_per_cohort.include?(o['id']) || o['tags'].include?(TAG_DUPLICATE_ARCHIVED)
-        client.add_tag(o, TAG_DUPLICATE_ARCHIVED)
+      unless latest_opps_per_cohort.include?(o['id'])
+        client.add_tags_if_unset(o, TAG_DUPLICATE_ARCHIVED)
         unless test_mode
           # client.archive(opp)
         end
-        process_again = true
+        # process_again = true
       else
         client.remove_tags_if_set(o, TAG_DUPLICATE_ARCHIVED)
       end
