@@ -21,8 +21,45 @@ COHORT_JOBS = [
   {posting_id: 'df1e30e5-c08d-47bd-bd43-8f3eaf96163e', code: 'TO1'}, # Toronto Pool
 ]
 
-TEST_JOB = '51e8be45-30e9-4465-97c0-64cd2a9963db'
+COHORT_JOB_TAG = 'EF Cohort'
 
+TEST_JOB = '51e8be45-30e9-4465-97c0-64cd2a9963db'
+TEST_OPPORTUNITY_EMAIL = 'test@example.com'
+
+LEVER_BOT_USER = 'e6414a92-e785-46eb-ad30-181c18db19b5'
+
+COFFEE_FEEDBACK_FORM = '14598edb-390d-41e7-999c-fd56c3c4fe65'
+
+# AUTO_.. prefixes are used for auto-added attributes relating to the candidate data 
+# BOT_.. prefixes are used for auto-added attributed used by our bot
+#        - ignored for the purpose of detecting data changes
+AUTO_TAG_PREFIX = '🤖 '
+AUTO_LINK_PREFIX = 'http://🤖/'
+BOT_LINK_PREFIX = AUTO_LINK_PREFIX + 'bot/'
+BOT_METADATA_PREFIX = BOT_LINK_PREFIX + 'data/'
+
+TAG_ASSIGN_TO_LOCATION_NONE_FOUND = AUTO_TAG_PREFIX + 'No location tag'
+TAG_ASSIGN_TO_LOCATION_PREFIX = AUTO_TAG_PREFIX + 'Auto-assigned to cohort: '
+TAG_ASSIGNED_TO_LOCATION = AUTO_TAG_PREFIX + 'Auto-assigned to cohort'
+
+TAG_LINKEDIN_OPTOUT = AUTO_TAG_PREFIX + 'LinkedIn InMail likely decline'
+TAG_LINKEDIN_OPTIN_LIKELY = AUTO_TAG_PREFIX + 'LinkedIn InMail potential accept'
+TAG_LINKEDIN_OPTIN = AUTO_TAG_PREFIX + 'LinkedIn InMail accept awaiting followup'
+
+LINK_ALL_FEEDBACK_SUMMARY_PREFIX = AUTO_LINK_PREFIX + 'feedback/all/'
+
+TAG_DUPLICATE_ARCHIVED = AUTO_TAG_PREFIX + 'Archived duplicate'
+TAG_DUPLICATE_PREFIX = AUTO_TAG_PREFIX + "Duplicate: "
+TAG_ORIGINAL_PREFIX = AUTO_TAG_PREFIX + '[Original] '
+
+# deprecated: now storing under BOT_METADATA
+BOT_TAG_PREFIX = '🤖 [bot] '
+LAST_CHANGE_TAG_PREFIX = BOT_TAG_PREFIX + "last change detected: "
+TAG_CHECKSUM_PREFIX = BOT_TAG_PREFIX + "tag checksum: "
+LINK_CHECKSUM_PREFIX = BOT_LINK_PREFIX + "checksum/"
+TAG_LINKEDIN_OPTOUT_OLD = AUTO_TAG_PREFIX + 'LinkedIn InMail decline (suspected)'
+
+# deprecated: webhooks
 OPPORTUNITY_CHANGED_WEBHOOK_URLS = [
   ## Zap: New app + debrief info - https://zapier.com/app/history?root_id=80954860
   #'https://hooks.zapier.com/hooks/catch/3678640/o1tu42p/'
@@ -32,14 +69,7 @@ FULL_WEBHOOK_URLS = [
 #  'https://hooks.zapier.com/hooks/catch/6688770/o55rf2n/'
 ]
 
-COHORT_JOB_TAG = 'EF Cohort'
-
-LEVER_BOT_USER = 'e6414a92-e785-46eb-ad30-181c18db19b5'
-
-COFFEE_FEEDBACK_FORM = '14598edb-390d-41e7-999c-fd56c3c4fe65'
-
-TEST_OPPORTUNITY_EMAIL = 'test@example.com'
-
+# deprecated: CSV export
 CSV_EXPORT_HEADERS = %w[
   contact name application__name application__createdAt__datetime __empty__ application__type application__posting id stageChanges stage__text stage__id origin sources tags links archived__archivedAt__datetime archived__reason  owner__name  application__createdAt__datetime
   feedback_summary__ability_completed_at__datetime
@@ -84,32 +114,3 @@ CSV_EXPORT_HEADERS = %w[
   feedback_summary__phone_screen_completed_by
   feedback_summary__phone_screen_rating
 ]
-
-# AUTO_.. prefixes are used for auto-added attributes relating to the candidate data 
-# BOT_.. prefixes are used for auto-added attributed used by our bot
-#        - ignored for the purpose of detecting data changes
-AUTO_TAG_PREFIX = '🤖 '
-AUTO_LINK_PREFIX = 'http://🤖/'
-BOT_LINK_PREFIX = AUTO_LINK_PREFIX + 'bot/'
-BOT_METADATA_PREFIX = BOT_LINK_PREFIX + 'data/'
-
-TAG_ASSIGN_TO_LOCATION_NONE_FOUND = AUTO_TAG_PREFIX + 'No location tag'
-TAG_ASSIGN_TO_LOCATION_PREFIX = AUTO_TAG_PREFIX + 'Auto-assigned to cohort: '
-TAG_ASSIGNED_TO_LOCATION = AUTO_TAG_PREFIX + 'Auto-assigned to cohort'
-
-TAG_LINKEDIN_OPTOUT = AUTO_TAG_PREFIX + 'LinkedIn InMail likely decline'
-TAG_LINKEDIN_OPTIN_LIKELY = AUTO_TAG_PREFIX + 'LinkedIn InMail potential accept'
-TAG_LINKEDIN_OPTIN = AUTO_TAG_PREFIX + 'LinkedIn InMail accept awaiting followup'
-
-LINK_ALL_FEEDBACK_SUMMARY_PREFIX = AUTO_LINK_PREFIX + 'feedback/all/'
-
-TAG_DUPLICATE_ARCHIVED = AUTO_TAG_PREFIX + 'Archived duplicate'
-TAG_DUPLICATE_PREFIX = AUTO_TAG_PREFIX + "Duplicate: "
-TAG_ORIGINAL_PREFIX = AUTO_TAG_PREFIX + '[Original] '
-
-# deprecated: now storing under BOT_METADATA
-BOT_TAG_PREFIX = '🤖 [bot] '
-LAST_CHANGE_TAG_PREFIX = BOT_TAG_PREFIX + "last change detected: "
-TAG_CHECKSUM_PREFIX = BOT_TAG_PREFIX + "tag checksum: "
-LINK_CHECKSUM_PREFIX = BOT_LINK_PREFIX + "checksum/"
-TAG_LINKEDIN_OPTOUT_OLD = AUTO_TAG_PREFIX + 'LinkedIn InMail decline (suspected)'
