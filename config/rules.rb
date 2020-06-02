@@ -115,8 +115,11 @@ class Rules < BaseRules
   end
   
   def summarise_one_feedback(f, opp)
+    # don't summarise feedback if we have a new cohort not yet in config.rb
+    return {} if Util.cohort(opp, nil).nil?
+  
     result = {
-      'posting' => Util.posting(opp)
+      'cohort' => Util.cohort(opp)
     }
 
     # feedback type
@@ -164,7 +167,7 @@ class Rules < BaseRules
       result['gender'] = (f['fields'].select{|f| f[:_text] == 'gender'}.first || {})[:_value]
       
       # eligibile
-      opp_posting_code = (COHORT_JOBS.select { |j| j[:posting_id] == Util.posting(opp) }.first || {}).dig(:code)
+      cohort = (COHORT_JOBS.select { |j| j[:posting_id] == Util.posting(opp) }.first || {}).dig(:cohort)
       eligibility_value = (f['fields'].select { |f|
         f[:_text].include?('eligible') ||
         f[:_text].include?('elligible') ||
@@ -174,9 +177,9 @@ class Rules < BaseRules
           'eligible'
         elsif eligibility_value == 'no'
           'ineligible'
-        elsif opp_posting_code.nil? || eligibility_value.nil?
+        elsif cohort.nil? || eligibility_value.nil?
           nil # unknown
-        elsif (eligibility_value + ' ').include?(opp_posting_code.downcase + ' ')
+        elsif (eligibility_value + ' ').include?(cohort.downcase + ' ')
           'eligible'
         else
           'ineligible'

@@ -74,6 +74,18 @@ class Util
     opp.dig('applications', 0, 'posting') || none
   end
   
+  def self.cohort(opp, unknown='unknown')
+    posting_cohort(posting(opp)) || unknown
+  end
+  
+  def self.posting_data(posting_id)
+    COHORT_JOBS.select { |posting| posting[:posting_id] == posting_id }.first
+  end
+  
+  def self.posting_cohort(posting_id)
+    (posting_data(posting_id) || {})[:cohort]
+  end
+  
   def self.is_cohort_app(opp)
     opp['tags'].include?(COHORT_JOB_TAG)
   end
