@@ -122,9 +122,9 @@ module Controller_ProcessUpdates
       nil
     else
       client.remove_tags_if_set(opp, TAG_ASSIGN_TO_LOCATION_NONE_FOUND)
-      client.add_tag(opp, TAG_ASSIGN_TO_LOCATION_PREFIX + location[:name])
+      client.add_tag(opp, TAG_ASSIGN_TO_LOCATION_PREFIX + location[:tag])
       client.add_tag(opp, TAG_ASSIGNED_TO_LOCATION)
-      # add_note(opp, 'Assigned to cohort job: ' + location[:name] + ' based on tags')
+      # add_note(opp, 'Assigned to cohort job: ' + location[:tag] + ' based on tags')
       client.add_candidate_to_posting(opp["id"], location[:posting_id]) unless test_mode
       true
     end

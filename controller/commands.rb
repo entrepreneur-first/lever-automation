@@ -24,8 +24,8 @@ module Controller_Commands
       summary[:unassigned_leads_with_detected_location] += 1 if opp['applications'].length == 0 && !location.nil?
       summary[:unassigned_leads_without_detected_location] += 1 if opp['applications'].length == 0 && location.nil?
 
-      # puts location[:name] if opp['applications'].length == 0 && !location.nil?
-      tagable['unassigned_tagable_to_' + location[:name]] += 1 if opp['applications'].length == 0 && !location.nil?
+      # puts location[:tag] if opp['applications'].length == 0 && !location.nil?
+      tagable['unassigned_tagable_to_' + location[:tag]] += 1 if opp['applications'].length == 0 && !location.nil?
       tagable['unassigned_tagable_owned_by_' + (opp.dig('owner','name') || '')] += 1 if opp['applications'].length == 0 && !location.nil?
       tagable['unassigned_tagable_sourced_by_' + (opp.dig('sourcedBy','name') || '')] += 1 if opp['applications'].length == 0 && !location.nil?
       
