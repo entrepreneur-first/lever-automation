@@ -426,23 +426,22 @@ module Controller_ProcessUpdates
     latest_opp_id = opps.last['id']
     
     # see what type(s) of duplicates we have - multiple postings? etc.
-    latest_opp_by_posting = {}
+    latest_opp_by_cohort = {}
     opps.each { |o|
-      posting = (o.fetch('applications', []).first || {}).fetch('posting', 'none')
-      latest_opp_by_posting[posting] = opp['id']
+      latest_opp_by_cohort[Util.cohort(o)] = o['id']
     }
     
     duplicate_type =
-      if latest_opp_by_posting.length == 1 && latest_opp_by_posting.has_key?('none')
+      if latest_opp_by_cohort.length == 1 && latest_opp_by_cohort.has_key?('none')
         :general
-      elsif latest_opp_by_posting.length == 1
+      elsif latest_opp_by_cohort.length == 1
         :single
-      elsif latest_opp_by_posting.length == 2 && latest_opp_by_posting.has_key?('none')
+      elsif latest_opp_by_cohort.length == 2 && latest_opp_by_cohort.has_key?('none')
         :single_plus_general
       else
         :multiple
       end
-    latest_opps_per_posting = latest_opp_by_posting.values
+    latest_opps_per_cohort = latest_opp_by_cohort.values
     
     # ensure we've processed all opportunities for this candidate in order of creation
     opps.each { |o|
@@ -458,7 +457,7 @@ module Controller_ProcessUpdates
         process_again = true
       end
       
-      unless latest_opps_per_posting.include?(o['id']) || o['tags'].include?(TAG_DUPLICATE_ARCHIVED)
+      unless latest_opps_per_cohort.include?(o['id']) || o['tags'].include?(TAG_DUPLICATE_ARCHIVED)
         client.add_tag(o, TAG_DUPLICATE_ARCHIVED)
         unless test_mode
           # client.archive(opp)
