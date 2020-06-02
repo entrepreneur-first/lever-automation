@@ -170,7 +170,7 @@ class Rules < BaseRules
         f[:_text].include?('elligible') ||
         f[:_text].include?('cohort they can join')
       }.first || {})[:_value]
-      result['eligibile'] = eligibility_value == 'yes' || (!opp_posting_code.nil? && ((eligibility_value || '') + ' ').include?(opp_posting_code.downcase + ' ')) ? 'eligible' : 'ineligible'
+      result['eligible'] = (eligibility_value == 'yes' || (!opp_posting_code.nil? && ((eligibility_value || '') + ' ').include?(opp_posting_code.downcase + ' '))) ? 'eligible' : 'ineligible'
     end
     
     if ['app_review', 'ability_interview'].include? result['type']
