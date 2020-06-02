@@ -417,7 +417,7 @@ module Controller_ProcessUpdates
       o['createdAt']
     }
     
-    original_source = Util.overall_source_from_opp(opps.first).delete_prefix(AUTO_TAG_PREFIX)
+    original_source = (Util.overall_source_from_opp(opps.first) || '').delete_prefix(AUTO_TAG_PREFIX)
     latest_opp_id = opps.last['id']
     
     # see what type(s) of duplicates we have - multiple postings? etc.
@@ -448,7 +448,7 @@ module Controller_ProcessUpdates
       process_again = false
 
       # don't apply original source tag to original opp
-      unless (o['id'] == opps.first['id']) || o['tags'].include?(TAG_ORIGINAL_PREFIX + original_source)
+      unless (o['id'] == opps.first['id']) || (original_source == '') || o['tags'].include?(TAG_ORIGINAL_PREFIX + original_source)
         client.add_tag(o, TAG_ORIGINAL_PREFIX + original_source)
         process_again = true
       end
