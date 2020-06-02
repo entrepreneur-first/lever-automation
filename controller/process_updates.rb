@@ -445,7 +445,7 @@ module Controller_ProcessUpdates
       process_again = false
 
       # don't apply original source tag to original opp
-      unless o['id'] == opps.first['id'] || o['tags'].include?(TAG_ORIGINAL_PREFIX + original_source)
+      unless (o['id'] == opps.first['id']) || o['tags'].include?(TAG_ORIGINAL_PREFIX + original_source)
         client.add_tag(opp, TAG_ORIGINAL_PREFIX + original_source)
         process_again = true
       end
