@@ -83,7 +83,7 @@ class Router
     
     # process
     'process': -> (opp) {
-      @controller.process_opportunity(opp)
+      @controller.process_one_opportunity(opp)
     },
     'process_all': -> {
       @controller.process_opportunities(nil)

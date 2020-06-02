@@ -116,6 +116,12 @@ module Controller_Commands
     end
   end
 
+  def process_one_opportunity(opp, test_mode=false)
+    @opps_processed = Hash.new(0)
+    @contacts_processed = Hash.new(0)
+    process_opportunity(opp, test_mode)
+  end
+
   def export_to_bigquery(archived=nil, all_fields=true, test=false)
     prefix = Time.now
     log_opp_type = archived ? 'archived ' : (archived.nil? ? '' : 'active ')
