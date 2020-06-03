@@ -454,7 +454,6 @@ module Controller_ProcessUpdates
       # don't apply original source tag to original opp
       unless (o['id'] == opps.first['id']) || (original_source == '')
         rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {tag: original_source}, rules.tags(:source), o)
-        process_again = true
       else
         rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {remove: true}, rules.tags(:source), o)
       end
@@ -471,6 +470,11 @@ module Controller_ProcessUpdates
 
       # apply tag indicating specific type of dupes to all affected opps
       rules.apply_single_tag(TAG_DUPLICATE_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opps), o)
+
+      if client.commit_opp(o, test_mode)
+        result[o['id']]['updated'] = true
+        process_again = true
+      end
       
       if process_again
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }

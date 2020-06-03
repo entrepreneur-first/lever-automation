@@ -111,9 +111,17 @@ class Client
 
   def commit_opp(opp, test_mode=false)
     updated = false
-    ['Tags','Links'].each{|type|
-      (updated = true; add_annotations(opp, type, opp['_add'+type], !test_mode)) if Array(opp['_add'+type]).any?
-      (updated = true; remove_annotations(opp, type, opp['_remove'+type], !test_mode)) if Array(opp['_remove'+type]).any?
+    ['Tags','Links'].each{ |type|
+      if Array(opp['_add'+type]).any?
+        add_annotations(opp, type, opp['_add'+type], !test_mode)
+        opp['_add'+type] = []
+        updated = true
+      end
+      if Array(opp['_remove'+type]).any?
+        remove_annotations(opp, type, opp['_remove'+type], !test_mode)
+        opp['_remove'+type] = []
+        updated = true
+      end
     }
     updated
   end
@@ -168,7 +176,6 @@ class Client
       result = post("#{opp_url(opp)}/add#{type}?", {"#{ltype}": values})
       values.each {|value|
         opp[ltype] += [value] if !opp[ltype].include?(value)
-        opp['_add'+type].delete(value) if Array(opp['_add'+type]).any?
       }
       result
     end
@@ -184,7 +191,6 @@ class Client
       result = post("#{opp_url(opp)}/remove#{type}?", {"#{ltype}": values})
       values.each {|value|
         opp[ltype].delete(value)
-        opp['_remove' + type].delete(value) if Array(opp['_remove'+type]).any?
       }
       result
     end
