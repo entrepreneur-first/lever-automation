@@ -56,7 +56,7 @@ class Util
 
   def self.parse_all_feedback_summary_link(opp)
     URI.decode_www_form((opp['links'].select {|l|
-      l.start_with?(LINK_ALL_FEEDBACK_SUMMARY_PREFIX)
+      l.start_with?(LINK_ALL_FEEDBACK_SUMMARY_PREFIX + cohort(opp) + '?')
     }.first || '').sub(/[^?]*\?/, '')).to_h
   end
   
