@@ -244,7 +244,7 @@ class Rules < BaseRules
     # Links are shared across all opportunities for that candidate contact
     # so here we filter down to just feedback for the same cohort as the current opportunity
     summaries.select! { |f| f['cohort'] == Util.cohort(opp) }
-  
+
     return {} unless summaries.any?
   
     result = {
