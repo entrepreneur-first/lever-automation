@@ -347,9 +347,10 @@ module Controller_ProcessUpdates
     #
     
     all_link = all_feedback_summary_link(opp)
-    unless opp['links'].include?(all_link)
-      client.remove_links_with_prefix(opp, LINK_ALL_FEEDBACK_SUMMARY_PREFIX + Util.cohort(opp) + '?')
-    end
+    client.remove_links(opp, opp['links'].select { |link|
+      link.start_with?(LINK_ALL_FEEDBACK_SUMMARY_PREFIX + Util.cohort(opp) + '?') &&
+      (link != (all_link || ''))
+    })
     unless all_link.nil? || opp['links'].include?(all_link) || Util.cohort(opp, nil).nil?
       client.add_links(opp, all_link)
     end
