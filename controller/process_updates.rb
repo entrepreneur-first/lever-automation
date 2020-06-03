@@ -429,7 +429,7 @@ module Controller_ProcessUpdates
     # see what type(s) of duplicates we have - multiple postings? etc.
     latest_opp_by_cohort = {}
     opps.each { |o|
-      latest_opp_by_cohort[Util.cohort(o)] = o['id']
+      latest_opp_by_cohort[Util.cohort(o, 'none')] = o['id']
     }
     
     duplicate_type =
