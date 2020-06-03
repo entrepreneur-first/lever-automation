@@ -168,6 +168,7 @@ class Client
       result = post("#{opp_url(opp)}/add#{type}?", {"#{ltype}": values})
       values.each {|value|
         opp[ltype] += [value] if !opp[ltype].include?(value)
+        opp['_add'+type].delete(value) if Array(opp['_add'+type]).any?
       }
       result
     end
@@ -183,6 +184,7 @@ class Client
       result = post("#{opp_url(opp)}/remove#{type}?", {"#{ltype}": values})
       values.each {|value|
         opp[ltype].delete(value)
+        opp['_remove' + type].delete(value) if Array(opp['_remove'+type]).any?
       }
       result
     end
