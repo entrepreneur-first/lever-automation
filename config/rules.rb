@@ -242,8 +242,8 @@ class Rules < BaseRules
   def summarise_all_feedback(summaries, opp)
     # We store feedback summaries within Lever as links on the candidate contact
     # Links are shared across all opportunities for that candidate contact
-    # so here we filter down to just feedback for the same posting as the current opportunity
-    summaries.select! { |f| f['posting'] == Util.posting(opp) }
+    # so here we filter down to just feedback for the same cohort as the current opportunity
+    summaries.select! { |f| f['cohort'] == Util.cohort(opp) }
   
     return {} unless summaries.any?
   
