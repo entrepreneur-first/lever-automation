@@ -4,19 +4,6 @@ module Controller_Fixes
 
   # temp commands
 
-  # detect duplicate opportunities for a candidate
-  def detect_duplicate_opportunities(opp)
-    client.remove_tags_with_prefix(opp, TAG_DUPLICATE_OPPS_PREFIX) if opp["applications"].count < 2
-    posting_ids = opp["applications"].map {|a| a["posting"] || 'none'}
-    duplicates = Util.dup_hash(posting_ids)
-    # multiple opps, same position
-    client.add_tag(opp, TAG_DUPLICATE_OPPS_PREFIX + " same posting") if duplicates.length > 0
-    # multiple opps, for different positions
-    client.add_tag(opp, TAG_DUPLICATE_OPPS_PREFIX + " different posting") if posting_ids.reject {|p| p == 'none' }.uniq.length > 1
-    # one or more opps for a position, as well as a lead with no job position assigned
-    client.add_tag(opp, TAG_DUPLICATE_OPPS_PREFIX + " without posting") if posting_ids.reject {|p| p == 'none' }.length > 0 && posting_ids.include?("none")
-  end
-
   def opportunities_without_posting
     log_string = 'opportunities_without_posting'
     params = {}

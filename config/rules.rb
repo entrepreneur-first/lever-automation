@@ -5,7 +5,11 @@ require_relative '../app/base_rules.rb'
 # Logic for rules we wish to apply
 #
 
+TAG_OVERALL = AUTO_TAG_PREFIX + 'Overall: '
+
 TAG_FROM_APPLICATION = AUTO_TAG_PREFIX + 'App: '
+
+TAG_FROM_PRE_SCREEN = AUTO_TAG_PREFIX + 'Pre-Screen: '
 TAG_FROM_COFFEE = AUTO_TAG_PREFIX + 'Coffee: '
 TAG_FROM_APP_REVIEW = AUTO_TAG_PREFIX + 'App Review: '
 TAG_FROM_PHONE_SCREEN = AUTO_TAG_PREFIX + 'Phone Screen: '
@@ -24,6 +28,8 @@ class Rules < BaseRules
         referral: 'Referral',
         organic: 'Organic',
         offline: 'Offline',
+        digital_marketing: 'DM',
+        rollover: 'Rollover',
         offline_organic: 'Offline-or-Organic',
         error: '<source unknown>'
       },
@@ -81,8 +87,15 @@ class Rules < BaseRules
         yes: 'Healthcare',
         no: 'Not Healthcare',
         error: '<healthcare unknown>'
+      },
+      
+      duplicate_opps: {
+        general: 'General opportunity',
+        single: 'Single posting',
+        single_plus_general: 'Single posting + general opp',
+        multiple: 'Multiple postings'
       }
-    }  
+    }
   end
 
   def update_links(opp)
@@ -101,16 +114,23 @@ class Rules < BaseRules
     add_links(links.uniq)
   end
   
-  def summarise_one_feedback(f)
-    result = {}
+  def summarise_one_feedback(f, opp)
+    # don't summarise feedback if we have a new cohort not yet in config.rb
+    return {} if Util.cohort(opp, nil).nil?
+  
+    result = {
+      'cohort' => Util.cohort(opp)
+    }
 
     # feedback type
     type = Util.simplify_str(f['text'])
     result['title'] = type
     result['type'] =
-      if type.include?('coffee') || type.include?('initial call') || type.include?('london call') || type.include?('berlin call') || type.include?('paris call') || type.include?('toronto call')
+      if type.include?('coffee') || type.include?('initial call') || type.include?('london call') || type.include?('berlin call') || type.include?('paris call') || type.include?('toronto call') || type.include?('sy stream stage 4')
         'coffee'
-      elsif type.include?('phone screen')
+      elsif type.include?('sy stream phone screen') || type.include?('sy stream pi')
+        'pre_coffee_screen'
+      elsif type.include?('phone screen') # excludes 'sy stream phone screen' above
         'phone_screen'
       elsif type.include?('app review')
         'app_review'
@@ -124,16 +144,46 @@ class Rules < BaseRules
         'unknown'
       end
     
-    # rating  
-    result['rating'] = (f['fields'].select{|f| f[:_text] == 'rating' || f[:_text].include?('could pass ic')|| f[:_text].include?('overall score')}.first || {})[:_value]
+    # rating
+    # always one field of type 'score-system' for overall feedback rating
+    result['rating'] = (f['fields'].select{|f| f['type'] == 'score-system'}.first || {})[:_value]
+    # for imported feedback forms where all fields are strings, fall back to field name
+    result['rating'] ||= (f['fields'].select{|f| f[:_text] == 'rating'}.first || {})[:_value].to_s
+    result['rating'] = case result['rating']
+      when '1'
+        '1 - Strong No Hire'
+      when '2'
+        '2 - No Hire'
+      when '3'
+        '3 - Hire'
+      when '4'
+        '4 - Strong Hire'
+      else
+        result['rating']
+      end
     
-    if result['type'] == 'coffee'
+    if ['pre_coffee_screen', 'coffee'].include?(result['type'])
       # gender
       result['gender'] = (f['fields'].select{|f| f[:_text] == 'gender'}.first || {})[:_value]
       
       # eligibile
-      # TODO: question title/format varies
-      result['eligibile'] = (f['fields'].select{|f| f[:_text].include?('eligible for the upcoming cohort')}.first || {})[:_value]
+      cohort = (COHORT_JOBS.select { |j| j[:posting_id] == Util.posting(opp) }.first || {}).dig(:cohort)
+      eligibility_value = (f['fields'].select { |f|
+        f[:_text].include?('eligible') ||
+        f[:_text].include?('elligible') ||
+        f[:_text].include?('cohort they can join')
+      }.first || {})[:_value]
+      result['eligible'] = if eligibility_value == 'yes'
+          'eligible'
+        elsif eligibility_value == 'no'
+          'ineligible'
+        elsif cohort.nil? || eligibility_value.nil?
+          nil # unknown
+        elsif (eligibility_value + ' ').include?(cohort.downcase + ' ')
+          'eligible'
+        else
+          'ineligible'
+        end
     end
     
     if ['app_review', 'ability_interview'].include? result['type']
@@ -148,8 +198,6 @@ class Rules < BaseRules
     end
     
     if ['app_review', 'debrief'].include?(result['type'])
- 
-     
       # talker/doer
       # TODO: question?
       result['talker_doer'] = (f['fields'].select{|f| f[:_text].include?('talker')}.first || {})[:_value]
@@ -163,15 +211,13 @@ class Rules < BaseRules
       result['technology'] = (f['fields'].select{|f| f[:_text] == 'technology'}.first || {})[:_value]
     end    
     
-    if ['coffee', 'app_review', 'debrief'].include?(result['type'])
+    if ['pre_coffee_screen', 'coffee', 'app_review', 'debrief'].include?(result['type'])
       # edge
       # TODO: question title varies
-      
       result['edge'] = (f['fields'].select{|f| f[:_text].include?('edge')}.first || {})[:_value]
 
       # software/hardware
       # TODO: question?
-
       result['software_hardware'] = (f['fields'].select{|f| f[:_text].include?('software')}.first || {})[:_value]
     end
     
@@ -193,10 +239,24 @@ class Rules < BaseRules
     result
   end
 
-  def summarise_all_feedback(summaries)
+  def summarise_all_feedback(summaries, opp)
+    # We store feedback summaries within Lever as links on the candidate contact
+    # Links are shared across all opportunities for that candidate contact
+    # so here we filter down to just feedback for the same cohort as the current opportunity
+    summaries.select! { |f| f['cohort'] == Util.cohort(opp) }
+
     return {} unless summaries.any?
   
     result = {
+      has_pre_coffee_screen: false,
+      pre_coffee_screen_rating: nil,
+      pre_coffee_screen_edge: nil,
+      pre_coffee_screen_gender: nil,
+      pre_coffee_screen_eligible: nil,
+      pre_coffee_screen_software_hardware: nil,
+      pre_coffee_screen_completed_at: nil,
+      pre_coffee_screen_completed_by: nil,
+
       has_coffee: false,
       coffee_rating: nil,
       coffee_edge: nil,
@@ -206,11 +266,6 @@ class Rules < BaseRules
       coffee_completed_by: nil,
       coffee_software_hardware: nil,
 
-      has_phone_screen: false,
-      phone_screen_rating: nil,
-      phone_screen_completed_at: nil,
-      phone_screen_completed_by: nil,
-      
       has_app_review: false,
       app_review_rating: nil,
       app_review_edge: nil,
@@ -221,6 +276,11 @@ class Rules < BaseRules
       app_review_ceo_cto: nil,
       app_review_completed_at: nil,
       app_review_completed_by: nil,
+      
+      has_phone_screen: false,
+      phone_screen_rating: nil,
+      phone_screen_completed_at: nil,
+      phone_screen_completed_by: nil,
       
       has_ability: false,
       ability_rating: nil,
@@ -245,8 +305,18 @@ class Rules < BaseRules
       debrief_visa_exposure: nil
     }
     
-    summaries.each {|f|
+    summaries.sort_by{|f| f['submitted_at'] || ''}.each {|f|
       case f['type']
+      when 'pre_coffee_screen'
+        result[:has_pre_coffee_screen] = true
+        result[:pre_coffee_screen_rating] = f['rating']
+        result[:pre_coffee_screen_edge] = f['edge']
+        result[:pre_coffee_screen_gender] = f['gender']
+        result[:pre_coffee_screen_eligible] = f['eligible']
+        result[:pre_coffee_screen_software_hardware] = f['software_hardware']
+        result[:pre_coffee_screen_completed_at] = f['submitted_at']
+        result[:pre_coffee_screen_completed_by] = f['submitted_by']
+        
       when 'coffee'
         result[:has_coffee] = true
         result[:coffee_rating] = f['rating']
@@ -256,7 +326,6 @@ class Rules < BaseRules
         result[:coffee_completed_at] = f['submitted_at']
         result[:coffee_completed_by] = f['submitted_by']
         result[:coffee_software_hardware] = f['software_hardware']
-        
         
       when 'app_review'
         result[:has_app_review] = true
@@ -302,7 +371,20 @@ class Rules < BaseRules
         result[:debrief_completed_at] = f['submitted_at']
       end
     }
-  
+    
+    # legacy fix for hardware/software tags
+    if (opp['tags'] & ['Software', 'Hardware']).any?
+      value = opp['tags'].include?('Software') ? 'software' : 'hardware'
+      # set value for most feedback form if not already present
+      if result[:has_app_review]
+        result[:app_review_software_hardware] ||= value
+      elsif result[:has_coffee]
+        result[:coffee_software_hardware] ||= value
+      elsif result[:has_pre_coffee_screen]
+        result[:pre_coffee_screen_software_hardware] ||= value
+      end
+    end
+    
     result
   end
 
@@ -317,7 +399,13 @@ class Rules < BaseRules
       apply_single_tag(TAG_FROM_APPLICATION, gender_from_app(opp), tags(:gender))
     end
     
+    # "master" source
+    apply_single_tag(TAG_OVERALL, {tag: overall_source(opp)}, tags(:source))
+    
     # feedback
+    apply_feedback_tag(TAG_FROM_PRE_SCREEN, :pre_coffee_screen_rating, :rating, :has_pre_coffee_screen)
+    apply_feedback_tag(TAG_FROM_PRE_SCREEN, :pre_coffee_screen_eligible, :eligibility, :has_pre_coffee_screen)
+    
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_rating, :rating, :has_coffee)
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_edge, :edge, :has_coffee)
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_gender, :gender, :has_coffee)
@@ -384,7 +472,7 @@ class Rules < BaseRules
         'healthcare'
       when 'no'
         'not healthcare'
-      end      
+      end
 
     when :visa_exposure
       case value
@@ -395,6 +483,75 @@ class Rules < BaseRules
       end
     
     end
+  end
+
+  def overall_source(opp)
+    potential_source_tags = tags(:source)    
+    tags = opp["tags"].map { |t| t.downcase.strip }
+    
+    # 0) If manually tagged "rollover", go with that above everything else
+    tags.each { |tag|
+      return potential_source_tags[:rollover] if tag.include?('rollover')
+    }
+
+    # 1) TODO: any merged-in source tags
+    
+
+    # 2) first, look at the source tags
+    
+    source_tags_map = {
+      # source tag => overall source to apply
+      /rollover/ => :rollover,
+      /sourced/ => :sourced,
+      'referral' => :referral,
+      'offline' => :offline,
+      'organic' => :organic,
+      /linkedin [a-z]+/ => :digital_marketing,
+      'fb' => :digital_marketing,
+      'facebook' => :digital_marketing,
+      'twitter' => :digital_marketing,
+      'quora' => :digital_marketing,
+      'dm' => :digital_marketing,
+      'digital marketing' => :digital_marketing,
+      'angellist' => :digital_marketing,
+      'ai-jobs' => :digital_marketing,
+      'researchgate' => :digital_marketing,
+      'linkedin' => :sourced
+    }
+    sources = opp["sources"].map { |s| s.downcase.strip }
+    source_tags_map.each { |key, value|
+      if key.respond_to?(:match)
+        sources.each { |s|
+          return potential_source_tags[value] if key.match?(s)
+        }
+      else
+        return potential_source_tags[value] if sources.include?(key)
+      end
+    }
+
+    # 3) if unclear from source tags, look for clues in generic tags
+    
+    tags_map = {
+      'dm' => :digital_marketing,
+      'sourced' => :sourced
+    }
+    tags_map.each { |key, value|
+      if key.respond_to?(:match)
+        tags.each { |s|
+          return potential_source_tags[value] if key.match?(s)
+        }
+      else
+        return potential_source_tags[value] if tags.include?(key)
+      end
+    }
+    
+    # 4) if no source tag detected, look at the self-reported source from the application
+    
+    from_app = Util.find_tag_value(opp, tags(:source), TAG_FROM_APPLICATION)
+    return from_app if from_app
+    
+    # 5) .. otherwise ¯\_(ツ)_/¯ 
+    nil
   end
 
   def source_from_app(opp)
@@ -415,7 +572,7 @@ class Rules < BaseRules
         map = [
           ['been on the ef programme', tags[:referral]],
           ['worked at ef', tags[:referral]],
-          ['professional network', tags[:organicl]],
+          ['professional network', tags[:organic]],
           ['friends or family', tags[:organic]]
         ]
         source = nil
@@ -431,7 +588,7 @@ class Rules < BaseRules
           ['directly contacted by ef', tags[:sourced]],
           ['cohort member', tags[:referral]],
           ['someone else', tags[:organic]], # if not already covered above by latter questions
-          ['came across ef', tags[:offline_organic]],
+          ['came across ef', tags[:organic]],
           ['event', tags[:offline]]
         ]
         source = nil

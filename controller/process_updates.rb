@@ -1,27 +1,29 @@
 # frozen_string_literal: true
-require_relative '../app/bigquery'
 
 module Controller_ProcessUpdates
 
   # process a single opportunity
   # apply changes & trigger webhook as necessary
-  def process_opportunity(opp)
-    return {'anonymized': true} if opp['isAnonymized']
+  def process_opportunity(opp, test_mode=false)
+    @opps_processed ||= Hash.new(0)
+    @opps_processed[opp['id']] += 1
+    
+    return {opp['id'] => {'anonymized': true}} if opp['isAnonymized']
   
-    result = {}
+    result = Hash.new { |hash, key| hash[key] = {} }
     log.log_prefix(opp['id'] + ': ')
-    client.batch_updates
+    prev_client_batch_updates = client.batch_updates
 
     # checks lastInteractionAt and tag checksum, creating checksum tag if necessary
     last_update = latest_change(opp)
     # should notify of change based on state before we executed?
     notify = last_update[:time] > last_change_detected(opp) + 100
 
-    if check_no_posting(opp)
+    if check_no_posting(opp, test_mode)
       # if we added to a job then reload as tags etc will have changed automagically 
       # based on new posting assignment
       client.refresh_opp(opp)
-      result['assigned_to_job'] = true
+      result[opp['id']]['assigned_to_job'] = true
     end
     
     check_linkedin_optout(opp)
@@ -31,7 +33,7 @@ module Controller_ProcessUpdates
       prepare_app_responses(opp)
       add_links(opp)
       summarise_feedbacks(opp)
-      # detect_duplicate_opportunities(opp)
+      result.merge(detect_duplicates(opp, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       rules.do_update_tags(opp)
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
@@ -41,10 +43,10 @@ module Controller_ProcessUpdates
         end
       }
 
-      if notify
+      if notify && !test_mode
         # send webhook of change
         notify_of_change(opp, last_update)
-        result['sent_webhook'] = result['updated'] = true
+        result[opp['id']]['sent_webhook'] = result[opp['id']]['updated'] = true
       else 
         # we didn't have a change to notify, but we added one or more notes
         # which will update lastInteractionAt
@@ -53,16 +55,22 @@ module Controller_ProcessUpdates
       end
 
       if commit_bot_metadata(opp)
-        result['updated'] = true
+        result[opp['id']]['updated'] = true
       end
     end
 
-    if client.commit_opp(opp)
-      result['updated'] = true
+    if test_mode
+      result[opp['id']]['_addTags'] = opp['_addTags']
+      result[opp['id']]['_removeTags'] = opp['_removeTags']
+    end
+
+    if client.commit_opp(opp, test_mode)
+      result[opp['id']]['updated'] = true
     end
 
     log.pop_log_prefix
-    client.batch_updates(false)
+    client.batch_updates(prev_client_batch_updates)
+
     result
   end
 
@@ -104,7 +112,7 @@ module Controller_ProcessUpdates
   # Note slight confusion between Lever interface vs API:
   # - Leads not assigned to a job posting show up in Lever as candidates with "no opportunity", but are returned in the API as opportunities without an application
   # - Leads assigned to a job posting show up in Lever as opportunities - potentially multiple per candidate. These show up in the API as applications against the opportunity - even when no actual application submitted
-  def check_no_posting(opp)
+  def check_no_posting(opp, test_mode)
     return if Util.has_posting(opp) || Util.is_archived(opp)
     
     location = location_from_tags(opp)
@@ -114,10 +122,10 @@ module Controller_ProcessUpdates
       nil
     else
       client.remove_tags_if_set(opp, TAG_ASSIGN_TO_LOCATION_NONE_FOUND)
-      client.add_tag(opp, TAG_ASSIGN_TO_LOCATION_PREFIX + location[:name])
+      client.add_tag(opp, TAG_ASSIGN_TO_LOCATION_PREFIX + location[:tag])
       client.add_tag(opp, TAG_ASSIGNED_TO_LOCATION)
-      # add_note(opp, 'Assigned to cohort job: ' + location[:name] + ' based on tags')
-      client.add_candidate_to_posting(opp["id"], location[:posting_id])
+      # add_note(opp, 'Assigned to cohort job: ' + location[:tag] + ' based on tags')
+      client.add_candidate_to_posting(opp["id"], location[:posting_id]) unless test_mode
       true
     end
   end
@@ -166,8 +174,7 @@ module Controller_ProcessUpdates
   end
 
   def update_bigquery(opp, update_time=nil)
-    @bigquery ||= BigQuery.new(@log)
-    @bigquery.insert_async_ensuring_columns(Util.flatten_hash(Util.opp_view_data(opp).merge({"#{BIGQUERY_IMPORT_TIMESTAMP_COLUMN}": update_time || opp['lastInteractionAt']})))
+    bigquery.insert_async_ensuring_columns(Util.flatten_hash(Util.opp_view_data(opp).merge({"#{BIGQUERY_IMPORT_TIMESTAMP_COLUMN}": update_time || opp['lastInteractionAt']})))
   end
 
   def update_changed_tag(opp, update_time=nil)
@@ -183,7 +190,8 @@ module Controller_ProcessUpdates
     [
       {time: opp["lastInteractionAt"], source: 'a new interaction'},
       tags_have_changed?(opp),
-      links_have_changed?(opp)
+      links_have_changed?(opp),
+      sources_have_changed?(opp)
     ].reject {|x| x.nil?}.max_by {|x| x[:time]}
   end
 
@@ -225,6 +233,25 @@ module Controller_ProcessUpdates
     end
   end
   
+  # detect if source(s) have changed since we last checked, based on special checksum
+  def sources_have_changed?(opp)
+    checksum = attribute_checksum(opp, 'sources')
+    existing = existing_sources_checksum(opp)
+
+    if existing != checksum
+      set_bot_metadata(opp, 'sources_checksum', checksum)
+    end
+
+    if existing != checksum && !existing.nil?
+      {
+        time: Time.now.to_i*1000,
+        source: "sources updated\n#" + opp['sources'].sort.join(" #")
+      }
+    else
+      nil
+    end
+  end
+  
   # calculate checksum for tags/links
   # - excludes bot-applied
   def attribute_checksum(opp, type)
@@ -259,14 +286,18 @@ module Controller_ProcessUpdates
     nil
   end
 
+  def existing_sources_checksum(opp)
+    return bot_metadata(opp)['sources_checksum'] if bot_metadata(opp)['sources_checksum']
+    nil
+  end
+
   def last_change_detected(opp)
     bot_metadata(opp)['last_change_detected'].to_i
   end
   
   def prepare_app_responses(opp)
     # responses to questions are subdivided by custom question set - need to combine them together
-    opp['_app_responses'] = []
-    opp['_app_responses'] = opp['applications'][0]['customQuestions'].reduce([]) {|a, b| a+b['fields']} if opp.dig('applications', 0, 'customQuestions')
+    opp['_app_responses'] = (opp.dig('applications', 0, 'customQuestions') || []).reduce([]) {|a, b| a+b['fields']}
     simple_response_text(opp['_app_responses'])    
   end
   
@@ -294,20 +325,33 @@ module Controller_ProcessUpdates
   def summarise_feedbacks(opp)
     if (opp['lastInteractionAt'] > last_change_detected(opp)) || feedback_outdated(opp)
       # summarise each feedback
-      client.feedback_for_opp(opp).each {|f|
+      (
+        client.feedback_for_opp(opp) + 
+        client.profile_forms_for_opp(opp)
+      ).each { |f|
+        if (f['deletedAt'] || 0) > 0
+          client.remove_links_with_prefix(opp, one_feedback_summary_link_prefix(f))
+          next
+        end
         simple_response_text(f['fields'])
-        link = one_feedback_summary_link(f)
-        next if opp['links'].include?(link)
+        link = one_feedback_summary_link(f, opp)
+        next if link.nil? || opp['links'].include?(link)
         client.remove_links_with_prefix(opp, one_feedback_summary_link_prefix(f))
         client.add_links(opp, link)
       }
     end
 
+    # tidy legacy summary format; TODO(remove)
+    client.remove_links_with_prefix(opp, LINK_ALL_FEEDBACK_SUMMARY_PREFIX + '?')
+    client.remove_links_with_prefix(opp, LINK_ALL_FEEDBACK_SUMMARY_PREFIX + Util.posting(opp) + '?')
+    #
+    
     all_link = all_feedback_summary_link(opp)
-    unless opp['links'].include?(all_link)
-      client.remove_links_with_prefix(opp, LINK_ALL_FEEDBACK_SUMMARY_PREFIX)
-    end
-    unless all_link.nil? || opp['links'].include?(all_link)
+    client.remove_links(opp, opp['links'].select { |link|
+      link.start_with?(LINK_ALL_FEEDBACK_SUMMARY_PREFIX + Util.cohort(opp) + '?') &&
+      (link != (all_link || ''))
+    })
+    unless all_link.nil? || opp['links'].include?(all_link) || Util.cohort(opp, nil).nil?
       client.add_links(opp, all_link)
     end
   end
@@ -326,8 +370,17 @@ module Controller_ProcessUpdates
     AUTO_LINK_PREFIX + "feedback/#{f['id']}/"
   end
   
-  def one_feedback_summary_link(f)
-    one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(rules.summarise_one_feedback(f).sort)
+  def one_feedback_summary_link(f, opp)
+    if f['type'] == 'form'
+      f['fields'].each { |field|
+        f[field['text']] = field['value'] if ['createdAt', 'completedAt', 'user'].include?(field['text'])
+      }
+    end
+    
+    summary = rules.summarise_one_feedback(f, opp)
+    return if summary.empty?
+    
+    one_feedback_summary_link_prefix(f) + feedback_rules_checksum + '?' + URI.encode_www_form(summary.sort)
   end
   
   def all_feedback_summary_link(opp)
@@ -337,19 +390,99 @@ module Controller_ProcessUpdates
         URI.decode_www_form(l.sub(/[^?]*\?/, '')).to_h
       }
     return unless feedback_data.any?
-    summary = rules.summarise_all_feedback(feedback_data)
+    summary = rules.summarise_all_feedback(feedback_data, opp)
     return unless summary.any?
-    LINK_ALL_FEEDBACK_SUMMARY_PREFIX + '?' + URI.encode_www_form(summary.sort)
+    LINK_ALL_FEEDBACK_SUMMARY_PREFIX + Util.cohort(opp) + '?' + URI.encode_www_form(summary.sort)
   end
   
   # determine intended cohort location from lead tags
   def location_from_tags(opp)
     opp["tags"].each { |tag|
-      COHORT_JOBS.each { |cohort|
-        return cohort if tag.downcase.include?(cohort[:name])
+      COHORT_JOBS.select { |cohort| cohort.has_key?(:tag) }.each { |cohort|
+        return cohort if tag.downcase.include?(cohort[:tag])
       }
     }
     nil
+  end
+
+  def detect_duplicates(opp, test_mode)
+    result = Hash.new { |hash, key| hash[key] = {} }
+    
+    @contacts_processed ||= Hash.new(0)
+    @contacts_processed[opp['contact']] += 1
+    
+    # we process duplicates on detection of the 2nd opportunity for a specific contact
+    # nb. we (currently) only process opportunities assigned to a cohort job posting or no posting ("general opportunity") - not EF team jobs
+    return result unless @contacts_processed[opp['contact']] == 2
+
+    # ok, we have a duplicate
+    # get all (cohort/unassigned) opportunities for this contact
+    opps = client.opportunities_for_contact(opp['contact']).select { |o| 
+      !Util.has_posting(o) || Util.is_cohort_app(o)
+    }.sort_by { |o|
+      o['createdAt']
+    }
+    
+    original_source = (Util.overall_source_from_opp(opps.first) || '').delete_prefix(AUTO_TAG_PREFIX)
+    latest_opp_id = opps.last['id']
+    
+    # see what type(s) of duplicates we have - multiple postings? etc.
+    latest_opp_by_cohort = {}
+    opps.each { |o|
+      latest_opp_by_cohort[Util.cohort(o, 'none')] = o['id']
+    }
+    
+    duplicate_type =
+      if latest_opp_by_cohort.length == 1 && latest_opp_by_cohort.has_key?('none')
+        :general
+      elsif latest_opp_by_cohort.length == 1
+        :single
+      elsif latest_opp_by_cohort.length == 2 && latest_opp_by_cohort.has_key?('none')
+        :single_plus_general
+      else
+        :multiple
+      end
+    latest_opps_per_cohort = latest_opp_by_cohort.values
+    
+    # ensure we've processed all opportunities for this candidate in order of creation
+    opps.each { |o|
+      unless @opps_processed.has_key?(o['id'])
+        result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
+      end
+
+      process_again = false
+
+      # don't apply original source tag to original opp
+      unless (o['id'] == opps.first['id']) || (original_source == '')
+        rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {tag: original_source}, rules.tags(:source), o)
+      else
+        rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {remove: true}, rules.tags(:source), o)
+      end
+      
+      unless latest_opps_per_cohort.include?(o['id'])
+        client.add_tags_if_unset(o, TAG_DUPLICATE_ARCHIVED)
+        unless test_mode
+          # client.archive(opp)
+        end
+        # process_again = true
+      else
+        client.remove_tags_if_set(o, TAG_DUPLICATE_ARCHIVED)
+      end
+
+      # apply tag indicating specific type of dupes to all affected opps
+      rules.apply_single_tag(TAG_DUPLICATE_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opps), o)
+
+      if client.commit_opp(o, test_mode)
+        result[o['id']]['updated'] = true
+        process_again = true
+      end
+      
+      if process_again
+        result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
+      end
+    }
+
+    result
   end
 
   def bot_metadata(opp)
