@@ -571,7 +571,7 @@ class Rules < BaseRules
       if qu[:_text].include?('who told you about ef')
         map = [
           ['been on the ef programme', tags[:referral]],
-          ['worked at ef', tags[:referral]],
+          ['worked for ef', tags[:referral]],
           ['professional network', tags[:organic]],
           ['friends or family', tags[:organic]]
         ]
