@@ -376,9 +376,13 @@ class Rules < BaseRules
     if (opp['tags'] & ['Software', 'Hardware']).any?
       value = opp['tags'].include?('Software') ? 'software' : 'hardware'
       # set value for most feedback form if not already present
-      if result[:has_app_review]
-        result[:app_review_software_hardware] ||= value
-      elsif result[:has_coffee]
+    
+      # remove app review from list of feedback forms to check 
+      # if result[:has_app_review]
+      #  result[:app_review_software_hardware] ||= value
+      #els
+      
+      if result[:has_coffee]
         result[:coffee_software_hardware] ||= value
       elsif result[:has_pre_coffee_screen]
         result[:pre_coffee_screen_software_hardware] ||= value
