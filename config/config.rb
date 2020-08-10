@@ -31,7 +31,7 @@ LEVER_BOT_USER = 'e6414a92-e785-46eb-ad30-181c18db19b5'
 
 COFFEE_FEEDBACK_FORM = '14598edb-390d-41e7-999c-fd56c3c4fe65'
 
-OFFER_STAGES = ["b2422e70-d9d5-4c49-ade5-c007bc094265"]
+OFFER_STAGES = ["offer", "b2422e70-d9d5-4c49-ade5-c007bc094265"]
 OFFER_ACCEPTED_STAGES = ["87f72880-e6b5-455e-9c8f-acee90bb9c92"]
 
 # AUTO_.. prefixes are used for auto-added attributes relating to the candidate data 
