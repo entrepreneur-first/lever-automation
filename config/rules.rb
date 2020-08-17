@@ -168,7 +168,7 @@ class Rules < BaseRules
       
       # eligibile
       cohort = (COHORT_JOBS.select { |j| j[:posting_id] == Util.posting(opp) }.first || {}).dig(:cohort)
-      eligibility_value = (f['fields'].select { |f| 
+      eligibility_value = (f['fields'].select { |f|
         f[:_text].include?('are they eligible') ||
         f[:_text].include?('elligible') ||
         f[:_text].include?('cohort they are')  
