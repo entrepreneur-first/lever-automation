@@ -171,6 +171,7 @@ class Rules < BaseRules
       eligibility_value = (f['fields'].select { |f|
         f[:_text].include?('are they eligible') ||
         f[:_text].include?('elligible') ||
+        f[:_text].include?('cohort they can join') ||
         f[:_text].include?('cohort they are')  
       }.first || {})[:_value]
       result['eligible'] = if eligibility_value == 'yes'
