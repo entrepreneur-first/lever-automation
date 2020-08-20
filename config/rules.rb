@@ -379,7 +379,7 @@ class Rules < BaseRules
       # set value for most feedback form if not already present
     
       if result[:has_app_review]
-        result[:app_review_software_hardware] = value
+        result[:app_review_software_hardware] ||= value
       elsif result[:has_coffee]
         result[:coffee_software_hardware] ||= value
       elsif result[:has_pre_coffee_screen]
