@@ -490,15 +490,15 @@ class Rules < BaseRules
 
   def overall_source(opp)
     potential_source_tags = tags(:source)    
-    tags = opp["tags"].map { |t| t.downcase.strip }
+    _tags = opp["tags"].map { |t| t.downcase.strip }
     
     # 0) If manually tagged "rollover", go with that above everything else
-    tags.each { |tag|
+    _tags.each { |tag|
       return potential_source_tags[:rollover] if tag.include?('rollover')
     }
 
     # 1) any merged-in source from a prior opportunity
-    tags.each { |tag|
+    opp['tags'].each { |tag|
       return tag.delete_prefix(TAG_ORIGINAL_OVERALL_PREFIX) if tag.start_with?(TAG_ORIGINAL_OVERALL_PREFIX)
     }
 
@@ -542,11 +542,11 @@ class Rules < BaseRules
     }
     tags_map.each { |key, value|
       if key.respond_to?(:match)
-        tags.each { |s|
+        _tags.each { |s|
           return potential_source_tags[value] if key.match?(s)
         }
       else
-        return potential_source_tags[value] if tags.include?(key)
+        return potential_source_tags[value] if _tags.include?(key)
       end
     }
     
