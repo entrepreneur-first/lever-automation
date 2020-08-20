@@ -221,6 +221,7 @@ module Controller_Commands
     opp = opp.first if opp.is_a?(Array)
     unless (opp || '') == ''
       client.batch_updates
+      prepare_app_responses(opp)
       summarise_feedbacks(opp)
       rules.do_update_tags(opp)
       

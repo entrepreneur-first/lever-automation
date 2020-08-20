@@ -454,9 +454,9 @@ module Controller_ProcessUpdates
 
       # don't apply original source tag to original opp
       unless (o['id'] == opps.first['id']) || (original_source == '')
-        rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {tag: original_source}, rules.tags(:source), o)
+        rules.apply_single_tag(TAG_ORIGINAL_OVERALL_PREFIX, {tag: original_source}, rules.tags(:source), o)
       else
-        rules.apply_single_tag(TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX)), {remove: true}, rules.tags(:source), o)
+        rules.apply_single_tag(TAG_ORIGINAL_OVERALL_PREFIX, {remove: true}, rules.tags(:source), o)
       end
       
       unless latest_opps_per_cohort.include?(o['id'])

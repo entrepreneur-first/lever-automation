@@ -6,6 +6,7 @@ require_relative '../app/base_rules.rb'
 #
 
 TAG_OVERALL = AUTO_TAG_PREFIX + 'Overall: '
+TAG_ORIGINAL_OVERALL_PREFIX = TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX))
 
 TAG_FROM_APPLICATION = AUTO_TAG_PREFIX + 'App: '
 
@@ -489,17 +490,19 @@ class Rules < BaseRules
 
   def overall_source(opp)
     potential_source_tags = tags(:source)    
-    tags = opp["tags"].map { |t| t.downcase.strip }
+    _tags = opp["tags"].map { |t| t.downcase.strip }
     
     # 0) If manually tagged "rollover", go with that above everything else
-    tags.each { |tag|
+    _tags.each { |tag|
       return potential_source_tags[:rollover] if tag.include?('rollover')
     }
 
-    # 1) TODO: any merged-in source tags
-    
+    # 1) any merged-in source from a prior opportunity
+    opp['tags'].each { |tag|
+      return tag.delete_prefix(TAG_ORIGINAL_OVERALL_PREFIX) if tag.start_with?(TAG_ORIGINAL_OVERALL_PREFIX)
+    }
 
-    # 2) first, look at the source tags
+    # 2) next, look at the source tags for this opportunity
     
     source_tags_map = {
       # source tag => overall source to apply
@@ -539,11 +542,11 @@ class Rules < BaseRules
     }
     tags_map.each { |key, value|
       if key.respond_to?(:match)
-        tags.each { |s|
+        _tags.each { |s|
           return potential_source_tags[value] if key.match?(s)
         }
       else
-        return potential_source_tags[value] if tags.include?(key)
+        return potential_source_tags[value] if _tags.include?(key)
       end
     }
     
