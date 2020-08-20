@@ -22,6 +22,12 @@ COHORT_JOBS = [
   {posting_id: 'f7a6dd4e-9f3a-4633-b676-15abe9165025', cohort: 'SG8'}, # Singapore Pool
   {posting_id: '3b2c714a-edee-4fd0-974d-413bae32c818', cohort: 'SG8'},
   {posting_id: 'df1e30e5-c08d-47bd-bd43-8f3eaf96163e', cohort: 'TO1'}, # Toronto Pool
+  {posting_id: '6fe2ce13-2296-4acd-8b1e-2e5b4a14c58c', cohort: 'PA6'},
+  {posting_id: 'faeae4e5-6529-4f95-b705-3f9974bb682c', cohort: 'PA7'},
+  {posting_id: '3eaed985-8d2e-4a88-b6bb-a1295cb57373', cohort: 'PA8'}, 
+  {posting_id: '210435bd-7ff7-4ced-a3e8-dbeed1c19f08', cohort: 'PA9'}, 
+
+
 ]
 
 COHORT_JOB_TAG = 'EF Cohort'
