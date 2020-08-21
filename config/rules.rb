@@ -499,7 +499,7 @@ class Rules < BaseRules
 
     # 1) any merged-in source from a prior opportunity
     opp['tags'].each { |tag|
-      return tag.delete_prefix(TAG_ORIGINAL_OVERALL_PREFIX) if tag.start_with?(TAG_ORIGINAL_OVERALL_PREFIX)
+      return tag.delete_prefix(TAG_ORIGINAL_OVERALL_PREFIX) if tag.start_with?(TAG_ORIGINAL_OVERALL_PREFIX) && (tag != TAG_ORIGINAL_OVERALL_PREFIX + tags(:source, :error))
     }
 
     # 2) next, look at the source tags for this opportunity
