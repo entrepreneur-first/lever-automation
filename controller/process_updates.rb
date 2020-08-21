@@ -423,7 +423,10 @@ module Controller_ProcessUpdates
       o['createdAt']
     }
     
-    original_source = (Util.overall_source_from_opp(opps.first) || '').delete_prefix(AUTO_TAG_PREFIX)
+    previous_source = {
+      :source => (Util.overall_source_from_opp(opps.first) || '').delete_prefix(AUTO_TAG_PREFIX),
+      :createdAt => opps.first['createdAt']
+    }
     latest_opp_id = opps.last['id']
     
     # see what type(s) of duplicates we have - multiple postings? etc.
@@ -453,10 +456,21 @@ module Controller_ProcessUpdates
       process_again = false
 
       # don't apply original source tag to original opp
-      unless (o['id'] == opps.first['id']) || (original_source == '')
-        rules.apply_single_tag(TAG_ORIGINAL_OVERALL_PREFIX, {tag: original_source}, rules.tags(:source), o)
+      unless (o['id'] == opps.first['id']) || (previous_source[:source] == '')
+        if o['createdAt'] < previous_source[:createdAt] + ORIGINAL_TIMEOUT
+          rules.apply_single_tag(TAG_ORIGINAL_OVERALL_PREFIX, {tag: previous_source[:source]}, rules.tags(:source), o)
+          rules.apply_single_tag(TAG_HISTORIC_OVERALL_PREFIX, {remove: true}, rules.tags(:source), o)
+        else
+          rules.apply_single_tag(TAG_HISTORIC_OVERALL_PREFIX, {tag: previous_source[:source]}, rules.tags(:source), o)
+          rules.apply_single_tag(TAG_PREVIOUS_OVERALL_PREFIX, {remove: true}, rules.tags(:source), o)
+          previous_source = {
+            :source => (Util.overall_source_from_opp(o) || '').delete_prefix(AUTO_TAG_PREFIX)
+            :createdAt => o['createdAt']
+          }
+        end
       else
         rules.apply_single_tag(TAG_ORIGINAL_OVERALL_PREFIX, {remove: true}, rules.tags(:source), o)
+        rules.apply_single_tag(TAG_HISTORIC_OVERALL_PREFIX, {remove: true}, rules.tags(:source), o)
       end
       
       unless latest_opps_per_cohort.include?(o['id'])
