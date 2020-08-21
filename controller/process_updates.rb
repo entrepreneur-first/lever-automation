@@ -464,7 +464,7 @@ module Controller_ProcessUpdates
           rules.apply_single_tag(TAG_HISTORIC_OVERALL_PREFIX, {tag: previous_source[:source]}, rules.tags(:source), o)
           rules.apply_single_tag(TAG_PREVIOUS_OVERALL_PREFIX, {remove: true}, rules.tags(:source), o)
           previous_source = {
-            :source => (Util.overall_source_from_opp(o) || '').delete_prefix(AUTO_TAG_PREFIX)
+            :source => (Util.overall_source_from_opp(o) || '').delete_prefix(AUTO_TAG_PREFIX),
             :createdAt => o['createdAt']
           }
         end
