@@ -7,6 +7,7 @@ require_relative '../app/base_rules.rb'
 
 TAG_OVERALL = AUTO_TAG_PREFIX + 'Overall: '
 TAG_ORIGINAL_OVERALL_PREFIX = TAG_ORIGINAL_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX))
+TAG_HISTORIC_OVERALL_PREFIX = TAG_HISTORIC_PREFIX + (TAG_OVERALL.delete_prefix(AUTO_TAG_PREFIX))
 
 TAG_FROM_APPLICATION = AUTO_TAG_PREFIX + 'App: '
 
@@ -499,7 +500,7 @@ class Rules < BaseRules
 
     # 1) any merged-in source from a prior opportunity
     opp['tags'].each { |tag|
-      return tag.delete_prefix(TAG_ORIGINAL_OVERALL_PREFIX) if tag.start_with?(TAG_ORIGINAL_OVERALL_PREFIX)
+      return tag.delete_prefix(TAG_ORIGINAL_OVERALL_PREFIX) if tag.start_with?(TAG_ORIGINAL_OVERALL_PREFIX) && (tag != TAG_ORIGINAL_OVERALL_PREFIX + tags(:source, :error))
     }
 
     # 2) next, look at the source tags for this opportunity
