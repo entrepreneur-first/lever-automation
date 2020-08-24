@@ -460,6 +460,7 @@ module Controller_ProcessUpdates
         if o['createdAt'] < previous_source[:createdAt] + ORIGINAL_TIMEOUT
           rules.apply_single_tag(TAG_ORIGINAL_OVERALL_PREFIX, {tag: previous_source[:source]}, rules.tags(:source), o)
           rules.apply_single_tag(TAG_HISTORIC_OVERALL_PREFIX, {remove: true}, rules.tags(:source), o)
+          previous_source[:createdAt] = o[:createdAt]
         else
           rules.apply_single_tag(TAG_HISTORIC_OVERALL_PREFIX, {tag: previous_source[:source]}, rules.tags(:source), o)
           rules.apply_single_tag(TAG_ORIGINAL_OVERALL_PREFIX, {remove: true}, rules.tags(:source), o)
