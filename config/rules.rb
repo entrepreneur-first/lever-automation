@@ -62,6 +62,11 @@ class Rules < BaseRules
         ineligible: 'Ineligible',
         error: '<eligibility unknown>'
       },
+      availability: {
+        available: 'Available',
+        unavailable: 'Unavailable',
+        error: '<availability unknown>'
+      },
       software_hardware: {
         software: 'Software',
         hardware: 'Hardware',
@@ -128,7 +133,7 @@ class Rules < BaseRules
     type = Util.simplify_str(f['text'])
     result['title'] = type
     result['type'] =
-      if type.include?('coffee') || type.include?('initial call') || type.include?('london call') || type.include?('berlin call') || type.include?('paris call') || type.include?('toronto call') || type.include?('sy stream stage 4')
+      if type.include?('coffee') || type.include?('initial call') || type.include?('london call') || type.include?('berlin call') || type.include?('paris call') || type.include?('toronto call') || type.include?('sy stream stage 4') || type.include?('prospect call')
         'coffee'
       elsif type.include?('sy stream phone screen') || type.include?('sy stream pi')
         'pre_coffee_screen'
@@ -187,6 +192,20 @@ class Rules < BaseRules
           'eligible'
         else
           'ineligible'
+        end
+    
+      # available
+      availability_value = (f['fields'].select { |f|
+        f[:_text].include?('available to join the cohort')
+      }.first || {})[:_value]
+      result['available'] = if availability_value == 'yes'
+          'available'
+        elsif availability_value == 'no' || availability_value == 'no - notice period' || availability_value == 'no - still studying' || availability_value == 'no - visa issue that we cannot unblock in time' || availability_value == 'no - unmovable personal commitment'
+          'unavailable'
+        elsif availability_value.nil?
+          nil # unknown
+        else
+          'unavailable'
         end
     end
     
@@ -266,6 +285,7 @@ class Rules < BaseRules
       coffee_edge: nil,
       coffee_gender: nil,
       coffee_eligible: nil,
+      coffee_available: nil,
       coffee_completed_at: nil,
       coffee_completed_by: nil,
       coffee_software_hardware: nil,
@@ -327,6 +347,7 @@ class Rules < BaseRules
         result[:coffee_edge] = f['edge']
         result[:coffee_gender] = f['gender']
         result[:coffee_eligible] = f['eligible']
+        result[:coffee_available] = f['available']
         result[:coffee_completed_at] = f['submitted_at']
         result[:coffee_completed_by] = f['submitted_by']
         result[:coffee_software_hardware] = f['software_hardware']
@@ -414,6 +435,7 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_edge, :edge, :has_coffee)
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_gender, :gender, :has_coffee)
     apply_feedback_tag(TAG_FROM_COFFEE, :coffee_eligible, :eligibility, :has_coffee)
+    apply_feedback_tag(TAG_FROM_COFFEE, :coffee_available, :availability, :has_coffee)
 
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_rating, :rating, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_edge, :edge, :has_app_review)
