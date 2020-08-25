@@ -200,12 +200,10 @@ class Rules < BaseRules
       }.first || {})[:_value]
       result['available'] = if availability_value == 'yes'
           'available'
-        elsif availability_value == 'no' || availability_value == 'no - notice period' || availability_value == 'no - still studying' || availability_value == 'no - visa issue that we cannot unblock in time' || availability_value == 'no - unmovable personal commitment'
+        elsif availability_value == 'no' || availability_value.include?('no - ')
           'unavailable'
-        elsif availability_value.nil?
-          nil # unknown
         else
-          'unavailable'
+          nil # unknown
         end
     end
     
