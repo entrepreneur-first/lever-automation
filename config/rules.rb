@@ -200,6 +200,8 @@ class Rules < BaseRules
       }.first || {})[:_value]
       result['available'] = if availability_value == 'yes'
           'available'
+        elsif availability_value.nil?
+          nil # availability question does not exist for old coffee feedback forms
         elsif availability_value == 'no' || availability_value.include?('no - ')
           'unavailable'
         else
