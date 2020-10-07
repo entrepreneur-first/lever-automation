@@ -242,6 +242,16 @@ class Rules < BaseRules
       # industry
       # TODO: question?
       result['technology'] = (f['fields'].select{|f| f[:_text] == 'technology'}.first || {})[:_value]
+      
+      # ceo_cto_both
+      both_value = (f['fields'].select{|f| f[:_text].include?('can this person potentially be both')}.first || {})[:_value]
+      result['both_ceo_cto'] = if both_value == 'yes'
+          'both'
+        elsif both_value == 'no'
+          'not_both'
+         elsif both_value.nil?
+          nil # unknown
+        end
     end    
     
     if ['pre_coffee_screen', 'coffee', 'app_review', 'debrief'].include?(result['type'])
@@ -263,10 +273,9 @@ class Rules < BaseRules
       # TODO: question?
       result['visa_exposure'] = (f['fields'].select{|f| f[:_text] == 'visa exposure'}.first || {})[:_value]
       
-      # ceo/cto and both
+      # new ceo/cto
        
       ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceo or cto'}.first || {})[:_value]
-      both_value = (f['fields'].select{|f| f[:_text].include?('can this person potentially be both')}.first || {})[:_value]
       result['new_ceo_cto'] = if ceo_cto_value == 'ceo'
           'ceo'
         elsif ceo_cto_value == 'cto'
@@ -274,17 +283,7 @@ class Rules < BaseRules
         elsif ceo_cto_value.nil?
           nil # unknown
         end
-    
-      result['both_ceo_cto'] = if both_value == 'yes'
-          'both'
-        elsif both_value == 'no'
-          'not_both'
-         elsif both_value.nil?
-          nil # unknown
-        end
-      
 
-      
 
     end
         
@@ -334,6 +333,7 @@ class Rules < BaseRules
       app_review_ceo_cto: nil,
       app_review_completed_at: nil,
       app_review_completed_by: nil,
+      app_review_both_ceo_cto: nil,
       
       has_phone_screen: false,
       phone_screen_rating: nil,
@@ -399,6 +399,7 @@ class Rules < BaseRules
         result[:app_review_ceo_cto] = f['ceo_cto']
         result[:app_review_completed_at] = f['submitted_at']
         result[:app_review_completed_by] = f['submitted_by']
+        result[:app_review_both_ceo_cto] = f['both_ceo_cto']
         
       when 'phone_screen'
         result[:has_phone_screen] = true
