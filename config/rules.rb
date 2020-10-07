@@ -481,6 +481,7 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_software_hardware, :software_hardware, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_talker_doer, :talker_doer, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto, :ceo_cto, :has_app_review)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_both_ceo_cto, :both_ceo_cto, :has_app_review)
     
     apply_feedback_tag(TAG_FROM_PHONE_SCREEN, :phone_screen_rating, :rating, :has_phone_screen)
 
@@ -490,7 +491,9 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_talker_doer, :talker_doer, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_healthcare, :healthcare, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_visa_exposure, :visa_exposure, :has_debrief)
-      
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_ceo_cto, :new_ceo_cto, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_both_ceo_cto, :both_ceo_cto, :has_debrief)
+
     apply_feedback_tag(TAG_FROM_ABILITY_INTERVIEW, :ability_rating, :rating, :has_ability)
     apply_feedback_tag(TAG_FROM_F2F, :f2f_ceo_cto, :ceo_cto, :has_ability)
     apply_feedback_tag(TAG_FROM_BEHAVIOUR_INTERVIEW, :behaviour_rating, :rating, :has_behaviour)
