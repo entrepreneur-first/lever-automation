@@ -362,7 +362,7 @@ class Rules < BaseRules
       debrief_healthcare: nil,
       debrief_visa_exposure: nil,
       debrief_ceo_cto: nil,
-      debrief_both_ceo_cto: nil,
+      debrief_both_ceo_cto: nil
     }
     
     summaries.sort_by{|f| f['submitted_at'] || ''}.each {|f|
