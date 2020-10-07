@@ -85,6 +85,11 @@ class Rules < BaseRules
         cto: 'CTO',
         error: '<ceo/cto unknown>'
       },
+      new_ceo_cto: {
+        ceo: 'CEO',
+        cto: 'CTO',
+        error: '<ceo/cto unknown>'
+      },
       visa_exposure: {
         yes: 'Visa Exposure',
         no: 'No Visa Exposure',
@@ -256,12 +261,12 @@ class Rules < BaseRules
       # ceo/cto
        
       ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceo or cto'}.first || {})[:_value]
-      result['ceo_cto'] = if ceo_cto_value == 'ceo'
+      result['new_ceo_cto'] = if ceo_cto_value == 'ceo'
           'ceo'
         elsif ceo_cto_value == 'cto'
           'cto'
         elsif ceo_cto_value.nil?
-          end # unknown/take historical ceo/cto value from scorecard name
+          nil # unknown/take historical ceo/cto value from scorecard name
         end
       
 
@@ -339,7 +344,8 @@ class Rules < BaseRules
       debrief_industry: nil,
       debrief_technology: nil,
       debrief_healthcare: nil,
-      debrief_visa_exposure: nil
+      debrief_visa_exposure: nil,
+      debrief_ceo_cto: nil,
     }
     
     summaries.sort_by{|f| f['submitted_at'] || ''}.each {|f|
@@ -407,6 +413,7 @@ class Rules < BaseRules
         result[:debrief_visa_exposure] = f['visa_exposure']
         result[:debrief_rating] = f['rating']
         result[:debrief_completed_at] = f['submitted_at']
+        result[:debrief_ceo_cto] = f['new_ceo_cto']
       end
     }
     
