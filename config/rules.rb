@@ -252,6 +252,19 @@ class Rules < BaseRules
       # visa exposure
       # TODO: question?
       result['visa_exposure'] = (f['fields'].select{|f| f[:_text] == 'visa exposure'}.first || {})[:_value]
+      
+      # ceo/cto
+       
+      ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceo or cto'}.first || {})[:_value]
+      result['ceo_cto'] = if ceo_cto_value == 'ceo'
+          'ceo'
+        elsif ceo_cto_value == 'cto'
+          'cto'
+        elsif ceo_cto_value.nil?
+          end # unknown/take historical ceo/cto value from scorecard name
+        end
+      
+
     end
         
     # when scorecard was completed
