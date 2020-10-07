@@ -90,6 +90,11 @@ class Rules < BaseRules
         cto: 'CTO',
         error: '<ceo/cto unknown>'
       },
+      both_ceo_cto: {
+        both: 'both',
+        not_both: 'not_both',
+        error: '<ceo/cto both unknown>'
+      },
       visa_exposure: {
         yes: 'Visa Exposure',
         no: 'No Visa Exposure',
@@ -258,16 +263,27 @@ class Rules < BaseRules
       # TODO: question?
       result['visa_exposure'] = (f['fields'].select{|f| f[:_text] == 'visa exposure'}.first || {})[:_value]
       
-      # ceo/cto
+      # ceo/cto and both
        
       ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceo or cto'}.first || {})[:_value]
+      both_value = (f['fields'].select{|f| f[:_text].include?('can this person potentially be both')}.first || {})[:_value]
       result['new_ceo_cto'] = if ceo_cto_value == 'ceo'
           'ceo'
         elsif ceo_cto_value == 'cto'
           'cto'
         elsif ceo_cto_value.nil?
-          nil # unknown/take historical ceo/cto value from scorecard name
+          nil # unknown
         end
+    
+      result['both_ceo_cto'] = if both_value == 'yes'
+          'both'
+        elsif both_value == 'no'
+          'not_both'
+         elsif both_value.nil?
+          nil # unknown
+        end
+      
+
       
 
     end
@@ -346,6 +362,7 @@ class Rules < BaseRules
       debrief_healthcare: nil,
       debrief_visa_exposure: nil,
       debrief_ceo_cto: nil,
+      debrief_both_ceo_cto: nil,
     }
     
     summaries.sort_by{|f| f['submitted_at'] || ''}.each {|f|
@@ -414,6 +431,7 @@ class Rules < BaseRules
         result[:debrief_rating] = f['rating']
         result[:debrief_completed_at] = f['submitted_at']
         result[:debrief_ceo_cto] = f['new_ceo_cto']
+        result[:debrief_both_ceo_cto] = f['both_ceo_cto']
       end
     }
     
