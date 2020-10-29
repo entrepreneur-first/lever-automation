@@ -458,7 +458,7 @@ module Controller_ProcessUpdates
       client.add_tags_if_unset(o, carry_forward_tags.keys.map { |tag| CARRIED_FORWARD_TAG_PREFIX + tag })
     
       # collect tags that we wish to carry forward
-      _tags = o['tags'].map { |t| t.downcase.strip }
+      _tags = o['tags'].map { |t| t.downcase.strip }.select { |tag| !tag.start_with?(CARRIED_FORWARD_TAG_PREFIX) }
       CARRY_FORWARD_TAGS.each { |pattern|
         if pattern.respond_to?(:match)
           _tags.each { |tag|
@@ -506,6 +506,11 @@ module Controller_ProcessUpdates
 
       # apply tag indicating specific type of dupes to all affected opps
       rules.apply_single_tag(TAG_DUPLICATE_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opps), o)
+
+      if test_mode
+        result[o['id']]['_addTags'] = o['_addTags']
+        result[o['id']]['_removeTags'] = o['_removeTags']
+      end
 
       if client.commit_opp(o, test_mode)
         result[o['id']]['updated'] = true
