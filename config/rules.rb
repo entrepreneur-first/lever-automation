@@ -238,7 +238,6 @@ class Rules < BaseRules
       result['technology'] = (f['fields'].select{|f| f[:_text] == 'technology'}.first || {})[:_value]
         
       # potential/credible
-      # TODO: question?
       result['potential_credible'] = (f['fields'].select{|f| f[:_text].include?('potential or credible')}.first || {})[:_value]
     end    
     
