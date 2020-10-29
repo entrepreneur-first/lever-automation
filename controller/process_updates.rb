@@ -468,6 +468,7 @@ module Controller_ProcessUpdates
           carry_forward_tags[pattern] = true if _tags.include?(pattern)
         end
       }
+      log.log(carry_forward_tags.to_s)
     
       unless @opps_processed.has_key?(o['id'])
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
