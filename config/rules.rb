@@ -95,7 +95,11 @@ class Rules < BaseRules
         no: 'Not Healthcare',
         error: '<healthcare unknown>'
       },
-      
+      potential_credible: {
+        potential: 'Potential',
+        credible: 'Credible',
+        error: '<potential/credible unknown>'
+      },      
       duplicate_opps: {
         general: 'General opportunity',
         single: 'Single posting',
@@ -232,6 +236,9 @@ class Rules < BaseRules
       # industry
       # TODO: question?
       result['technology'] = (f['fields'].select{|f| f[:_text] == 'technology'}.first || {})[:_value]
+        
+      # potential/credible
+      result['potential_credible'] = (f['fields'].select{|f| f[:_text].include?('potential or credible')}.first || {})[:_value]
     end    
     
     if ['pre_coffee_screen', 'coffee', 'app_review', 'debrief'].include?(result['type'])
@@ -298,6 +305,7 @@ class Rules < BaseRules
       app_review_industry: nil,
       app_review_technology: nil,
       app_review_ceo_cto: nil,
+      app_review_potential_credible: nil,
       app_review_completed_at: nil,
       app_review_completed_by: nil,
       
@@ -326,7 +334,8 @@ class Rules < BaseRules
       debrief_industry: nil,
       debrief_technology: nil,
       debrief_healthcare: nil,
-      debrief_visa_exposure: nil
+      debrief_visa_exposure: nil,
+      debrief_potential_credible: nil
     }
     
     summaries.sort_by{|f| f['submitted_at'] || ''}.each {|f|
@@ -361,6 +370,7 @@ class Rules < BaseRules
         result[:app_review_industry] = f['industry']
         result[:app_review_technology] = f['technology']
         result[:app_review_ceo_cto] = f['ceo_cto']
+        result[:app_review_potential_credible] = f['potential_credible']
         result[:app_review_completed_at] = f['submitted_at']
         result[:app_review_completed_by] = f['submitted_by']
         
@@ -393,6 +403,7 @@ class Rules < BaseRules
         result[:debrief_healthcare] = f['healthcare']
         result[:debrief_visa_exposure] = f['visa_exposure']
         result[:debrief_rating] = f['rating']
+        result[:debrief_potential_credible] = f['potential_credible']
         result[:debrief_completed_at] = f['submitted_at']
       end
     }
@@ -442,6 +453,7 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_software_hardware, :software_hardware, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_talker_doer, :talker_doer, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto, :ceo_cto, :has_app_review)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_potential_credible, :potential_credible, :has_app_review)
     
     apply_feedback_tag(TAG_FROM_PHONE_SCREEN, :phone_screen_rating, :rating, :has_phone_screen)
 
@@ -451,7 +463,8 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_talker_doer, :talker_doer, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_healthcare, :healthcare, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_visa_exposure, :visa_exposure, :has_debrief)
-      
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_potential_credible, :potential_credible, :has_debrief)
+
     apply_feedback_tag(TAG_FROM_ABILITY_INTERVIEW, :ability_rating, :rating, :has_ability)
     apply_feedback_tag(TAG_FROM_F2F, :f2f_ceo_cto, :ceo_cto, :has_ability)
     apply_feedback_tag(TAG_FROM_BEHAVIOUR_INTERVIEW, :behaviour_rating, :rating, :has_behaviour)
