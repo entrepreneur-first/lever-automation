@@ -427,7 +427,7 @@ module Controller_ProcessUpdates
       :source => (Util.overall_source_from_opp(opps.first) || '').delete_prefix(AUTO_TAG_PREFIX),
       :createdAt => opps.first['createdAt']
     }
-    latest_opp_id = opps.last['id']
+    # latest_opp_id = opps.last['id']
     
     # see what type(s) of duplicates we have - multiple postings? etc.
     latest_opp_by_cohort = {}
@@ -448,7 +448,27 @@ module Controller_ProcessUpdates
     latest_opps_per_cohort = latest_opp_by_cohort.values
     
     # ensure we've processed all opportunities for this candidate in order of creation
+    carry_forward_tags = {}
     opps.each { |o|
+
+      # apply tags that we wish to carry forward; remove previously-carried-forward tags we no longer want
+      o['tags'].each { |tag|
+        client.remove_tag(o, tag) if tag.start_with?(CARRIED_FORWARD_TAG_PREFIX) && !carry_forward_tags.key?(tag.delete_prefix(CARRIED_FORWARD_TAG_PREFIX))
+      }
+      client.add_tags_if_unset(o, carry_forward_tags.keys.map { |tag| CARRIED_FORWARD_TAG_PREFIX + tag })
+    
+      # collect tags that we wish to carry forward
+      _tags = o['tags'].map { |t| t.downcase.strip }
+      CARRY_FORWARD_TAGS.each { |pattern|
+        if pattern.respond_to?(:match)
+          _tags.each { |tag|
+            carry_forward_tags[tag] = true if pattern.match?(tag)
+          }
+        else
+          carry_forward_tags[pattern] = true if _tags.include?(pattern)
+        end
+      }
+    
       unless @opps_processed.has_key?(o['id'])
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
