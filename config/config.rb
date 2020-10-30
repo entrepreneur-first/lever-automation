@@ -69,8 +69,8 @@ TAG_HISTORIC_PREFIX = AUTO_TAG_PREFIX + '[Historic] '
 CARRIED_FORWARD_TAG_PREFIX = '↪️ '
 CARRY_FORWARD_TAGS = [
   /^li-/,
-  /^lead score:/,
-  /[0-9]+sourced/
+  /^lead score:/i,
+  /[0-9]+sourced/i
 ]
 
 # ~6 months

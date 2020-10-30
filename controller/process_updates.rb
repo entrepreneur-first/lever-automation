@@ -458,7 +458,7 @@ module Controller_ProcessUpdates
       client.add_tags_if_unset(o, carry_forward_tags.keys.map { |tag| CARRIED_FORWARD_TAG_PREFIX + tag })
     
       # collect tags that we wish to carry forward
-      _tags = o['tags'].map { |t| t.downcase.strip }.select { |tag| !tag.start_with?(CARRIED_FORWARD_TAG_PREFIX) }
+      _tags = o['tags'].reject { |tag| tag.start_with?(CARRIED_FORWARD_TAG_PREFIX) }
       CARRY_FORWARD_TAGS.each { |pattern|
         if pattern.respond_to?(:match)
           _tags.each { |tag|
