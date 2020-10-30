@@ -508,8 +508,8 @@ module Controller_ProcessUpdates
       rules.apply_single_tag(TAG_DUPLICATE_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opps), o)
 
       if test_mode
-        result[o['id']]['_addTags'] = o['_addTags'] + result[o['id']]['_addTags'].to_a
-        result[o['id']]['_removeTags'] = o['_removeTags'] + result[o['id']]['_removeTags'].to_a
+        result[o['id']]['_addTags'] = o['_addTags'].to_a + result[o['id']]['_addTags'].to_a
+        result[o['id']]['_removeTags'] = o['_removeTags'].to_a + result[o['id']]['_removeTags'].to_a
       end
 
       if client.commit_opp(o, test_mode)
