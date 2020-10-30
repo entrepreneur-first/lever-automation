@@ -34,7 +34,6 @@ module Controller_ProcessUpdates
       add_links(opp)
       summarise_feedbacks(opp)
       result.merge!(detect_duplicates(opp, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
-      log.log(result.to_s)
       rules.do_update_tags(opp)
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
@@ -520,7 +519,6 @@ module Controller_ProcessUpdates
       if process_again
         result.merge!(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
-      log.log('AddTags5' + result[o['id']]['_addTags'].to_s)
     }
 
     result
