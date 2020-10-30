@@ -33,7 +33,7 @@ module Controller_ProcessUpdates
       prepare_app_responses(opp)
       add_links(opp)
       summarise_feedbacks(opp)
-      result.merge(detect_duplicates(opp, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
+      result.merge!(detect_duplicates(opp, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       log.log(result.to_s)
       rules.do_update_tags(opp)
 
@@ -469,7 +469,6 @@ module Controller_ProcessUpdates
           carry_forward_tags[pattern] = true if _tags.include?(pattern)
         end
       }
-      log.log(carry_forward_tags.to_s)
     
       unless @opps_processed.has_key?(o['id'])
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
