@@ -471,7 +471,7 @@ module Controller_ProcessUpdates
       }
     
       unless @opps_processed.has_key?(o['id'])
-        result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
+        result.merge!(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
 
       process_again = false
@@ -518,7 +518,7 @@ module Controller_ProcessUpdates
       end
       
       if process_again
-        result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
+        result.merge!(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
       log.log('AddTags5' + result[o['id']]['_addTags'].to_s)
     }
