@@ -456,7 +456,6 @@ module Controller_ProcessUpdates
         client.remove_tag(o, tag) if tag.start_with?(CARRIED_FORWARD_TAG_PREFIX) && !carry_forward_tags.key?(tag.delete_prefix(CARRIED_FORWARD_TAG_PREFIX))
       }
       client.add_tags_if_unset(o, carry_forward_tags.keys.map { |tag| CARRIED_FORWARD_TAG_PREFIX + tag })
-      log.log('AddTags:' + o['_addTags'].to_s)
     
       # collect tags that we wish to carry forward
       _tags = o['tags'].map { |t| t.downcase.strip }.select { |tag| !tag.start_with?(CARRIED_FORWARD_TAG_PREFIX) }
@@ -474,8 +473,6 @@ module Controller_ProcessUpdates
       unless @opps_processed.has_key?(o['id'])
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
-
-      log.log('AddTags2:' + o['_addTags'].to_s)
 
       process_again = false
 
@@ -511,19 +508,16 @@ module Controller_ProcessUpdates
       rules.apply_single_tag(TAG_DUPLICATE_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opps), o)
 
       if test_mode
-        result[o['id']]['_addTags'] = o['_addTags']
-        result[o['id']]['_removeTags'] = o['_removeTags']
+        result[o['id']]['_addTags'] = o['_addTags'] + result[o['id']]['_addTags'].to_a
+        result[o['id']]['_removeTags'] = o['_removeTags'] + result[o['id']]['_removeTags'].to_a
       end
-
-      log.log('AddTags3' + o['_addTags'].to_s)
 
       if client.commit_opp(o, test_mode)
         result[o['id']]['updated'] = true
         process_again = true
       end
-            
+      
       if process_again
-      log.log('AddTags4' + result[o['id']]['_addTags'].to_s)
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
       log.log('AddTags5' + result[o['id']]['_addTags'].to_s)
