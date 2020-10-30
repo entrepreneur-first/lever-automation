@@ -326,7 +326,7 @@ class Rules < BaseRules
       app_review_potential_credible: nil,
       app_review_completed_at: nil,
       app_review_completed_by: nil,
-      app_review_scorecard: [],
+      app_review_scorecard: {},
       
       has_phone_screen: false,
       phone_screen_rating: nil,
@@ -344,7 +344,7 @@ class Rules < BaseRules
       behaviour_completed_at: nil,
       behaviour_completed_by: nil,
       
-      interview_scorecard: [],
+      interview_scorecard: {},
       
       has_debrief: false,
       debrief_rating: nil,
@@ -394,7 +394,7 @@ class Rules < BaseRules
         result[:app_review_potential_credible] = f['potential_credible']
         result[:app_review_completed_at] = f['submitted_at']
         result[:app_review_completed_by] = f['submitted_by']
-        result[:app_review_scorecard] += f.select { |k, v| k.start_with?(APP_SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(APP_SCORECARD_FIELD_PREFIX) }
+        result[:app_review_scorecard].merge(f.select { |k, v| k.start_with?(APP_SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(APP_SCORECARD_FIELD_PREFIX) })
         
       when 'phone_screen'
         result[:has_phone_screen] = true
@@ -408,14 +408,14 @@ class Rules < BaseRules
         result[:f2f_ceo_cto] = f['ceo_cto']
         result[:ability_completed_at] = f['submitted_at']
         result[:ability_completed_by] = f['submitted_by']
-        result[:interview_scorecard] += f.select { |k, v| k.start_with?(SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(SCORECARD_FIELD_PREFIX) }
+        result[:interview_scorecard].merge(f.select { |k, v| k.start_with?(SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(SCORECARD_FIELD_PREFIX) })
         
       when 'behaviour_interview'
         result[:has_behaviour] = true
         result[:behaviour_rating] = f['rating']
         result[:behaviour_completed_at] = f['submitted_at']
         result[:behaviour_completed_by] = f['submitted_by']
-        result[:interview_scorecard] += f.select { |k, v| k.start_with?(SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(SCORECARD_FIELD_PREFIX) }
+        result[:interview_scorecard].merge(f.select { |k, v| k.start_with?(SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(SCORECARD_FIELD_PREFIX) })
         
       when 'debrief'
         result[:has_debrief] = true
