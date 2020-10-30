@@ -456,6 +456,7 @@ module Controller_ProcessUpdates
         client.remove_tag(o, tag) if tag.start_with?(CARRIED_FORWARD_TAG_PREFIX) && !carry_forward_tags.key?(tag.delete_prefix(CARRIED_FORWARD_TAG_PREFIX))
       }
       client.add_tags_if_unset(o, carry_forward_tags.keys.map { |tag| CARRIED_FORWARD_TAG_PREFIX + tag })
+      log.log('AddTags:' + o['_addTags'].to_s)
     
       # collect tags that we wish to carry forward
       _tags = o['tags'].map { |t| t.downcase.strip }.select { |tag| !tag.start_with?(CARRIED_FORWARD_TAG_PREFIX) }
