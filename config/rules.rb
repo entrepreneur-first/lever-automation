@@ -260,7 +260,22 @@ class Rules < BaseRules
       # TODO: question?
       result['visa_exposure'] = (f['fields'].select{|f| f[:_text] == 'visa exposure'}.first || {})[:_value]
     end
-        
+    
+    # scorecard style ratings
+    if ['app_review', 'ability_interview', 'behaviour_interview'].include?(result['type'])
+      prefix = result['type'] == 'app_review' ? 'app_scorecard:' : 'scorecard:'
+      # individual score questions
+      f['fields'].select { |f| f['type'] == 'score' }.each { |f| 
+        result[prefix + f[:_text][0,50]] = f['value']
+      }
+      # multiple-line scorecard questions
+      f['fields'].select { |f| f['type'] == 'scorecard' }.each { |f|
+        f['scores'].each_index { |i|
+          result[prefix + Util.simplify_str(f['scores'][i]['text'])[0,50]] = f['value'][i]['score']
+        }
+      }
+    end
+    
     # when scorecard was completed
     result['submitted_at'] = f['completedAt']
     # scorecard submitted by
