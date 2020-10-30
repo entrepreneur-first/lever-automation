@@ -70,8 +70,7 @@ CARRIED_FORWARD_TAG_PREFIX = '↪️ '
 CARRY_FORWARD_TAGS = [
   /^li-/,
   /^lead score:/,
-  /[0-9]+sourced/,
-  /overall/ # temp test
+  /[0-9]+sourced/
 ]
 
 # ~6 months
