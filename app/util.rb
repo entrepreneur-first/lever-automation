@@ -172,7 +172,7 @@ class Util
     Time.at((t/1000.0).ceil).utc.to_s
   end
 
-  def self.simplify_str(str, also_allow_pattern)
+  def self.simplify_str(str, also_allow_pattern='')
     str.downcase.gsub(/[^a-z0-9\-\/\s#{Regexp.quote(also_allow_pattern.to_s)}]/, '').gsub(/\s+/, ' ').strip
   end
   
