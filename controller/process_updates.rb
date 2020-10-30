@@ -520,9 +520,12 @@ module Controller_ProcessUpdates
         process_again = true
       end
       
+      log.log('AddTags3' + o['_addTags'])
+      
       if process_again
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
+      log.log('AddTags4' + o['_addTags'])
     }
 
     result
