@@ -523,10 +523,10 @@ module Controller_ProcessUpdates
       end
             
       if process_again
-      log.log('AddTags4' + o['_addTags'].to_s)
+      log.log('AddTags4' + result[o['id']]['_addTags'].to_s)
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
-      log.log('AddTags5' + o['_addTags'].to_s)
+      log.log('AddTags5' + result[o['id']]['_addTags'].to_s)
     }
 
     result
