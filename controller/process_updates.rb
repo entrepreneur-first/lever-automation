@@ -60,8 +60,8 @@ module Controller_ProcessUpdates
     end
 
     if test_mode
-      result[opp['id']]['_addTags'] = opp['_addTags']
-      result[opp['id']]['_removeTags'] = opp['_removeTags']
+        result[o['id']]['_addTags'] = o['_addTags'].to_a + result[o['id']]['_addTags'].to_a
+        result[o['id']]['_removeTags'] = o['_removeTags'].to_a + result[o['id']]['_removeTags'].to_a
     end
 
     if client.commit_opp(opp, test_mode)
