@@ -475,6 +475,8 @@ module Controller_ProcessUpdates
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
 
+      log.log('AddTags2:' + o['_addTags'].to_s)
+
       process_again = false
 
       # don't apply original source tag to original opp
