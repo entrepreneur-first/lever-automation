@@ -172,8 +172,8 @@ class Util
     Time.at((t/1000.0).ceil).utc.to_s
   end
 
-  def self.simplify_str(str)
-    str.downcase.gsub(/[^a-z0-9\-\/\s]/, '').gsub(/\s+/, ' ').strip
+  def self.simplify_str(str, also_allow_pattern='')
+    str.downcase.gsub(/[^a-z0-9\-\/\s#{Regexp.quote(also_allow_pattern.to_s)}]/, '').gsub(/\s+/, ' ').strip
   end
   
   def self.log_if_api_error(log, result)

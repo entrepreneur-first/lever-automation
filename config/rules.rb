@@ -20,6 +20,9 @@ TAG_FROM_ABILITY_INTERVIEW = AUTO_TAG_PREFIX + 'Ability: '
 TAG_FROM_BEHAVIOUR_INTERVIEW = AUTO_TAG_PREFIX + 'Behaviour: '
 TAG_FROM_DEBRIEF = AUTO_TAG_PREFIX + 'Debrief: '
 
+SCORECARD_FIELD_PREFIX = 'scorecard:'
+APP_SCORECARD_FIELD_PREFIX = 'app_scorecard:'
+
 class Rules < BaseRules
 
   # list of tags for each category, so we can remove when updating with new values
@@ -260,7 +263,22 @@ class Rules < BaseRules
       # TODO: question?
       result['visa_exposure'] = (f['fields'].select{|f| f[:_text] == 'visa exposure'}.first || {})[:_value]
     end
-        
+    
+    # scorecard style ratings
+    if ['app_review', 'ability_interview', 'behaviour_interview'].include?(result['type'])
+      prefix = result['type'] == 'app_review' ? APP_SCORECARD_FIELD_PREFIX : SCORECARD_FIELD_PREFIX
+      # individual score questions
+      f['fields'].select { |f| f['type'] == 'score' }.each { |f| 
+        result[prefix + Util.simplify_str(f['text'], ':')[0,50]] = f['value']
+      }
+      # multiple-line scorecard questions
+      f['fields'].select { |f| f['type'] == 'scorecard' }.each { |f|
+        f['scores'].each_index { |i|
+          result[prefix + Util.simplify_str(f['scores'][i]['text'], ':')[0,50]] = f['value'][i]['score']
+        }
+      }
+    end
+    
     # when scorecard was completed
     result['submitted_at'] = f['completedAt']
     # scorecard submitted by
@@ -308,6 +326,7 @@ class Rules < BaseRules
       app_review_potential_credible: nil,
       app_review_completed_at: nil,
       app_review_completed_by: nil,
+      app_review_scorecard: {},
       
       has_phone_screen: false,
       phone_screen_rating: nil,
@@ -324,6 +343,8 @@ class Rules < BaseRules
       behaviour_rating: nil,
       behaviour_completed_at: nil,
       behaviour_completed_by: nil,
+      
+      interview_scorecard: {},
       
       has_debrief: false,
       debrief_rating: nil,
@@ -373,6 +394,7 @@ class Rules < BaseRules
         result[:app_review_potential_credible] = f['potential_credible']
         result[:app_review_completed_at] = f['submitted_at']
         result[:app_review_completed_by] = f['submitted_by']
+        result[:app_review_scorecard].merge!(f.select { |k, v| k.start_with?(APP_SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(APP_SCORECARD_FIELD_PREFIX) })
         
       when 'phone_screen'
         result[:has_phone_screen] = true
@@ -386,12 +408,14 @@ class Rules < BaseRules
         result[:f2f_ceo_cto] = f['ceo_cto']
         result[:ability_completed_at] = f['submitted_at']
         result[:ability_completed_by] = f['submitted_by']
+        result[:interview_scorecard].merge!(f.select { |k, v| k.start_with?(SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(SCORECARD_FIELD_PREFIX) })
         
       when 'behaviour_interview'
         result[:has_behaviour] = true
         result[:behaviour_rating] = f['rating']
         result[:behaviour_completed_at] = f['submitted_at']
         result[:behaviour_completed_by] = f['submitted_by']
+        result[:interview_scorecard].merge!(f.select { |k, v| k.start_with?(SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(SCORECARD_FIELD_PREFIX) })
         
       when 'debrief'
         result[:has_debrief] = true
