@@ -29,8 +29,6 @@ COHORT_JOBS = [
   {posting_id: '3eaed985-8d2e-4a88-b6bb-a1295cb57373', cohort: 'PA8'}, 
   {posting_id: '210435bd-7ff7-4ced-a3e8-dbeed1c19f08', cohort: 'PA9'},
   {posting_id: '0b785d4c-3a6e-4597-829e-fcafb06cae2b', cohort: 'TO1'},
-
-
 ]
 
 COHORT_JOB_TAG = 'EF Cohort'
@@ -67,6 +65,13 @@ TAG_DUPLICATE_ARCHIVED = AUTO_TAG_PREFIX + 'Archived duplicate'
 TAG_DUPLICATE_PREFIX = AUTO_TAG_PREFIX + "Duplicate: "
 TAG_ORIGINAL_PREFIX = AUTO_TAG_PREFIX + '[Original] '
 TAG_HISTORIC_PREFIX = AUTO_TAG_PREFIX + '[Historic] '
+
+CARRIED_FORWARD_TAG_PREFIX = '↪️ '
+CARRY_FORWARD_TAGS = [
+  /^li-/,
+  /^lead score:/i,
+  /[0-9]+sourced/i
+]
 
 # ~6 months
 ORIGINAL_TIMEOUT = 15552000000
