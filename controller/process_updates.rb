@@ -515,17 +515,18 @@ module Controller_ProcessUpdates
         result[o['id']]['_removeTags'] = o['_removeTags']
       end
 
+      log.log('AddTags3' + o['_addTags'].to_s)
+
       if client.commit_opp(o, test_mode)
         result[o['id']]['updated'] = true
         process_again = true
       end
-      
-      log.log('AddTags3' + o['_addTags'].to_s)
-      
+            
       if process_again
+      log.log('AddTags4' + o['_addTags'].to_s)
         result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
-      log.log('AddTags4' + o['_addTags'].to_s)
+      log.log('AddTags5' + o['_addTags'].to_s)
     }
 
     result
