@@ -342,6 +342,7 @@ class Client
       result = api_call_log(log_string, page) do
         get(url + '?' + Util.to_query(params.merge(offset: next_batch).reject{|k,v| v.nil?}))
       end
+      # TODO: result can sometimes unexpectedly be nil; unknown why - API error?
       result.fetch('data', []).each { |row|
         yield(row)
       }

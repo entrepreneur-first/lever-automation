@@ -423,6 +423,9 @@ module Controller_ProcessUpdates
       o['createdAt']
     }
     
+    # TODO: opps can sometimes be empty & will cause fatal below
+    # - should not happen, unknown why - API error?
+    
     previous_source = {
       :source => (Util.overall_source_from_opp(opps.first) || '').delete_prefix(AUTO_TAG_PREFIX),
       :createdAt => opps.first['createdAt']
