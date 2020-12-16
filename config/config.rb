@@ -3,7 +3,7 @@
 COHORT_JOBS = [
   # next cohort postings
   # .. include tag: <location> to auto-assign based on tags
-  {posting_id: 'b65f18c3-27f3-4812-92af-b0f66a5694b8', cohort: 'BA5',  tag: 'bangalore'},
+  {posting_id: 'ce63e00d-93aa-493b-ae97-691a3a6639b9', cohort: 'BA6',  tag: 'bangalore'},
   {posting_id: '9d662b61-de96-40c0-bb81-89d3f84ef1b2', cohort: 'LD16', tag: 'london'},
   {posting_id: 'fc7a7137-4433-4522-9c51-61bc8fde864f', cohort: 'SG9',  tag: 'singapore'},
   {posting_id: '6fe2ce13-2296-4acd-8b1e-2e5b4a14c58c', cohort: 'PA6',  tag: 'paris'},
@@ -13,6 +13,7 @@ COHORT_JOBS = [
   # previous cohort postings
   {posting_id: 'd924991a-614a-4cde-ab4e-600a5fce2af4', cohort: 'BA4'}, # Bangalore Pool
   {posting_id: '23bf8c07-b32e-483f-9007-1b9c2a004eb6', cohort: 'BA4'},
+  {posting_id: 'b65f18c3-27f3-4812-92af-b0f66a5694b8', cohort: 'BA5'},
   {posting_id: '46ac9eaf-31d1-4b41-8b2b-1d43014aacc0', cohort: 'BE5'},
   {posting_id: 'b9c2b6b8-3d82-4c45-9b06-b549d223b017', cohort: 'BE6'},
   {posting_id: 'ee0ed9ee-7148-4967-a402-e6962e4c6bc1', cohort: 'BE5'}, # Berlin Pool
