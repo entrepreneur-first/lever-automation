@@ -80,7 +80,9 @@ TAG_HISTORIC_PREFIX = AUTO_TAG_PREFIX + '[Historic] '
 
 CARRIED_FORWARD_TAG_PREFIX = '↪️ '
 CARRY_FORWARD_TAGS = [
-  /^li-/,
+  /^li-/,     # tags starting li- for  LinkedIn
+  /-li-/,     # tags containing -li- for LinkedIn
+  /[a-zA-Z]{2}[0-9]+-/,   # tags starting with a cohort code e.g. sg9-
   /^lead score:/i,
   /[0-9]+sourced/i
 ]
