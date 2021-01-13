@@ -12,7 +12,7 @@ Daemons.run_proc('lever_daemon.rb') do
 
   loop do
     unless ENV['ENABLE_DAEMON'].nil? || ENV['ENABLE_DAEMON'].empty? || ['0', 'false'].include?(ENV['ENABLE_DAEMON'].downcase)
-      controller.process_opportunities(active, false, posting_ids) 
+      controller.process_opportunities(archived, false, posting_ids) 
     end
     
     break if controller.terminating?
