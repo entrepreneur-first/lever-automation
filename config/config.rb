@@ -5,7 +5,7 @@ COHORT_JOBS = [
   # .. include tag: <location> to auto-assign based on tags
   {posting_id: 'ce63e00d-93aa-493b-ae97-691a3a6639b9', cohort: 'BA6',  tag: 'bangalore'},
   {posting_id: '9d662b61-de96-40c0-bb81-89d3f84ef1b2', cohort: 'LD16', tag: 'london'},
-  {posting_id: 'fc7a7137-4433-4522-9c51-61bc8fde864f', cohort: 'SG9',  tag: 'singapore'},
+  {posting_id: '09f026d5-746e-4f0f-9d7c-f45bae0e8bad', cohort: 'SG10',  tag: 'singapore'},
   {posting_id: '6fe2ce13-2296-4acd-8b1e-2e5b4a14c58c', cohort: 'PA6',  tag: 'paris'},
   {posting_id: '394f29ca-7054-4e57-bc64-54886ce98eb2', cohort: 'BE7',  tag: 'berlin'},
   {posting_id: '4a924c27-5737-48fe-8d45-48a1163745c0', cohort: 'TO2',  tag: 'toronto'},
@@ -24,6 +24,7 @@ COHORT_JOBS = [
   {posting_id: 'e57c60e3-f129-4088-9c7f-1e9ea270fbf6', cohort: 'PA4'}, # Paris Pool
   {posting_id: 'f7a6dd4e-9f3a-4633-b676-15abe9165025', cohort: 'SG8'}, # Singapore Pool
   {posting_id: '3b2c714a-edee-4fd0-974d-413bae32c818', cohort: 'SG8'},
+  {posting_id: 'fc7a7137-4433-4522-9c51-61bc8fde864f', cohort: 'SG9'},
   {posting_id: 'df1e30e5-c08d-47bd-bd43-8f3eaf96163e', cohort: 'TO1'}, # Toronto Pool
   {posting_id: 'e23deb1a-c0ab-43b8-9a3a-e47e3cca0970', cohort: 'PA5'},
   {posting_id: 'faeae4e5-6529-4f95-b705-3f9974bb682c', cohort: 'PA7'},
