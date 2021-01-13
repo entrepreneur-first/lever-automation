@@ -62,7 +62,7 @@ module Controller_Commands
     
     log_opp_type = archived ? 'archived ' : (archived.nil? ? '' : 'active ')
 
-    log.log("#{test_mode ? '[Test mode - no changes applied] ' : ''}Processing all #{log_opp_type}opportunities#{posting_ids ? ' for ' + posting_ids.length + ' current postings': ''}..")
+    log.log("#{test_mode ? '[Test mode - no changes applied] ' : ''}Processing all #{log_opp_type}opportunities#{posting_ids ? ' for ' + posting_ids.length.to_s + ' current postings': ''}..")
     log_index = 0
 
     client.process_paged_result(OPPORTUNITIES_URL, {archived: archived, posting_id: posting_ids, expand: client.OPP_EXPAND_VALUES}, "#{log_opp_type}opportunities") { |opp|
