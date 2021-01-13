@@ -8,7 +8,7 @@ controller = Controller.new
 Daemons.run_proc('lever_daemon.rb') do
   archived = nil
   archived = false if ARGV.include?('active')
-  posting_ids = ARGV.include?('current_cohorts') ? Util.current_cohorts : nil
+  posting_ids = ARGV.include?('current_cohorts') ? Util.current_cohorts.map {|cohort| cohort[:posting_id]} : nil
 
   loop do
     unless ENV['ENABLE_DAEMON'].nil? || ENV['ENABLE_DAEMON'].empty? || ['0', 'false'].include?(ENV['ENABLE_DAEMON'].downcase)
