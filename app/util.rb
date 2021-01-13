@@ -92,6 +92,10 @@ class Util
   def self.posting_data(posting_id)
     COHORT_JOBS.select { |posting| posting[:posting_id] == posting_id }.first
   end
+
+  def self.current_cohorts
+    COHORT_JOBS.select { |posting| posting.has_key?(:tag) }
+  end
   
   def self.posting_cohort(posting_id)
     (posting_data(posting_id) || {})[:cohort]
