@@ -81,11 +81,17 @@ TAG_HISTORIC_PREFIX = AUTO_TAG_PREFIX + '[Historic] '
 
 CARRIED_FORWARD_TAG_PREFIX = '↪️ '
 CARRY_FORWARD_TAGS = [
-  /^li-/,     # tags starting li- for  LinkedIn
+  /^dm-/,     # tags starting dm- for Digital Marketing
+  /^li-/,     # tags starting li- for LinkedIn
   /-li-/,     # tags containing -li- for LinkedIn
   /[a-zA-Z]{2}[0-9]+-/,   # tags starting with a cohort code e.g. sg9-
+  /[a-zA-Z]{2}[0-9]+$/,   # tags of cohort code e.g. "SG9"
   /^lead score:/i,
-  /[0-9]+sourced/i
+  /[0-9]+sourced/i,
+
+  # legacy tags carried forward from old but not expected to be added to new opportunities
+  /^linkedin lead gen/i,
+  /^\(\d+\) / # tags starting "(x) " where x is a number
 ]
 
 # ~6 months
