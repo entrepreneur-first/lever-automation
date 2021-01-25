@@ -146,7 +146,7 @@ class Rules < BaseRules
         'pre_coffee_screen'
       elsif type.include?('phone screen') # excludes 'sy stream phone screen' above
         'phone_screen'
-      elsif type.include?('app review')
+      elsif type.include?('app review') || type.include?('reviewly')
         'app_review'
       elsif type.include?('interview debrief')
         'debrief'
@@ -163,6 +163,7 @@ class Rules < BaseRules
     result['rating'] = (f['fields'].select{|f| f['type'] == 'score-system'}.first || {})[:_value]
     # for imported feedback forms where all fields are strings, fall back to field name
     result['rating'] ||= (f['fields'].select{|f| f[:_text] == 'rating'}.first || {})[:_value].to_s
+    result['rating'] ||= (f['fields'].select{|f| f[:_text] == 'overall_rating'}.first || {})[:_value].to_s
     result['rating'] = case result['rating']
       when '1'
         '1 - Strong No Hire'
@@ -241,7 +242,7 @@ class Rules < BaseRules
       result['technology'] = (f['fields'].select{|f| f[:_text] == 'technology'}.first || {})[:_value]
         
       # potential/credible
-      result['potential_credible'] = (f['fields'].select{|f| f[:_text].include?('potential or credible')}.first || {})[:_value]
+      result['potential_credible'] = (f['fields'].select{|f| f[:_text].include?('potential or credible') || f[:_text].include?('potential_credible')}.first || {})[:_value]
     end    
     
     if ['pre_coffee_screen', 'coffee', 'app_review', 'debrief'].include?(result['type'])
