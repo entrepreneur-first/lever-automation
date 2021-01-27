@@ -243,7 +243,7 @@ class Rules < BaseRules
       result['technology'] = (f['fields'].select{|f| f[:_text] == 'technology'}.first || {})[:_value]
         
       # potential/credible
-      result['potential_credible'] = (f['fields'].select{|f| f[:_text].include?('potential or credible') || f[:_text].include?('potential_credible')}.first || {})[:_value]
+      result['potential_credible'] = (f['fields'].select{|f| f[:_text].include?('potential or credible') || f[:_text].include?('credible')}.first || {})[:_value]
     end    
     
     if ['pre_coffee_screen', 'coffee', 'app_review', 'debrief'].include?(result['type'])
