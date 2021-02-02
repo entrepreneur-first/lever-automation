@@ -84,6 +84,16 @@ CARRY_FORWARD_TAGS = [
   /^dm-/,     # tags starting dm- for Digital Marketing
   /^li-/,     # tags starting li- for LinkedIn
   /-li-/,     # tags containing -li- for LinkedIn
+  
+  /^referral-app+$/,     # tags exactly "referral-app" for Referrals from App form
+  /^referral-website+$/,     # tags exactly "referral-website" for Referrals from Website
+  /^referral-alum+$/,     # tags exactly "referral-alum" for Referrals from Alum
+  /^referral-cohort+$/,     # tags exactly "referral-cohort" for Referrals from Current Cohort
+  /^referral-futurecohort+$/,     # tags exactly "referral-futurecohort" for Referrals from Future Cohort
+  /^referral-investor+$/,     # tags exactly "referral-investor" for Referrals from Investor
+  /^referral-efteam+$/,     # tags exactly "referral-efteam" for Referrals from the EF team
+  /^referral-other+$/,     # tags exactly "referral-other" for Referrals from any other channel
+  
   /[a-zA-Z]{2}[0-9]+-/,   # tags starting with a cohort code e.g. sg9-
   /[a-zA-Z]{2}[0-9]+$/,   # tags of cohort code e.g. "SG9"
   /^lead score:/i,
