@@ -85,15 +85,10 @@ class Rules < BaseRules
         cto: 'CTO',
         error: '<ceo/cto unknown>'
       },
-      new_ceo_cto: {
-        ceo: 'CEO',
-        cto: 'CTO',
-        error: '<ceo/cto unknown>'
-      },
-      both_ceo_cto: {
-        both: 'both',
-        not_both: 'not_both',
-        error: '<ceo/cto both unknown>'
+      ceo_cto_both: {
+        both: 'CEO/CTO: Both',
+        not_both: 'CEO/CTO: One',
+        error: '<ceo/cto-both unknown>'
       },
       visa_exposure: {
         yes: 'Visa Exposure',
@@ -229,6 +224,12 @@ class Rules < BaseRules
           'unknown'
         end
     end
+
+    if result['type'] == 'debrief'
+      # debrief ceo/cto
+      ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceo or cto'}.first || {})[:_value]
+      result['ceo_cto'] = ['ceo', 'cto'].include?(ceo_cto_value) ? ceo_cto_value : nil
+    end      
     
     if ['app_review', 'debrief'].include?(result['type'])
       # talker/doer
@@ -244,12 +245,12 @@ class Rules < BaseRules
       result['technology'] = (f['fields'].select{|f| f[:_text] == 'technology'}.first || {})[:_value]
       
       # ceo_cto_both
-      both_value = (f['fields'].select{|f| f[:_text].include?('can this person potentially be both')}.first || {})[:_value]
-      result['both_ceo_cto'] = if both_value == 'yes'
-          'both'
-        elsif both_value == 'no'
-          'not_both'
-         elsif both_value.nil?
+      cxo_both_value = (f['fields'].select{|f| f[:_text].include?('can this person potentially be both')}.first || {})[:_value]
+      result['ceo_cto_both'] = if cxo_both_value == 'yes'
+          'both' ##
+        elsif cxo_both_value == 'no'
+          'not_both' ##
+        else
           nil # unknown
         end
     end    
@@ -272,19 +273,6 @@ class Rules < BaseRules
       # visa exposure
       # TODO: question?
       result['visa_exposure'] = (f['fields'].select{|f| f[:_text] == 'visa exposure'}.first || {})[:_value]
-      
-      # new ceo/cto
-       
-      ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceo or cto'}.first || {})[:_value]
-      result['new_ceo_cto'] = if ceo_cto_value == 'ceo'
-          'ceo'
-        elsif ceo_cto_value == 'cto'
-          'cto'
-        elsif ceo_cto_value.nil?
-          nil # unknown
-        end
-
-
     end
         
     # when scorecard was completed
@@ -331,9 +319,9 @@ class Rules < BaseRules
       app_review_industry: nil,
       app_review_technology: nil,
       app_review_ceo_cto: nil,
+      app_review_ceo_cto_both: nil,
       app_review_completed_at: nil,
       app_review_completed_by: nil,
-      app_review_both_ceo_cto: nil,
       
       has_phone_screen: false,
       phone_screen_rating: nil,
@@ -397,9 +385,9 @@ class Rules < BaseRules
         result[:app_review_industry] = f['industry']
         result[:app_review_technology] = f['technology']
         result[:app_review_ceo_cto] = f['ceo_cto']
+        result[:app_review_ceo_cto_both] = f['ceo_cto_both']
         result[:app_review_completed_at] = f['submitted_at']
         result[:app_review_completed_by] = f['submitted_by']
-        result[:app_review_both_ceo_cto] = f['both_ceo_cto']
         
       when 'phone_screen'
         result[:has_phone_screen] = true
@@ -431,8 +419,8 @@ class Rules < BaseRules
         result[:debrief_visa_exposure] = f['visa_exposure']
         result[:debrief_rating] = f['rating']
         result[:debrief_completed_at] = f['submitted_at']
-        result[:debrief_ceo_cto] = f['new_ceo_cto']
-        result[:debrief_both_ceo_cto] = f['both_ceo_cto']
+        result[:debrief_ceo_cto] = f['ceo_cto']
+        result[:debrief_ceo_cto_both] = f['ceo_cto_both']
       end
     }
     
@@ -481,7 +469,7 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_software_hardware, :software_hardware, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_talker_doer, :talker_doer, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto, :ceo_cto, :has_app_review)
-    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_both_ceo_cto, :both_ceo_cto, :has_app_review)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto_both, :ceo_cto_both, :has_app_review)
     
     apply_feedback_tag(TAG_FROM_PHONE_SCREEN, :phone_screen_rating, :rating, :has_phone_screen)
 
@@ -491,8 +479,8 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_talker_doer, :talker_doer, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_healthcare, :healthcare, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_visa_exposure, :visa_exposure, :has_debrief)
-    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_ceo_cto, :new_ceo_cto, :has_debrief)
-    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_both_ceo_cto, :both_ceo_cto, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_ceo_cto, :ceo_cto, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_ceo_cto_both, :ceo_cto_both, :has_debrief)
 
     apply_feedback_tag(TAG_FROM_ABILITY_INTERVIEW, :ability_rating, :rating, :has_ability)
     apply_feedback_tag(TAG_FROM_F2F, :f2f_ceo_cto, :ceo_cto, :has_ability)
