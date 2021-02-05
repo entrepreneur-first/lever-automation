@@ -3,9 +3,9 @@
 COHORT_JOBS = [
   # next cohort postings
   # .. include tag: <location> to auto-assign based on tags
-  {posting_id: 'b65f18c3-27f3-4812-92af-b0f66a5694b8', cohort: 'BA5',  tag: 'bangalore'},
+  {posting_id: 'ce63e00d-93aa-493b-ae97-691a3a6639b9', cohort: 'BA6',  tag: 'bangalore'},
   {posting_id: '9d662b61-de96-40c0-bb81-89d3f84ef1b2', cohort: 'LD16', tag: 'london'},
-  {posting_id: 'fc7a7137-4433-4522-9c51-61bc8fde864f', cohort: 'SG9',  tag: 'singapore'},
+  {posting_id: '09f026d5-746e-4f0f-9d7c-f45bae0e8bad', cohort: 'SG10',  tag: 'singapore'},
   {posting_id: '6fe2ce13-2296-4acd-8b1e-2e5b4a14c58c', cohort: 'PA6',  tag: 'paris'},
   {posting_id: '394f29ca-7054-4e57-bc64-54886ce98eb2', cohort: 'BE7',  tag: 'berlin'},
   {posting_id: '4a924c27-5737-48fe-8d45-48a1163745c0', cohort: 'TO2',  tag: 'toronto'},
@@ -13,6 +13,7 @@ COHORT_JOBS = [
   # previous cohort postings
   {posting_id: 'd924991a-614a-4cde-ab4e-600a5fce2af4', cohort: 'BA4'}, # Bangalore Pool
   {posting_id: '23bf8c07-b32e-483f-9007-1b9c2a004eb6', cohort: 'BA4'},
+  {posting_id: 'b65f18c3-27f3-4812-92af-b0f66a5694b8', cohort: 'BA5'},
   {posting_id: '46ac9eaf-31d1-4b41-8b2b-1d43014aacc0', cohort: 'BE5'},
   {posting_id: 'b9c2b6b8-3d82-4c45-9b06-b549d223b017', cohort: 'BE6'},
   {posting_id: 'ee0ed9ee-7148-4967-a402-e6962e4c6bc1', cohort: 'BE5'}, # Berlin Pool
@@ -23,14 +24,13 @@ COHORT_JOBS = [
   {posting_id: 'e57c60e3-f129-4088-9c7f-1e9ea270fbf6', cohort: 'PA4'}, # Paris Pool
   {posting_id: 'f7a6dd4e-9f3a-4633-b676-15abe9165025', cohort: 'SG8'}, # Singapore Pool
   {posting_id: '3b2c714a-edee-4fd0-974d-413bae32c818', cohort: 'SG8'},
+  {posting_id: 'fc7a7137-4433-4522-9c51-61bc8fde864f', cohort: 'SG9'},
   {posting_id: 'df1e30e5-c08d-47bd-bd43-8f3eaf96163e', cohort: 'TO1'}, # Toronto Pool
   {posting_id: 'e23deb1a-c0ab-43b8-9a3a-e47e3cca0970', cohort: 'PA5'},
   {posting_id: 'faeae4e5-6529-4f95-b705-3f9974bb682c', cohort: 'PA7'},
   {posting_id: '3eaed985-8d2e-4a88-b6bb-a1295cb57373', cohort: 'PA8'}, 
   {posting_id: '210435bd-7ff7-4ced-a3e8-dbeed1c19f08', cohort: 'PA9'},
   {posting_id: '0b785d4c-3a6e-4597-829e-fcafb06cae2b', cohort: 'TO1'},
-
-
 ]
 
 COHORT_JOB_TAG = 'EF Cohort'
@@ -44,6 +44,17 @@ COFFEE_FEEDBACK_FORM = '14598edb-390d-41e7-999c-fd56c3c4fe65'
 
 OFFER_STAGES = ["offer", "b2422e70-d9d5-4c49-ade5-c007bc094265"]
 OFFER_ACCEPTED_STAGES = ["87f72880-e6b5-455e-9c8f-acee90bb9c92"]
+APP_REVIEW_STAGES = ["76b1d300-3e5c-467c-a6cf-7d55b8073a34"]
+PHONE_SCREEN_STAGES = ["7b592951-1bc2-4c1b-b465-ac695d17f9fc"]
+INVITE_TO_INTERVIEW_STAGES = ["98753039-272d-4603-9458-18438e5d1c4c"]
+INTERVIEW_STAGES = ["2254992f-c3c4-450f-a453-af7d4023b333"]
+EXERCISE_STAGES = ["69c0875c-f2c4-4ec2-9f84-5172568ecbfb"]
+SECOND_INTERVIEW_STAGES = ["6060bde0-d3ea-4653-84a2-8cb7611ea664"]
+ONSITE_INTERVIEW_STAGES = ["39acc5f6-25ec-41cb-a1fd-bc39f4180913"]
+FINAL_INTERVIEW_STAGES = ["33223437-984a-48de-8572-58447b2fb070"]
+TO_ARCHIVE_STAGES = ["0db63e4b-7448-49fb-864d-ed2a2bae9648"]
+STARTED_COHORT_STAGES = ["3e082916-13bd-493b-a97d-d25fabdc783b"]
+
 
 # AUTO_.. prefixes are used for auto-added attributes relating to the candidate data 
 # BOT_.. prefixes are used for auto-added attributed used by our bot
@@ -67,6 +78,21 @@ TAG_DUPLICATE_ARCHIVED = AUTO_TAG_PREFIX + 'Archived duplicate'
 TAG_DUPLICATE_PREFIX = AUTO_TAG_PREFIX + "Duplicate: "
 TAG_ORIGINAL_PREFIX = AUTO_TAG_PREFIX + '[Original] '
 TAG_HISTORIC_PREFIX = AUTO_TAG_PREFIX + '[Historic] '
+
+CARRIED_FORWARD_TAG_PREFIX = '↪️ '
+CARRY_FORWARD_TAGS = [
+  /^dm-/,     # tags starting dm- for Digital Marketing
+  /^li-/,     # tags starting li- for LinkedIn
+  /-li-/,     # tags containing -li- for LinkedIn
+  /[a-zA-Z]{2}[0-9]+-/,   # tags starting with a cohort code e.g. sg9-
+  /[a-zA-Z]{2}[0-9]+$/,   # tags of cohort code e.g. "SG9"
+  /^lead score:/i,
+  /[0-9]+sourced/i,
+
+  # legacy tags carried forward from old but not expected to be added to new opportunities
+  /^linkedin lead gen/i,
+  /^\(\d+\) / # tags starting "(x) " where x is a number
+]
 
 # ~6 months
 ORIGINAL_TIMEOUT = 15552000000

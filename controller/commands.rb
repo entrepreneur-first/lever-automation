@@ -50,7 +50,7 @@ module Controller_Commands
     log.log(JSON.pretty_generate(untagable))
   end
 
-  def process_opportunities(archived=false, test_mode=false)
+  def process_opportunities(archived=false, test_mode=false, posting_ids=nil)
     reset
     
     summary = Hash.new(0)
@@ -62,10 +62,10 @@ module Controller_Commands
     
     log_opp_type = archived ? 'archived ' : (archived.nil? ? '' : 'active ')
 
-    log.log("#{test_mode ? '[Test mode - no changes applied] ' : ''}Processing all #{log_opp_type}opportunities..")
+    log.log("#{test_mode ? '[Test mode - no changes applied] ' : ''}Processing all #{log_opp_type}opportunities#{posting_ids ? ' for ' + posting_ids.length.to_s + ' current postings': ''}..")
     log_index = 0
 
-    client.process_paged_result(OPPORTUNITIES_URL, {archived: archived, expand: client.OPP_EXPAND_VALUES}, "#{log_opp_type}opportunities") { |opp|
+    client.process_paged_result(OPPORTUNITIES_URL, {archived: archived, posting_id: posting_ids, expand: client.OPP_EXPAND_VALUES}, "#{log_opp_type}opportunities") { |opp|
     
       contacts[opp['contact']] += 1
       summary[:opportunities] += 1

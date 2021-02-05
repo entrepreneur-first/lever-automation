@@ -14,7 +14,18 @@ class Util
         overall_source: overall_source_from_opp(opp),
         original_links: actual_links(opp),
         offered_at: (find_stage_changes(opp, OFFER_STAGES).first || {})['updatedAt'],
-        offer_accepted_at: (find_stage_changes(opp, OFFER_ACCEPTED_STAGES).first || {})['updatedAt']
+        offer_accepted_at: (find_stage_changes(opp, OFFER_ACCEPTED_STAGES).first || {})['updatedAt'],
+        app_review_stage_at:(find_stage_changes(opp, APP_REVIEW_STAGES).first || {})['updatedAt'],
+        phone_screen_stage_at:(find_stage_changes(opp, PHONE_SCREEN_STAGES).first || {})['updatedAt'],
+        invite_to_interview_stage_at:(find_stage_changes(opp, INVITE_TO_INTERVIEW_STAGES).first || {})['updatedAt'],
+        interview_stage_at:(find_stage_changes(opp, INTERVIEW_STAGES).first || {})['updatedAt'],
+        exercise_stage_at:(find_stage_changes(opp, EXERCISE_STAGES).first || {})['updatedAt'],
+        second_interview_stage_at:(find_stage_changes(opp, SECOND_INTERVIEW_STAGES).first || {})['updatedAt'],
+        onsite_interview_stage_at:(find_stage_changes(opp, ONSITE_INTERVIEW_STAGES).first || {})['updatedAt'],
+        final_interview_stage_at:(find_stage_changes(opp, FINAL_INTERVIEW_STAGES).first || {})['updatedAt'],
+        to_archive_stage_at:(find_stage_changes(opp, TO_ARCHIVE_STAGES).first || {})['updatedAt'],
+        started_cohort_stage_at:(find_stage_changes(opp, STARTED_COHORT_STAGES).first || {})['updatedAt']
+
       }))
   end
   
@@ -80,6 +91,10 @@ class Util
   
   def self.posting_data(posting_id)
     COHORT_JOBS.select { |posting| posting[:posting_id] == posting_id }.first
+  end
+
+  def self.current_cohorts
+    COHORT_JOBS.select { |posting| posting.has_key?(:tag) }
   end
   
   def self.posting_cohort(posting_id)
@@ -172,8 +187,8 @@ class Util
     Time.at((t/1000.0).ceil).utc.to_s
   end
 
-  def self.simplify_str(str)
-    str.downcase.gsub(/[^a-z0-9\-\/\s]/, '').gsub(/\s+/, ' ').strip
+  def self.simplify_str(str, also_allow_pattern='')
+    str.downcase.gsub(/[^a-z0-9\-\/\s#{Regexp.quote(also_allow_pattern.to_s)}]/, '').gsub(/\s+/, ' ').strip
   end
   
   def self.log_if_api_error(log, result)

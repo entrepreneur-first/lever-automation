@@ -20,6 +20,9 @@ TAG_FROM_ABILITY_INTERVIEW = AUTO_TAG_PREFIX + 'Ability: '
 TAG_FROM_BEHAVIOUR_INTERVIEW = AUTO_TAG_PREFIX + 'Behaviour: '
 TAG_FROM_DEBRIEF = AUTO_TAG_PREFIX + 'Debrief: '
 
+SCORECARD_FIELD_PREFIX = 'scorecard:'
+APP_SCORECARD_FIELD_PREFIX = 'app_scorecard:'
+
 class Rules < BaseRules
 
   # list of tags for each category, so we can remove when updating with new values
@@ -100,7 +103,11 @@ class Rules < BaseRules
         no: 'Not Healthcare',
         error: '<healthcare unknown>'
       },
-      
+      potential_credible: {
+        potential: 'Potential',
+        credible: 'Credible',
+        error: '<potential/credible unknown>'
+      },      
       duplicate_opps: {
         general: 'General opportunity',
         single: 'Single posting',
@@ -144,7 +151,7 @@ class Rules < BaseRules
         'pre_coffee_screen'
       elsif type.include?('phone screen') # excludes 'sy stream phone screen' above
         'phone_screen'
-      elsif type.include?('app review')
+      elsif type.include?('app review') || type.include?('reviewly')
         'app_review'
       elsif type.include?('interview debrief')
         'debrief'
@@ -160,7 +167,9 @@ class Rules < BaseRules
     # always one field of type 'score-system' for overall feedback rating
     result['rating'] = (f['fields'].select{|f| f['type'] == 'score-system'}.first || {})[:_value]
     # for imported feedback forms where all fields are strings, fall back to field name
-    result['rating'] ||= (f['fields'].select{|f| f[:_text] == 'rating'}.first || {})[:_value].to_s
+    result['rating'] ||= (f['fields'].select{|f| f[:_text] == 'rating'}.first || {})[:_value]
+    result['rating'] ||= (f['fields'].select{|f| f[:_text].include?('overallrating')}.first || {})[:_value]
+    result['rating'] = result['rating'].to_s
     result['rating'] = case result['rating']
       when '1'
         '1 - Strong No Hire'
@@ -243,7 +252,7 @@ class Rules < BaseRules
       # industry
       # TODO: question?
       result['technology'] = (f['fields'].select{|f| f[:_text] == 'technology'}.first || {})[:_value]
-      
+
       # ceo_cto_both
       cxo_both_value = (f['fields'].select{|f| f[:_text].include?('can this person potentially be both')}.first || {})[:_value]
       result['ceo_cto_both'] = if cxo_both_value == 'yes'
@@ -253,6 +262,9 @@ class Rules < BaseRules
         else
           nil # unknown
         end
+        
+      # potential/credible
+      result['potential_credible'] = (f['fields'].select{|f| f[:_text].include?('potential or credible') || f[:_text].include?('potentialcredible')}.first || {})[:_value]
     end    
     
     if ['pre_coffee_screen', 'coffee', 'app_review', 'debrief'].include?(result['type'])
@@ -274,7 +286,22 @@ class Rules < BaseRules
       # TODO: question?
       result['visa_exposure'] = (f['fields'].select{|f| f[:_text] == 'visa exposure'}.first || {})[:_value]
     end
-        
+    
+    # scorecard style ratings
+    if ['app_review', 'ability_interview', 'behaviour_interview'].include?(result['type'])
+      prefix = result['type'] == 'app_review' ? APP_SCORECARD_FIELD_PREFIX : SCORECARD_FIELD_PREFIX
+      # individual score questions
+      f['fields'].select { |f| f['type'] == 'score' }.each { |f| 
+        result[prefix + Util.simplify_str(f['text'], ':')[0,50]] = f['value']
+      }
+      # multiple-line scorecard questions
+      f['fields'].select { |f| f['type'] == 'scorecard' }.each { |f|
+        f['scores'].each_index { |i|
+          result[prefix + Util.simplify_str(f['scores'][i]['text'], ':')[0,50]] = f['value'][i]['score']
+        }
+      }
+    end
+    
     # when scorecard was completed
     result['submitted_at'] = f['completedAt']
     # scorecard submitted by
@@ -320,8 +347,10 @@ class Rules < BaseRules
       app_review_technology: nil,
       app_review_ceo_cto: nil,
       app_review_ceo_cto_both: nil,
+      app_review_potential_credible: nil,
       app_review_completed_at: nil,
       app_review_completed_by: nil,
+      app_review_scorecard: {},
       
       has_phone_screen: false,
       phone_screen_rating: nil,
@@ -339,6 +368,8 @@ class Rules < BaseRules
       behaviour_completed_at: nil,
       behaviour_completed_by: nil,
       
+      interview_scorecard: {},
+      
       has_debrief: false,
       debrief_rating: nil,
       debrief_completed_at: nil,
@@ -350,7 +381,8 @@ class Rules < BaseRules
       debrief_healthcare: nil,
       debrief_visa_exposure: nil,
       debrief_ceo_cto: nil,
-      debrief_both_ceo_cto: nil
+      debrief_both_ceo_cto: nil,
+      debrief_potential_credible: nil
     }
     
     summaries.sort_by{|f| f['submitted_at'] || ''}.each {|f|
@@ -386,8 +418,10 @@ class Rules < BaseRules
         result[:app_review_technology] = f['technology']
         result[:app_review_ceo_cto] = f['ceo_cto']
         result[:app_review_ceo_cto_both] = f['ceo_cto_both']
+        result[:app_review_potential_credible] = f['potential_credible']
         result[:app_review_completed_at] = f['submitted_at']
         result[:app_review_completed_by] = f['submitted_by']
+        result[:app_review_scorecard].merge!(f.select { |k, v| k.start_with?(APP_SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(APP_SCORECARD_FIELD_PREFIX) })
         
       when 'phone_screen'
         result[:has_phone_screen] = true
@@ -401,12 +435,14 @@ class Rules < BaseRules
         result[:f2f_ceo_cto] = f['ceo_cto']
         result[:ability_completed_at] = f['submitted_at']
         result[:ability_completed_by] = f['submitted_by']
+        result[:interview_scorecard].merge!(f.select { |k, v| k.start_with?(SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(SCORECARD_FIELD_PREFIX) })
         
       when 'behaviour_interview'
         result[:has_behaviour] = true
         result[:behaviour_rating] = f['rating']
         result[:behaviour_completed_at] = f['submitted_at']
         result[:behaviour_completed_by] = f['submitted_by']
+        result[:interview_scorecard].merge!(f.select { |k, v| k.start_with?(SCORECARD_FIELD_PREFIX) }.transform_keys { |k| k.delete_prefix(SCORECARD_FIELD_PREFIX) })
         
       when 'debrief'
         result[:has_debrief] = true
@@ -418,6 +454,7 @@ class Rules < BaseRules
         result[:debrief_healthcare] = f['healthcare']
         result[:debrief_visa_exposure] = f['visa_exposure']
         result[:debrief_rating] = f['rating']
+        result[:debrief_potential_credible] = f['potential_credible']
         result[:debrief_completed_at] = f['submitted_at']
         result[:debrief_ceo_cto] = f['ceo_cto']
         result[:debrief_ceo_cto_both] = f['ceo_cto_both']
@@ -470,6 +507,7 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_talker_doer, :talker_doer, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto, :ceo_cto, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto_both, :ceo_cto_both, :has_app_review)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_potential_credible, :potential_credible, :has_app_review)
     
     apply_feedback_tag(TAG_FROM_PHONE_SCREEN, :phone_screen_rating, :rating, :has_phone_screen)
 
@@ -481,6 +519,7 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_visa_exposure, :visa_exposure, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_ceo_cto, :ceo_cto, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_ceo_cto_both, :ceo_cto_both, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_potential_credible, :potential_credible, :has_debrief)
 
     apply_feedback_tag(TAG_FROM_ABILITY_INTERVIEW, :ability_rating, :rating, :has_ability)
     apply_feedback_tag(TAG_FROM_F2F, :f2f_ceo_cto, :ceo_cto, :has_ability)

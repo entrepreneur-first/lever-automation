@@ -33,7 +33,7 @@ module Controller_ProcessUpdates
       prepare_app_responses(opp)
       add_links(opp)
       summarise_feedbacks(opp)
-      result.merge(detect_duplicates(opp, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
+      result.merge!(detect_duplicates(opp, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       rules.do_update_tags(opp)
 
       [tags_have_changed?(opp), links_have_changed?(opp)].each{ |update|
@@ -60,8 +60,8 @@ module Controller_ProcessUpdates
     end
 
     if test_mode
-      result[opp['id']]['_addTags'] = opp['_addTags']
-      result[opp['id']]['_removeTags'] = opp['_removeTags']
+      result[opp['id']]['_addTags'] = opp['_addTags'].to_a + result[opp['id']]['_addTags'].to_a
+      result[opp['id']]['_removeTags'] = opp['_removeTags'].to_a + result[opp['id']]['_removeTags'].to_a
     end
 
     if client.commit_opp(opp, test_mode)
@@ -423,11 +423,14 @@ module Controller_ProcessUpdates
       o['createdAt']
     }
     
+    # TODO: opps can sometimes be empty & will cause fatal below
+    # - should not happen, unknown why - API error?
+    
     previous_source = {
       :source => (Util.overall_source_from_opp(opps.first) || '').delete_prefix(AUTO_TAG_PREFIX),
       :createdAt => opps.first['createdAt']
     }
-    latest_opp_id = opps.last['id']
+    # latest_opp_id = opps.last['id']
     
     # see what type(s) of duplicates we have - multiple postings? etc.
     latest_opp_by_cohort = {}
@@ -448,9 +451,29 @@ module Controller_ProcessUpdates
     latest_opps_per_cohort = latest_opp_by_cohort.values
     
     # ensure we've processed all opportunities for this candidate in order of creation
+    carry_forward_tags = {}
     opps.each { |o|
+
+      # apply tags that we wish to carry forward; remove previously-carried-forward tags we no longer want
+      o['tags'].each { |tag|
+        client.remove_tag(o, tag) if tag.start_with?(CARRIED_FORWARD_TAG_PREFIX) && !carry_forward_tags.key?(tag.delete_prefix(CARRIED_FORWARD_TAG_PREFIX))
+      }
+      client.add_tags_if_unset(o, carry_forward_tags.keys.map { |tag| CARRIED_FORWARD_TAG_PREFIX + tag })
+    
+      # collect tags that we wish to carry forward
+      _tags = o['tags'].reject { |tag| tag.start_with?(CARRIED_FORWARD_TAG_PREFIX) }
+      CARRY_FORWARD_TAGS.each { |pattern|
+        if pattern.respond_to?(:match)
+          _tags.each { |tag|
+            carry_forward_tags[tag] = true if pattern.match?(tag)
+          }
+        else
+          carry_forward_tags[pattern] = true if _tags.include?(pattern)
+        end
+      }
+    
       unless @opps_processed.has_key?(o['id'])
-        result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
+        result.merge!(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
 
       process_again = false
@@ -486,13 +509,18 @@ module Controller_ProcessUpdates
       # apply tag indicating specific type of dupes to all affected opps
       rules.apply_single_tag(TAG_DUPLICATE_PREFIX, {tag: duplicate_type}, rules.tags(:duplicate_opps), o)
 
+      if test_mode
+        result[o['id']]['_addTags'] = o['_addTags'].to_a + result[o['id']]['_addTags'].to_a
+        result[o['id']]['_removeTags'] = o['_removeTags'].to_a + result[o['id']]['_removeTags'].to_a
+      end
+
       if client.commit_opp(o, test_mode)
         result[o['id']]['updated'] = true
         process_again = true
       end
       
       if process_again
-        result.merge(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
+        result.merge!(process_opportunity(o, test_mode)) { |key, oldval, newval| oldval.merge(newval) }
       end
     }
 

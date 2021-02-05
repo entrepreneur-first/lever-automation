@@ -91,6 +91,9 @@ class Router
     'process_archived': -> {
       @controller.process_opportunities(true)
     },
+    'process_active': -> {
+      @controller.process_opportunities(false)
+    },
     
     # views
     'summarise': -> {
