@@ -88,6 +88,11 @@ class Rules < BaseRules
         cto: 'CTO',
         error: '<ceo/cto unknown>'
       },
+      ceo_cto_both: {
+        both: 'CEO/CTO: Both',
+        not_both: 'CEO/CTO: One',
+        error: '<ceo/cto-both unknown>'
+      },
       visa_exposure: {
         yes: 'Visa Exposure',
         no: 'No Visa Exposure',
@@ -228,6 +233,12 @@ class Rules < BaseRules
           'unknown'
         end
     end
+
+    if result['type'] == 'debrief'
+      # debrief ceo/cto
+      ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceo or cto'}.first || {})[:_value]
+      result['ceo_cto'] = ['ceo', 'cto'].include?(ceo_cto_value) ? ceo_cto_value : nil
+    end      
     
     if ['app_review', 'debrief'].include?(result['type'])
       # talker/doer
@@ -241,6 +252,16 @@ class Rules < BaseRules
       # industry
       # TODO: question?
       result['technology'] = (f['fields'].select{|f| f[:_text] == 'technology'}.first || {})[:_value]
+
+      # ceo_cto_both
+      cxo_both_value = (f['fields'].select{|f| f[:_text].include?('can this person potentially be both')}.first || {})[:_value]
+      result['ceo_cto_both'] = if cxo_both_value == 'yes'
+          'both' ##
+        elsif cxo_both_value == 'no'
+          'not_both' ##
+        else
+          nil # unknown
+        end
         
       # potential/credible
       result['potential_credible'] = (f['fields'].select{|f| f[:_text].include?('potential or credible') || f[:_text].include?('potentialcredible')}.first || {})[:_value]
@@ -325,6 +346,7 @@ class Rules < BaseRules
       app_review_industry: nil,
       app_review_technology: nil,
       app_review_ceo_cto: nil,
+      app_review_ceo_cto_both: nil,
       app_review_potential_credible: nil,
       app_review_completed_at: nil,
       app_review_completed_by: nil,
@@ -358,6 +380,8 @@ class Rules < BaseRules
       debrief_technology: nil,
       debrief_healthcare: nil,
       debrief_visa_exposure: nil,
+      debrief_ceo_cto: nil,
+      debrief_ceo_cto_both: nil,
       debrief_potential_credible: nil
     }
     
@@ -393,6 +417,7 @@ class Rules < BaseRules
         result[:app_review_industry] = f['industry']
         result[:app_review_technology] = f['technology']
         result[:app_review_ceo_cto] = f['ceo_cto']
+        result[:app_review_ceo_cto_both] = f['ceo_cto_both']
         result[:app_review_potential_credible] = f['potential_credible']
         result[:app_review_completed_at] = f['submitted_at']
         result[:app_review_completed_by] = f['submitted_by']
@@ -431,6 +456,8 @@ class Rules < BaseRules
         result[:debrief_rating] = f['rating']
         result[:debrief_potential_credible] = f['potential_credible']
         result[:debrief_completed_at] = f['submitted_at']
+        result[:debrief_ceo_cto] = f['ceo_cto']
+        result[:debrief_ceo_cto_both] = f['ceo_cto_both']
       end
     }
     
@@ -479,6 +506,7 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_software_hardware, :software_hardware, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_talker_doer, :talker_doer, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto, :ceo_cto, :has_app_review)
+    apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_ceo_cto_both, :ceo_cto_both, :has_app_review)
     apply_feedback_tag(TAG_FROM_APP_REVIEW, :app_review_potential_credible, :potential_credible, :has_app_review)
     
     apply_feedback_tag(TAG_FROM_PHONE_SCREEN, :phone_screen_rating, :rating, :has_phone_screen)
@@ -489,6 +517,8 @@ class Rules < BaseRules
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_talker_doer, :talker_doer, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_healthcare, :healthcare, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_visa_exposure, :visa_exposure, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_ceo_cto, :ceo_cto, :has_debrief)
+    apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_ceo_cto_both, :ceo_cto_both, :has_debrief)
     apply_feedback_tag(TAG_FROM_DEBRIEF, :debrief_potential_credible, :potential_credible, :has_debrief)
 
     apply_feedback_tag(TAG_FROM_ABILITY_INTERVIEW, :ability_rating, :rating, :has_ability)
