@@ -4,10 +4,10 @@ COHORT_JOBS = [
   # next cohort postings
   # .. include tag: <location> to auto-assign based on tags
   {posting_id: 'ce63e00d-93aa-493b-ae97-691a3a6639b9', cohort: 'BA6',  tag: 'bangalore'},
-  {posting_id: '9d662b61-de96-40c0-bb81-89d3f84ef1b2', cohort: 'LD16', tag: 'london'},
+  {posting_id: 'ea01837d-2997-436b-9940-558e940247c4', cohort: 'LD17', tag: 'london'},
   {posting_id: '09f026d5-746e-4f0f-9d7c-f45bae0e8bad', cohort: 'SG10',  tag: 'singapore'},
-  {posting_id: '6fe2ce13-2296-4acd-8b1e-2e5b4a14c58c', cohort: 'PA6',  tag: 'paris'},
-  {posting_id: '394f29ca-7054-4e57-bc64-54886ce98eb2', cohort: 'BE7',  tag: 'berlin'},
+  {posting_id: 'faeae4e5-6529-4f95-b705-3f9974bb682c', cohort: 'PA7',  tag: 'paris'},
+  {posting_id: 'ef80d34d-c87c-45fd-b48d-9f17154454ae', cohort: 'BE8',  tag: 'berlin'},
   {posting_id: '4a924c27-5737-48fe-8d45-48a1163745c0', cohort: 'TO2',  tag: 'toronto'},
 
   # previous cohort postings
@@ -16,9 +16,11 @@ COHORT_JOBS = [
   {posting_id: 'b65f18c3-27f3-4812-92af-b0f66a5694b8', cohort: 'BA5'},
   {posting_id: '46ac9eaf-31d1-4b41-8b2b-1d43014aacc0', cohort: 'BE5'},
   {posting_id: 'b9c2b6b8-3d82-4c45-9b06-b549d223b017', cohort: 'BE6'},
+  {posting_id: '394f29ca-7054-4e57-bc64-54886ce98eb2', cohort: 'BE7'},
   {posting_id: 'ee0ed9ee-7148-4967-a402-e6962e4c6bc1', cohort: 'BE5'}, # Berlin Pool
   {posting_id: 'b88a4eba-bbb4-492e-a77a-f36c1328d9dd', cohort: 'LD14'},
   {posting_id: 'c404cfc6-0621-4fce-9e76-5d908e36fd9c', cohort: 'LD15'},
+  {posting_id: '9d662b61-de96-40c0-bb81-89d3f84ef1b2', cohort: 'LD16'},
   {posting_id: 'ad446668-5642-4b1f-b027-7798a7472db7', cohort: 'LD14'}, # London Pool
   {posting_id: 'c88fa46b-b06c-47e3-81d6-4e63078fd509', cohort: 'PA4'},
   {posting_id: 'e57c60e3-f129-4088-9c7f-1e9ea270fbf6', cohort: 'PA4'}, # Paris Pool
@@ -27,6 +29,7 @@ COHORT_JOBS = [
   {posting_id: 'fc7a7137-4433-4522-9c51-61bc8fde864f', cohort: 'SG9'},
   {posting_id: 'df1e30e5-c08d-47bd-bd43-8f3eaf96163e', cohort: 'TO1'}, # Toronto Pool
   {posting_id: 'e23deb1a-c0ab-43b8-9a3a-e47e3cca0970', cohort: 'PA5'},
+  {posting_id: '6fe2ce13-2296-4acd-8b1e-2e5b4a14c58c', cohort: 'PA6'},
   {posting_id: 'faeae4e5-6529-4f95-b705-3f9974bb682c', cohort: 'PA7'},
   {posting_id: '3eaed985-8d2e-4a88-b6bb-a1295cb57373', cohort: 'PA8'}, 
   {posting_id: '210435bd-7ff7-4ced-a3e8-dbeed1c19f08', cohort: 'PA9'},
