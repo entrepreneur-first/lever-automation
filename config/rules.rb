@@ -243,7 +243,7 @@ class Rules < BaseRules
 
     if result['type'] == 'app_review'
       # reviewly app review ceo/cto
-      ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceo_cto'}.first || {})[:_value]
+      ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceocto'}.first || {})[:_value]
       result['ceo_cto'] = ['ceo', 'cto'].include?(ceo_cto_value) ? ceo_cto_value : result['ceo_cto']
     end 
     
