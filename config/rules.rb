@@ -239,6 +239,13 @@ class Rules < BaseRules
       ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceo or cto'}.first || {})[:_value]
       result['ceo_cto'] = ['ceo', 'cto'].include?(ceo_cto_value) ? ceo_cto_value : nil
     end      
+
+
+    if type.include?('reviewly') && result['type'] == 'app_review'
+      # reviewly app review ceo/cto
+      ceo_cto_value = (f['fields'].select{|f| f[:_text] == 'ceo_cto'}.first || {})[:_value]
+      result['ceo_cto'] = ['ceo', 'cto'].include?(ceo_cto_value) ? ceo_cto_value : nil
+    end 
     
     if ['app_review', 'debrief'].include?(result['type'])
       # talker/doer
